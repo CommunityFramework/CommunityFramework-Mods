@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 public class Players
 {
@@ -74,5 +76,25 @@ public class Players
 
         GameEventManager.Current.HandleAction(gameevent, null, player, false, "");
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageGameEventResponse>().Setup(gameevent, _cInfo.entityId, "", "", NetPackageGameEventResponse.ResponseTypes.Approved));
+    }
+    public static void CloseAllOpenWindows(ClientInfo _cInfo)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageCloseAllWindows>().Setup(_cInfo.entityId));
+    }
+    public static void ShowToolbeltMessage(ClientInfo _cInfo, string _toolbeltMessage)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageShowToolbeltMessage>().Setup(_toolbeltMessage, ""));
+    }
+    public static void ShowToolbeltMessageWithSound(ClientInfo _cInfo, string _toolbeltMessage, string _sound)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageShowToolbeltMessage>().Setup(_toolbeltMessage, _sound));
+    }
+    public static void PlaySound(ClientInfo _cInfo, string _sound)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageShowToolbeltMessage>().Setup("", _sound));
+    }
+    public static void OpenUrl(ClientInfo _cInfo, string websiteURL)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("createwebuser " + Convert.ToBase64String(Encoding.UTF8.GetBytes(websiteURL)), true));
     }
 }
