@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xml>
+	<Name value="Community Framework" />
+	<DisplayName value="Community Framework" />
+	<Description value="This modding framework consists of libraries designed to support other mods. It provides essential tools and resources for modders." />
+	<Author value="Zipcore" />
+	<Version value="1.0.0" />
+	<Website value="https://github.com/CommunityFramework" />
+</xml>
