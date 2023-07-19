@@ -66,7 +66,7 @@ namespace CF_Firewall
             module.AddSetting("IPhub_Token", "", "", "API token obtained from iphub.info", out ipHubToken);
             module.AddSetting("IPhub_Recheck", 72, 0, 99999, "Hours before rechecking an IP address.", out ipHubRecheck);
             module.AddSetting("IPhub_AsnAllow", "11414,20347,30781,38195,47104:51355,57246,396919,49902,56465,57248,57269,57536,57587,57608,57910,136557,137226", "", "ASN whitelist (separated by ',')", out ipHubAsnListA);
-            module.AddSetting("IPhub_AsnBlock", "174,1299,4229,4804,8797,9335,13442,16509,21859,21880,24955,29076,29752,38195,38854,45090,47104:51355,55990,56320:58367,61952:62463,62610,63199,134557:139577,139625,141039,141167,141180,140602:141625,146834,147049,205119,206026,213250", "", "ASN blacklist (separated by ',')", out ipHubAsnListB);
+            module.AddSetting("IPhub_AsnBlock", "174,1299,4229,9335,13442,16509,21859,21880,29752,38195,38854,45090,55990,62610,139625,141039,141167,141180,146834,147049,205119", "", "ASN blacklist (separated by ',')", out ipHubAsnListB);
             module.AddSetting("IPhub_VpnBanMode", 1, -1, 2, "-1: Disable, 0: Kick, 1: Ban", out ipHubVpnMode);
             module.AddSetting("IPhub_VpnSensitivity", 1, 0, 1, "0: Balanced, 1: Agressive (contains more false positives)", out ipHubVpnSensitivity);
             module.AddSetting("IPhub_CountryMode", 1, -1, 2, "-1: Disable, 0: Kick, 1: Ban", out ipHubCountryMode);
