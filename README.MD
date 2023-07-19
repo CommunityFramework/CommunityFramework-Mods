@@ -6,13 +6,13 @@ Compatible with __EAC enabled__.
 ## Features
 
 The Community Framework (CF) is __divided into modules__, each offering specific features. 
-For detailed information about features provided by each module please check our [__wiki__](LICENSE).
+For detailed information about features provided by each module please check our [__wiki__](https://github.com/CommunityFramework/CommunityFramework-Mods/wiki).
 
 ## Contributing
 We welcome contributions to the Community Framework project. If you would like to contribute, please get in touch with us. We appreciate your interest and support!
 
 ## Donations
-If you like this project feel free to support use with a donation here: [paypal.me/zipcore](https://paypal.me/zipcore)
+If you like this project feel free to support us with a donation here: [paypal.me/zipcore](https://paypal.me/zipcore)
 
 ## License
 
