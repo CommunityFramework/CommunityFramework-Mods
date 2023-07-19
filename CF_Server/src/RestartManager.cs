@@ -3,11 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using WorldGenerationEngineFinal;
 using static CF_Server.API;
 
 public class RestartManager
@@ -408,18 +404,9 @@ public class RestartManager
             }
         }
     }
-    public static void CloseAllXui(ClientInfo _cInfo, bool crafting = false, bool backpack = false)
+    public static void CloseAllXui(ClientInfo _cInfo)
     {
-        if (crafting)
-            _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("xui close crafting", true));
-
-        if (backpack)
-            _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("xui close backpack", true));
-
-        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("xui close looting", true));
-        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("xui close trader", true));
-        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("xui close workstation", true));
-        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("xui close vehicleStorage", true));
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageCloseAllWindows>().Setup(_cInfo.entityId));
     }
     public static bool CanOpenLootContainer(ClientInfo _cInfo, TileEntity _te)
     {
