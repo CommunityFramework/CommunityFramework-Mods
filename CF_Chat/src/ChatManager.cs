@@ -22,6 +22,9 @@ public class ChatManager
     {
         try
         {
+            if (cInfo == null)
+                return true;
+
             HandleChatMessage(cInfo, new ChatMessage(type, senderId, msg, mainName, localizeMain, recipientEntityIds));
             return false;
         }
