@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Epic.OnlineServices.Presence;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using static CF_Chat.API;
+using static GameSparks.Api.Responses.ListTeamChatResponse;
 
 public class ChatManager
 {
@@ -48,5 +51,26 @@ public class ChatManager
         chatMessage.Send();
 
         chatMessage.trigger?.callback(cInfo, chatMessage.command, chatMessage.args);
+
+        if (string.IsNullOrEmpty(discordWebhookURL))
+            return;
+
+        if (chatMessage.type != EChatType.Global)
+            return;
+
+        if (discordFilterCmds && (chatMessage.isPublicTrigger || chatMessage.isPrivateTrigger))
+            return;
+
+        string msg = discordMessageTemplate.
+                Replace("{NAME}", cInfo.playerName).
+                Replace("{MSG}", chatMessage.msg);
+
+        if (discordFilterEveryone)
+        {
+            msg.Replace("@everyone", "@ everyone").
+                Replace("@here", "@ here");
+        }
+
+        DiscordWebhook.SendMessage(msg, discordWebhookURL);
     }
 }
