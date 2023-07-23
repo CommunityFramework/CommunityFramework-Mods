@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CF_Server", "CF_Server\CF_S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CF_Firewall", "CF_Firewall\CF_Firewall.csproj", "{72512E46-187D-4420-AAF8-915CA71F1656}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CF_Zones", "CF_Zones\CF_Zones.csproj", "{9EFE1339-8A0A-4DF7-8644-A5C510707C2E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{72512E46-187D-4420-AAF8-915CA71F1656}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{72512E46-187D-4420-AAF8-915CA71F1656}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72512E46-187D-4420-AAF8-915CA71F1656}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EFE1339-8A0A-4DF7-8644-A5C510707C2E}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{9EFE1339-8A0A-4DF7-8644-A5C510707C2E}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{9EFE1339-8A0A-4DF7-8644-A5C510707C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EFE1339-8A0A-4DF7-8644-A5C510707C2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
