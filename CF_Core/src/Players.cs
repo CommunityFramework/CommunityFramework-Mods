@@ -12,7 +12,7 @@ public class Players
     public static ClientInfo GetClient(string _platform, string _platformAuth) => GetClient(PlatformUserIdentifierAbs.FromPlatformAndId(_platform, _platformAuth, false));
     public static ClientInfo GetClient(long _peer) => ConnectionManager.Instance.Clients.ForLiteNetPeer(_peer);
     public static ClientInfo GetClient(string _nameOrId) => ConnectionManager.Instance.Clients.GetForNameOrId(_nameOrId);
-
+    public static List<EntityPlayer> GetPlayers() => new List<EntityPlayer>(GameManager.Instance.World.Players.dict.Values.ToList());
     public static EntityPlayer GetPlayer(ClientInfo _cInfo) => GetPlayer(_cInfo.entityId);
     public static EntityPlayer GetPlayer(int _entityId) => GameManager.Instance.World.Players.dict.ContainsKey(_entityId)? GameManager.Instance.World.Players.dict[_entityId] : null;
 
