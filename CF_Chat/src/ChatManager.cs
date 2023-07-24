@@ -1,9 +1,7 @@
-﻿using Epic.OnlineServices.Presence;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using static CF_Chat.API;
-using static GameSparks.Api.Responses.ListTeamChatResponse;
 
 public class ChatManager
 {
@@ -13,10 +11,10 @@ public class ChatManager
     {
         chatHandlers.Add(_callback);
     }
-    public static void RegisterChatTrigger(string trigger, Action<ClientInfo, string, List<string>> _callback)
+    public static void RegisterChatTrigger(string trigger, Action<ClientInfo, string, List<string>> _callback, int _permission = 1000)
     {
         foreach (string alias in trigger.Split(',').ToList())
-            chatTriggers.Add(alias, new ChatTrigger(alias, _callback));
+            chatTriggers.Add(alias, new ChatTrigger(alias, _callback, _permission));
     }
     public static bool OnChatMessage(ClientInfo cInfo, EChatType type, int senderId, string msg, string mainName, bool localizeMain, List<int> recipientEntityIds)
     {
@@ -53,7 +51,8 @@ public class ChatManager
 
         chatMessage.Send();
 
-        chatMessage.trigger?.callback(cInfo, chatMessage.command, chatMessage.args);
+        if(chatMessage.trigger != null && chatMessage.trigger.CanExecute(cInfo))
+            chatMessage.trigger.callback(cInfo, chatMessage.command, chatMessage.args);
 
         if (string.IsNullOrEmpty(discordWebhookURL))
             return;
