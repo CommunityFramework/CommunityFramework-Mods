@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using static CF_Zones.API;
+
 public class ZoneManager
 {
     public static Dictionary<string, ZoneClass> ZoneClasses = new Dictionary<string, ZoneClass>();
@@ -28,34 +30,63 @@ public class ZoneManager
     {
         TickCallbacks.Add(_className, _callback);
     }
-    public static List<ZoneAlive> GetZonesForPlayer(EntityPlayer _player, string _className = "") => GetZonesForPlayer(_player.entityId, _className);
-    public static List<ZoneAlive> GetZonesForPlayer(int _playerId, string _className = "")
+    public static List<ZoneAlive> GetZonesForPlayerPosition(EntityPlayer _player, string _className = "", string _group = "", bool _distinct = true) => GetZonesForPosition(_player.position, _className, _group, _distinct);
+    public static List<ZoneAlive> GetZonesForPosition(Vector3 _pos, string _className = "", string _group = "", bool _distinct = true)
     {
         List<ZoneAlive> zones = new List<ZoneAlive>();
+        List<string> groups = new List<string>();
         foreach (ZoneAlive zone in Zones.Values)
         {
+            if (!string.IsNullOrEmpty(_group) && !zone.group.Equals(_group))
+                continue;
+
             if (!string.IsNullOrEmpty(_className) && !zone.HasClass(_className))
                 continue;
 
-            if (!zone.Players.ContainsKey(_playerId))
+            if (!zone.Inside(_pos))
                 continue;
+
+            if (_distinct)
+            {
+                if (groups.Contains(zone.group))
+                    continue;
+
+                groups.Add(zone.group);
+            }
 
             zones.Add(zone);
         }
 
         return zones;
     }
-    public static List<ZoneAlive> GetZonesForPlayerPosition(EntityPlayer _player, string _className = "") => GetZonesForPosition(_player.position, _className);
-    public static List<ZoneAlive> GetZonesForPosition(Vector3 _pos, string _className = "")
+    public static List<ZoneAlive> GetZonesFromPlayer(EntityPlayer _player, string _className = "", string _group = "", bool _distinct = true) => GetZonesFromPlayer(_player.entityId, _className, _group, _distinct);
+    public static List<ZoneAlive> GetZonesFromPlayer(int _playerid, string _className = "", string _group = "", bool _distinct = true)
     {
         List<ZoneAlive> zones = new List<ZoneAlive>();
+        List<string> groups = new List<string>();
         foreach (ZoneAlive zone in Zones.Values)
         {
+            if (!string.IsNullOrEmpty(_group))
+            { 
+                if(!zone.group.Equals(_group))
+                    continue;
+
+                if (_distinct)
+                {
+                    if(groups.Contains(zone.group))
+                        continue;
+
+                    groups.Add(zone.group);
+                }
+            }
+
             if (!string.IsNullOrEmpty(_className) && !zone.HasClass(_className))
                 continue;
 
-            if (zone.Inside(_pos))
-                zones.Add(zone);
+            if (!zone.Players.ContainsKey(_playerid))
+                continue;
+
+            zones.Add(zone);
         }
 
         return zones;
@@ -73,6 +104,10 @@ public class ZoneManager
     {
         return Zones.TryGetValue(_uniqueName, out _zone);
     }
+    public static void OnPlayerSpawnedInWorld(ClientInfo _cInfo, RespawnType _respawnReason, Vector3i _pos)
+    {
+
+    }
     public static void UpdateZonesForPlayer(EntityPlayer _player)
     {
         // We could use this to see if a player logged in inside a zone for example
@@ -82,7 +117,7 @@ public class ZoneManager
         if (!lastPositions.ContainsKey(_player.entityId))
             lastPositions.Add(_player.entityId, _player.position);
 
-        List<ZoneAlive> zonesOld = GetZonesForPlayer(_player);
+        List<ZoneAlive> zonesOld = GetZonesFromPlayer(_player);
         List<ZoneAlive> zonesNew = GetZonesForPlayerPosition(_player);
 
         // Loop zones player was inside
@@ -114,6 +149,9 @@ public class ZoneManager
     }
     public static void OnPlayerEnter(EntityPlayer _player, ZoneAlive _zone)
     {
+        if (GetZonesFromPlayer(_player , "", _zone.group, false).Count() > 0)
+            return;
+
         foreach(var kv in EnterCallbacks)
             kv.Value.Invoke(_player, _zone);
 
@@ -121,6 +159,9 @@ public class ZoneManager
     }
     public static void OnPlayerLeft(EntityPlayer _player, ZoneAlive _zone)
     {
+        if (GetZonesFromPlayer(_player, "", _zone.group, false).Count() > 1)
+            return;
+
         foreach (var kv in LeftCallbacks)
             kv.Value.Invoke(_player, _zone);
 
@@ -135,14 +176,22 @@ public class ZoneManager
     }
     public static void LoadZonesFromFile()
     {
-        if (!File.Exists(filePathZones)) 
+        if (!File.Exists(filePathZones))
+        {
+            //Zones.add
+            SaveZonesToFile();
             return;
+        }
 
         Zones = JsonConvert.DeserializeObject<Dictionary<string, ZoneAlive>>(File.ReadAllText(filePathZones));
     }
     public static void SaveZonesToFile()
     {
-        var json = JsonConvert.SerializeObject(Zones);
+        Dictionary<string, Zone> baseZones =
+    Zones.ToDictionary(
+        k => k.Key,
+        v => (Zone)v.Value);
+        var json = JsonConvert.SerializeObject(baseZones);
         File.WriteAllText(filePathZones, json);
     }
 }
