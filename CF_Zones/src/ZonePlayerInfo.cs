@@ -5,7 +5,7 @@ public class ZonePlayerInfo
 {
     public int entityId;
     public DateTime entered;
-    public Vector3 outPosPos;
+    public Vector3 outPos;
     public Vector3 enterPos;
     public Vector3 lastPos;
 
@@ -13,7 +13,7 @@ public class ZonePlayerInfo
     {
         entityId = _player.entityId;
         entered = DateTime.Now;
-        outPosPos = _outPos;
+        outPos = _outPos;
         enterPos = _player.position;
         lastPos = _player.position;
     }
