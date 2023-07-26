@@ -96,7 +96,7 @@ public class DiscordApp
                 }
                 catch (RateLimitException ex)
                 {
-                    Console.WriteLine("Hit rate limit. Waiting for " + ex.RetryAfter + " milliseconds before retrying.");
+                    Console.Out("Hit rate limit. Waiting for " + ex.RetryAfter + " milliseconds before retrying.");
 
                     // Get the current time
                     DateTime currentTime = DateTime.Now;
@@ -148,7 +148,7 @@ public class DiscordApp
                 var rateLimitData = JsonConvert.DeserializeObject<RateLimitData>(rateLimitResponse);
 
                 // Log and handle rate limit
-                Console.WriteLine($"Rate limit hit. Retry after: {rateLimitData.RetryAfter} ms. Global: {rateLimitData.Global}");
+                Console.Out($"Rate limit hit. Retry after: {rateLimitData.RetryAfter} ms. Global: {rateLimitData.Global}");
 
                 // Wait for rate limit to reset
                 await Task.Delay(rateLimitData.RetryAfter);
@@ -159,7 +159,7 @@ public class DiscordApp
             else if (!response.IsSuccessStatusCode)
             {
                 // Handle other possible HTTP errors
-                Console.WriteLine($"Error sending message: {response.StatusCode}");
+                Console.Out($"Error sending message: {response.StatusCode}");
             }
         }
     }

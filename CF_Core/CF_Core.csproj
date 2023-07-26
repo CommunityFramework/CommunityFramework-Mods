@@ -140,6 +140,7 @@
     <Compile Include="src\API.cs" />
     <Compile Include="src\Blocks.cs" />
     <Compile Include="src\Chat.cs" />
+    <Compile Include="src\Console.cs" />
     <Compile Include="src\DiscordWebhook.cs" />
     <Compile Include="src\Entity.cs" />
     <Compile Include="src\EntityEnemy.cs" />
