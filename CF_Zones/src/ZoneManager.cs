@@ -91,6 +91,10 @@ public class ZoneManager
 
         return zones;
     }
+    public static void AddZone(string uniqueName, Vector3 pointA, Vector3 pointB)
+    {
+        Zones.Add(uniqueName, new ZoneAlive(uniqueName, $"{pointA.x:F0} {pointA.z:F0}", $"{pointB.x:F0} {pointB.z:F0}"));
+    }
     public static void AddZone(string uniqueName, string pointA, string pointB)
     {
         Zones.Add(uniqueName, new ZoneAlive(uniqueName, pointA, pointB));
