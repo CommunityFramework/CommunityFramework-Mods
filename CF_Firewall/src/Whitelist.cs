@@ -50,7 +50,7 @@ namespace CF_Firewall
             }
             catch (FileNotFoundException e)
             {
-                x.Error($"File not found.");
+                x.Error($"File not found: {e}");
             }
             catch (Exception e)
             {
