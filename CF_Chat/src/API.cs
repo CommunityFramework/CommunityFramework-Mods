@@ -1,10 +1,9 @@
-﻿using static GameSparks.Api.Responses.ListTeamChatResponse;
-
-namespace CF_Chat
+﻿namespace CF_Chat
 {
     public class API : IModApi
     {
         public static ModX mod = new ModX("CF_Chat", OnConfigLoaded, OnPhrasesLoaded);
+        public static LogX x = new LogX("CF_Chat");
         public void InitMod(Mod _modInstance)
         {
             mod.Activate();

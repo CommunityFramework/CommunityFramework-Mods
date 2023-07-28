@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CF_Zones", "CF_Zones\CF_Zon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CF_Cvars", "CF_Cvars\CF_Cvars.csproj", "{444FD9E6-34C8-41BC-ABAE-482607ED9F3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CF_PlayerRanks", "CF_PlayerRanks\CF_PlayerRanks.csproj", "{19D02C1E-B95E-4F04-ADBD-D5EDE912BF90}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{444FD9E6-34C8-41BC-ABAE-482607ED9F3C}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{444FD9E6-34C8-41BC-ABAE-482607ED9F3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{444FD9E6-34C8-41BC-ABAE-482607ED9F3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19D02C1E-B95E-4F04-ADBD-D5EDE912BF90}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{19D02C1E-B95E-4F04-ADBD-D5EDE912BF90}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{19D02C1E-B95E-4F04-ADBD-D5EDE912BF90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19D02C1E-B95E-4F04-ADBD-D5EDE912BF90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
