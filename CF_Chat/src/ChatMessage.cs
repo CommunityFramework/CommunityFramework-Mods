@@ -6,7 +6,7 @@ public class ChatMessage
     public EChatType type;
     public int senderId;
     public string msg;
-    public string mainName;
+    public string name;
     public bool localizeMain;
     public List<int> recipientEntityIds;
 
@@ -24,7 +24,7 @@ public class ChatMessage
         type = EChatType.Global;
         senderId = -1;
         this.msg = msg;
-        mainName = "";
+        name = "";
         recipientEntityIds = null;
 
         send = true;
@@ -34,7 +34,7 @@ public class ChatMessage
         type = EChatType.Global;
         senderId = -1;
         msg = _msg;
-        mainName = _mainName;
+        name = _mainName;
         recipientEntityIds = null;
 
         send = true;
@@ -44,7 +44,7 @@ public class ChatMessage
         type = _type;
         senderId = _senderId;
         msg = _msg;
-        mainName = _mainName;
+        name = _mainName;
         localizeMain = _localizeMain;
         recipientEntityIds = _recipientEntityIds;
 
@@ -63,7 +63,7 @@ public class ChatMessage
     public bool IsTrigger() => trigger != null;
     public void Send(int entityId)
     {
-        SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(entityId)?.SendPackage(NetPackageManager.GetPackage<NetPackageChat>().Setup(type, senderId, msg, mainName, localizeMain, null));
+        SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(entityId)?.SendPackage(NetPackageManager.GetPackage<NetPackageChat>().Setup(type, senderId, msg, name, localizeMain, null));
     }
     public void Send()
     {
@@ -90,7 +90,7 @@ public class ChatMessage
             if (recipientEntityId == -1)
                 continue;
 
-            SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(recipientEntityId)?.SendPackage(NetPackageManager.GetPackage<NetPackageChat>().Setup(type, senderId, msg, mainName, localizeMain, null));
+            SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(recipientEntityId)?.SendPackage(NetPackageManager.GetPackage<NetPackageChat>().Setup(type, senderId, msg, name, localizeMain, null));
         }
     }
 }

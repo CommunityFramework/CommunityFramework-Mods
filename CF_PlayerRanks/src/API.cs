@@ -9,6 +9,7 @@
         {
             filePathPlayerRanks = mod.modDatabasePath + "/PlayerRanks.json";
             mod.Activate();
+            PlayerRankManager.Init();
         }
         public static void OnConfigLoaded()
         {

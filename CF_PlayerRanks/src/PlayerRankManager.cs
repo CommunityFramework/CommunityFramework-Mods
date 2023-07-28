@@ -9,11 +9,9 @@ public class PlayerRankManager
 {
     public static List<PlayerRank> ranks = new List<PlayerRank>();
     public static PlayerRank rankDefault = new PlayerRank("Default", "default");
-
     private static FileSystemWatcher FileWatcher = null;
     private static bool fileWatcher = false;
-
-    public static void OnConfigLoaded()
+    public static void Init()
     {
         LoadFile();
 
@@ -30,6 +28,28 @@ public class PlayerRankManager
         }
 
         AddDefaultGroups();
+
+        ChatManager.RegisterHandler(OnChatMessage);
+    }
+    public static void OnChatMessage(ClientInfo _cInfo, ChatMessage _chatMsg)
+    {
+        if (!GetCurrentRank(out PlayerRank _rank, (int)_cInfo.latestPlayerData.totalTimePlayed, Players.GetPermission(_cInfo), "chat"))
+            return;
+
+        if (!string.IsNullOrEmpty(_rank.colorChat))
+        {
+            _chatMsg.msg = _rank.colorChat + _chatMsg.msg;
+        }
+
+        if (!string.IsNullOrEmpty(_rank.nameTag))
+        {
+            _chatMsg.name = _rank.nameTag + _chatMsg.msg;
+        }
+        else if (!string.IsNullOrEmpty(_rank.colorName))
+        {
+            _chatMsg.name = _rank.colorName + _chatMsg.name;
+        }
+
     }
     public static bool LoadFile()
     {
@@ -66,7 +86,7 @@ public class PlayerRankManager
         _chatGroup = ranks.FirstOrDefault(group => group.name.Equals(name, StringComparison.OrdinalIgnoreCase));
         return _chatGroup != null;
     }
-    public static bool GetCurrentGroup(out PlayerRank _group, int _playtime = 0, int _permission = 1000, string _tag = "")
+    public static bool GetCurrentRank(out PlayerRank _group, int _playtime = 0, int _permission = 1000, string _tag = "")
     {
         _group = ranks
             .OrderByDescending(group => group.playtime)

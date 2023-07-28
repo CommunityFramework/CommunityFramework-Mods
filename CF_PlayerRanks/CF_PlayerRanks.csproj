@@ -38,6 +38,10 @@
       <HintPath>..\7dtd-bin\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="CF_Chat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Mods\0CommunityFramework\CF_Chat.dll</HintPath>
+    </Reference>
     <Reference Include="CF_Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Mods\0CommunityFramework\CF_Core.dll</HintPath>
