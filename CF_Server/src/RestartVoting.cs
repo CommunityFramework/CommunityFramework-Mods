@@ -17,7 +17,7 @@ internal class RestartVoting
         foreach (KeyValuePair<int, DateTime> kv in new Dictionary<int , DateTime>(votes))
         {
             int entityId = kv.Key;
-            ClientInfo cInfo = Players.GetClient(entityId);
+            ClientInfo cInfo = CF_Player.GetClient(entityId);
             if(cInfo == null)
             {
                 RemoveVote(entityId);
@@ -32,7 +32,7 @@ internal class RestartVoting
 
             // Expired
             RemoveVote(entityId);
-            Chat.Message($"Your restart vote expired.", cInfo);
+            CF_Player.Message($"Your restart vote expired.", cInfo);
         }
     }
     public static void OnVoteRestart(ClientInfo _cInfo, string _trigger, List<string> args)
@@ -43,19 +43,19 @@ internal class RestartVoting
     {
         if (HasVoted(_cInfo))
         {
-            Chat.Message($"You voted already, you can vote again when your vote expired.", _cInfo);
+            CF_Player.Message($"You voted already, you can vote again when your vote expired.", _cInfo);
             return;
         }
 
         if((DateTime.Now-serverStarted).TotalMinutes < restartVoteMinUptime)
         {
-            Chat.Message($"Server need to be up for at least {restartVoteMinUptime} minutes to be able to vote for a server restart.", _cInfo);
+            CF_Player.Message($"Server need to be up for at least {restartVoteMinUptime} minutes to be able to vote for a server restart.", _cInfo);
             return;
         }
 
         if (RestartManager.Restarting())
         {
-            Chat.Message($"Server is already restarting.", _cInfo);
+            CF_Player.Message($"Server is already restarting.", _cInfo);
             return;
         }
 
@@ -63,16 +63,16 @@ internal class RestartVoting
 
         int votesLeft = GetVotesRequired();
 
-        Chat.Message($"{_cInfo.playerName} has voted to restart the server. {votesLeft} votes requied. Type !rr if you like to vote for a server restart too.");
+        CF_Player.Message($"{_cInfo.playerName} has voted to restart the server. {votesLeft} votes requied. Type !rr if you like to vote for a server restart too.");
 
         if (restartVoteExpire > 0 && votesLeft > 0)
         {
-            Chat.Message($"Your restart vote will expire in {restartVoteExpire} minutes.", _cInfo);
+            CF_Player.Message($"Your restart vote will expire in {restartVoteExpire} minutes.", _cInfo);
             return;
         }
 
         ClearVotes();
-        Chat.Message($"{votes.Count} players voted for a server restart. Starting countdown...");
+        CF_Player.Message($"{votes.Count} players voted for a server restart. Starting countdown...");
         RestartManager.Restart(restartVoteCountdown, "Restart Voted");
     }
     public static bool HasVoted(ClientInfo _cInfo) => HasVoted(_cInfo.entityId);

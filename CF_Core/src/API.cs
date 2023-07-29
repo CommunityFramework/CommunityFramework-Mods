@@ -2,10 +2,10 @@
 {
     public class API : IModApi
     {
-        public static LogX x = new LogX("CF_Core", "Timers");
+        public static CF_Log x = new CF_Log("CF_Core", "Timers");
         public void InitMod(Mod _modInstance)
         {
-            Timers.TimerStart();
+            CF_Timer.TimerStart();
         }
     }
 }

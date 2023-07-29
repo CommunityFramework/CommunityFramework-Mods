@@ -15,9 +15,9 @@ public class RestartManager
         countdown = seconds;
 
         if(!string.IsNullOrEmpty(_reason))
-            Chat.Message(msgCountdownStarted.Replace("{REASON}", _reason));
+            CF_Player.Message(msgCountdownStarted.Replace("{REASON}", _reason));
         else 
-            Chat.Message(msgCountdownStarted.Replace("{REASON}", msgCountdownByAdmin));
+            CF_Player.Message(msgCountdownStarted.Replace("{REASON}", msgCountdownByAdmin));
 
         x.Log($"CoundownExec => Seconds: {seconds} Manual: {manual} Reason: {_reason}");
         Log.Out($"CoundownExec => Seconds: {seconds} Manual: {manual} Reason: {_reason}");
@@ -28,7 +28,7 @@ public class RestartManager
             return;
 
         countdown = -1;
-        Chat.Message(msgAborted);
+        CF_Player.Message(msgAborted);
     }
     public static void OnEverySec() // Main timer (async)
     {
@@ -60,7 +60,7 @@ public class RestartManager
         int dayBM = bmDayRef(GameManager.Instance.World.aiDirector.BloodMoonComponent);
         if (restartBloodmoonHours != -1 && dayBM == day && hour == restartBloodmoonHours)
         {
-            Chat.Message("[ff3333]Pre-Bloodmoon Restart!");
+            CF_Player.Message("[ff3333]Pre-Bloodmoon Restart!");
             Shutdown(restartCountdown);
             return;
         }
@@ -73,7 +73,7 @@ public class RestartManager
         if (averageFPS > 0 && averageFPS < lowAverage)
         {
             x.Warn($"Low FPS detected (average): {averageFPS:F1}. Restarting server.");
-            Chat.Message("[ff0000]Bad server performance detected!");
+            CF_Player.Message("[ff0000]Bad server performance detected!");
             Shutdown(restartCountdown);
             return;
         }
@@ -86,7 +86,7 @@ public class RestartManager
         if (veryLowSamples > 0 && lowFPS > veryLowSamples)
         {
             x.Warn($"Low FPS detected: {lowFPS} of / {ServerMonitor.FPSlist_30s.Count}s below {FPSveryLow}. Restarting server.");
-            Chat.Message("[ff0000]Bad server performance detected!");
+            CF_Player.Message("[ff0000]Bad server performance detected!");
             Shutdown(restartCountdown);
             return;
         }
@@ -129,7 +129,7 @@ public class RestartManager
             countdown = seconds;
             restartAttempts = 0;
             locked = false;
-            Chat.Message(msgAborted);
+            CF_Player.Message(msgAborted);
             return;
         }
         else if (seconds > 0)
@@ -319,7 +319,7 @@ public class RestartManager
 
                         x.Log($"COUNTDOWN => {countdown}m");
                         Log.Out($"COUNTDOWN => {countdown}m");
-                        Chat.Message(msgCountdownM.Replace("{COUNTDOWN}", countdown.ToString()));
+                        CF_Player.Message(msgCountdownM.Replace("{COUNTDOWN}", countdown.ToString()));
 
                         if (!string.IsNullOrEmpty(eventS))
                         {
@@ -327,7 +327,7 @@ public class RestartManager
                             if (list != null && list.Count > 0)
                             {
                                 for (int index = 0; index < list.Count; ++index)
-                                    Players.GameEvent(list[index], eventS);
+                                    CF_Player.GameEvent(list[index], eventS);
                             }
                         }
                         break;
@@ -367,8 +367,8 @@ public class RestartManager
                 case 1:
                     x.Log($"COUNTDOWN => {countdown}s");
                     Log.Out($"COUNTDOWN => {countdown}s");
-                    Chat.Message(msgCountdown.Replace("{COUNTDOWN}", countdown.ToString()));
-                    Chat.Message(msgLogout);
+                    CF_Player.Message(msgCountdown.Replace("{COUNTDOWN}", countdown.ToString()));
+                    CF_Player.Message(msgLogout);
 
                     if (!string.IsNullOrEmpty(eventS))
                     {
@@ -376,7 +376,7 @@ public class RestartManager
                         if (list != null && list.Count > 0)
                         {
                             for (int index = 0; index < list.Count; ++index)
-                                Players.GameEvent(list[index], eventS);
+                                CF_Player.GameEvent(list[index], eventS);
                         }
                     }
                     break;
@@ -394,12 +394,12 @@ public class RestartManager
 
         locked = true;
 
-        List<ClientInfo> cList = Players.GetClients();
+        List<ClientInfo> cList = CF_Player.GetClients();
         if (cList != null && cList.Count > 0)
         {
             for (int i = 0; i < cList.Count; i++)
             {
-                Chat.Message(msgLocked, cList[i]);
+                CF_Player.Message(msgLocked, cList[i]);
                 CloseAllXui(cList[i]);
             }
         }
@@ -419,7 +419,7 @@ public class RestartManager
             || _te is TileEntityVendingMachine
             || _te is TileEntityLootContainer)
         {
-            Chat.Message(msgDenied, _cInfo);
+            CF_Player.Message(msgDenied, _cInfo);
             return false;
         }
 

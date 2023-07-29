@@ -1,13 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
 
-public class JsonFileStorage<T>
+public class CF_JsonFile<T>
 {
     private T data;
     private readonly string filePath;
     private readonly object fileLock = new object();
 
-    public JsonFileStorage(string _filePath, T _jsonClass)
+    public CF_JsonFile(string _filePath, T _jsonClass)
     {
         filePath = _filePath;
         data = _jsonClass;

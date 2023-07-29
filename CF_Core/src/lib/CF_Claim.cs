@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class Claims
+public class CF_Claim
 {
     public static bool GetClaimInfoAtPos(Vector3i pos, out PersistentPlayerData ppd, out Vector3i claimPos)
     {

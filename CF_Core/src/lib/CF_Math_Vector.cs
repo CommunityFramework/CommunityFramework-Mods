@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class Vectors
+public class CF_Math_Vector
 {
     public static string Vec3ToTp(Vector3 p) => $"{(int)p.x} {(int)p.y} {(int)p.z}";
     public static string Vec3ToTele(Vector3i p) => $"{p.x} {p.y} {p.z}";

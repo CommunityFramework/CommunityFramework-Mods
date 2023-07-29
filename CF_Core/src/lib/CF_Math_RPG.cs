@@ -1,5 +1,5 @@
 ﻿using System;
-public class MathForRPG
+public class CF_Math_RPG
 {
     public static double GetMultiplierEx(int attackerLevel, int victimLevel, double max = 3.0, double maxM = 100.0, double tolerance = 0.1, double exponent = 1.25)
     {

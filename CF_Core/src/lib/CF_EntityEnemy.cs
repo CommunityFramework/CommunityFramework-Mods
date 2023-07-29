@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class EntityEnemy
+public class CF_EntityEnemy
 {
     public static bool IsHostileMobInRange(Vector3i pos, int radius)
     {

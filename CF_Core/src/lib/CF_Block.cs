@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Blocks
+public class CF_Block
 {
     public static bool IsDoorOpen(byte _metadata) => ((uint)_metadata & 1U) > 0U;
     public static string IsDoorOpenX(byte _metadata) => ((uint)_metadata & 1U) > 0U ? "Opened" : "Closed";
@@ -15,8 +15,8 @@ public class Blocks
     public static bool GiveBlockBackRPC(PlatformUserIdentifierAbs _UserId, BlockChangeInfo newBlockInfo)
     {
         World world = GameManager.Instance.World;
-        ClientInfo cInfo = Players.GetClient(_UserId);
-        EntityPlayer player = Players.GetPlayer(cInfo);
+        ClientInfo cInfo = CF_Player.GetClient(_UserId);
+        EntityPlayer player = CF_Player.GetPlayer(cInfo);
         string blockName = newBlockInfo.blockValue.Block.GetBlockName();
 
         try

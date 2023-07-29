@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Net;
-using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
 using Platform;
 using Platform.Steam;
-using System.Collections.ObjectModel;
-using LiteNetLib;
 using HarmonyLib;
 
 namespace CF_Firewall
 {
     public class API : IModApi
     {
-        public static ModX mod = new ModX("CF_Firewall", OnConfigLoaded, OnPhrasesLoaded);
-        public static LogX x = new LogX("CF_Firewall");
+        public static CF_Mod mod = new CF_Mod("CF_Firewall", OnConfigLoaded, OnPhrasesLoaded);
+        public static CF_Log x = new CF_Log("CF_Firewall");
         public static Harmony harmony = new Harmony("CF_Firewall");
         public static string filePathIPdata;
         public static string filePathWhitelist;

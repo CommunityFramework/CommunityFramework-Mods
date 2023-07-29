@@ -5,7 +5,7 @@ using static CF_Core.API;
 
 namespace CF_Core
 {
-    public class Timers
+    public class CF_Timer
     {
         private static Timer aTimer = new Timer();
         public static void TimerStart()

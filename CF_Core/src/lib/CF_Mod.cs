@@ -5,9 +5,9 @@ using System.IO;
 using System.Xml;
 using System.Security;
 
-public class ModX
+public class CF_Mod
 {
-    public static List<ModX> mods = new List<ModX>();
+    public static List<CF_Mod> mods = new List<CF_Mod>();
 
     public string settingsFilename = "Settings.xml";
     public string phrasesFilename = "Phrases.xml";
@@ -33,7 +33,7 @@ public class ModX
     public SortedDictionary<string, string> phrases;
     public Dictionary<string, string> phrasesDes;
 
-    public ModX(string Name, Action OnModConfigLoaded = null, Action OnModPhrasesLoaded = null)
+    public CF_Mod(string Name, Action OnModConfigLoaded = null, Action OnModPhrasesLoaded = null)
     {
         this.modName = Name;
 

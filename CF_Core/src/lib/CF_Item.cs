@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Items
+public class CF_Item
 {
     public static bool GiveItem(ClientInfo _cInfo, ItemValue _itemValue, bool allow_ground, int _count, out bool on_ground)
     {
@@ -34,7 +34,7 @@ public class Items
         if (_cInfo == null)
             return false;
 
-        return CanTakeItem(Players.GetPlayer(_cInfo), _itemValue, _count);
+        return CanTakeItem(CF_Player.GetPlayer(_cInfo), _itemValue, _count);
     }
     public static bool CanTakeItem(EntityPlayer _player, ItemValue _itemValue, int _count)
     {

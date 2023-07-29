@@ -25,7 +25,7 @@ namespace CF_Firewall
                 if (!banIP)
                     return;
 
-                ClientInfo cInfo = Players.GetClient(_identifier);
+                ClientInfo cInfo = CF_Player.GetClient(_identifier);
                 if (cInfo == null)
                     return;
 

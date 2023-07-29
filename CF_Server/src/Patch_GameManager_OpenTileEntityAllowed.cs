@@ -13,7 +13,7 @@ internal class GameManager_OpenTileEntityAllowed
         static AccessTools.FieldRef<TileEntity, Chunk> chunkRef = AccessTools.FieldRefAccess<TileEntity, Chunk>("chunk");
         static bool Prefix(ref bool __result, int _entityIdThatOpenedIt, TileEntity _te)
         {
-            ClientInfo cInfo = Players.GetClient(_entityIdThatOpenedIt);
+            ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
             if (cInfo == null)
             {
                 x.Error($"No ClientInfo for id {_entityIdThatOpenedIt}");
@@ -25,7 +25,7 @@ internal class GameManager_OpenTileEntityAllowed
             {
                 if (!RestartManager.CanOpenLootContainer(cInfo, _te))
                 {
-                    x.Log($"ServerManager denied access for id {_entityIdThatOpenedIt} opening a {_te.GetTileEntityType()} at {TileEntities.GetPosTele(_te)}");
+                    x.Log($"ServerManager denied access for id {_entityIdThatOpenedIt} opening a {_te.GetTileEntityType()} at {CF_TileEntity.GetPosTele(_te)}");
                     __result = false;
                     return false;
                 }
@@ -42,7 +42,7 @@ internal class GameManager_OpenTileEntityAllowed
         {
             try
             {
-                ClientInfo cInfo = Players.GetClient(_entityIdThatOpenedIt);
+                ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
                 if (cInfo == null)
                     return;
 

@@ -8,8 +8,8 @@ namespace CF_Server
     public class API : IModApi
     {
         public static DateTime serverStarted;
-        public static ModX mod = new ModX("CF_Server", OnConfigLoaded, OnPhrasesLoaded);
-        public static LogX x = new LogX("CF_Server");
+        public static CF_Mod mod = new CF_Mod("CF_Server", OnConfigLoaded, OnPhrasesLoaded);
+        public static CF_Log x = new CF_Log("CF_Server");
         Harmony harmony = new Harmony("CF_Server");
 
         public void InitMod(Mod _modInstance)
@@ -22,8 +22,8 @@ namespace CF_Server
 
             ChatManager.RegisterChatTrigger("serverstats,ss,server", OnServerStatsCommand);
 
-            Timers.AddOneSecTimer(ServerMonitor.OnEverySec, "ServerMonitor", false);
-            Timers.AddOneSecTimer(RestartManager.OnEverySec, "RestartManager", false);
+            CF_Timer.AddOneSecTimer(ServerMonitor.OnEverySec, "ServerMonitor", false);
+            CF_Timer.AddOneSecTimer(RestartManager.OnEverySec, "RestartManager", false);
         }
         public static string eventS;
         public static int restartBloodmoonHours;

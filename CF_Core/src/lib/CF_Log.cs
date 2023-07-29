@@ -2,7 +2,7 @@
 using System.IO;
 using System.Collections.Concurrent;
 
-public class LogX
+public class CF_Log
 {
     // Log Levels
     public enum LogLevel { Trace, Debug, Info, Warn, Error, Fatal, Corruption, Alert };
@@ -15,7 +15,7 @@ public class LogX
     private readonly string discordWebhookURL;
     private readonly ConcurrentQueue<string> logQueue = new ConcurrentQueue<string>();
 
-    public LogX(string folder = "logs", string subfolder = "", LogLevel thresholdLevel = LogLevel.Error, LogLevel minimumLevel = LogLevel.Trace, string discordWebhookURL = "", LogLevel discordThreshold = LogLevel.Corruption)
+    public CF_Log(string folder = "logs", string subfolder = "", LogLevel thresholdLevel = LogLevel.Error, LogLevel minimumLevel = LogLevel.Trace, string discordWebhookURL = "", LogLevel discordThreshold = LogLevel.Corruption)
     {
         this.folder = folder;
         this.subfolder = subfolder;
@@ -34,7 +34,7 @@ public class LogX
             return;
 
         var baseLogFileName = cInfo == null ? $"{DateTime.UtcNow:yyyyMMdd}"
-                                            : $"{XFormat.GetNameAndPlatform(cInfo)}_{DateTime.UtcNow:yyyyMMdd}";
+                                            : $"{CF_Format.PlayerNameAndPlatform(cInfo)}_{DateTime.UtcNow:yyyyMMdd}";
 
         var logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mod_Logs", folder, subfolder);
         Directory.CreateDirectory(logDirectory);
@@ -52,7 +52,7 @@ public class LogX
         // If level is above the discordThreshold, send message to Discord
         if (!string.IsNullOrEmpty(discordWebhookURL) && level >= discordThreshold)
         {
-            DiscordWebhook.SendMessage(logMessage, discordWebhookURL);
+            CF_DiscordWebhook.SendMessage(logMessage, discordWebhookURL);
         }
     }
 

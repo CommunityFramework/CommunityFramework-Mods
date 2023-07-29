@@ -1,4 +1,4 @@
-﻿public class BloodMoon
+﻿public class CF_BloodMoon
 {
     public static int GetBloodMoonLength()
     {

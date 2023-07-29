@@ -1,11 +1,11 @@
-﻿public class Teams
+﻿public class CF_PersistentPlayer
 {
     public static bool IsFriendOf(PersistentPlayerData ppd, int entityId)
     {
         if (ppd.ACL == null || ppd.ACL.Count < 1)
             return false; // No friends
 
-        PersistentPlayerData _ppd2 = Players.GetPersistent(entityId);
+        PersistentPlayerData _ppd2 = CF_Player.GetPersistent(entityId);
         if (_ppd2 == null)
         {
             Log.Error($"IsFriendOf(): Could not get PersistentPlayerData for {entityId}");
@@ -21,7 +21,7 @@
     }
     public static bool IsFriendOf(PlatformUserIdentifierAbs _UserId1, PlatformUserIdentifierAbs _UserId2)
     {
-        PersistentPlayerData ppd1 = Players.GetPersistent(_UserId1);
+        PersistentPlayerData ppd1 = CF_Player.GetPersistent(_UserId1);
         if (ppd1 == null)
         {
             Log.Error($"IsFriendOf(): Could not get PersistentPlayerData for {_UserId1}");
@@ -31,7 +31,7 @@
         if (ppd1.ACL == null || ppd1.ACL.Count < 1)
             return false; // No friends
 
-        PersistentPlayerData _ppd2 = Players.GetPersistent(_UserId2);
+        PersistentPlayerData _ppd2 = CF_Player.GetPersistent(_UserId2);
         if (_ppd2 == null)
         {
             Log.Error($"IsFriendOf(): Could not get PersistentPlayerData for {_UserId2}");
@@ -51,7 +51,7 @@
         if (ppd.ACL == null || ppd.ACL.Count < 1)
             return false; // No friends
 
-        PersistentPlayerData _ppd2 = Players.GetPersistent(_UserId);
+        PersistentPlayerData _ppd2 = CF_Player.GetPersistent(_UserId);
         if (_ppd2 == null)
         {
             Log.Error($"IsFriendOf(): Could not get PersistentPlayerData for {_UserId}");

@@ -73,6 +73,6 @@ public class ChatManager
                 Replace("@here", "@ here");
         }
 
-        DiscordWebhook.SendMessage(msg, discordWebhookURL);
+        CF_DiscordWebhook.SendMessage(msg, discordWebhookURL);
     }
 }

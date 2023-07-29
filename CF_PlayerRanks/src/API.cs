@@ -2,8 +2,8 @@
 {
     public class API : IModApi
     {
-        public static ModX mod = new ModX("CF_PlayerRanks", OnConfigLoaded, OnPhrasesLoaded);
-        public static LogX x = new LogX("CF_PlayerRanks");
+        public static CF_Mod mod = new CF_Mod("CF_PlayerRanks", OnConfigLoaded, OnPhrasesLoaded);
+        public static CF_Log x = new CF_Log("CF_PlayerRanks");
         public static string filePathPlayerRanks;
         public void InitMod(Mod _modInstance)
         {

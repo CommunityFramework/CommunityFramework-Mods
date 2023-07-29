@@ -138,32 +138,35 @@
   <ItemGroup>
     <Compile Include="..\Properties\AssemblyInfo.cs" />
     <Compile Include="src\API.cs" />
-    <Compile Include="src\Blocks.cs" />
-    <Compile Include="src\Chat.cs" />
-    <Compile Include="src\Console.cs" />
-    <Compile Include="src\DiscordWebhook.cs" />
-    <Compile Include="src\Entity.cs" />
-    <Compile Include="src\EntityEnemy.cs" />
-    <Compile Include="src\Items.cs" />
-    <Compile Include="src\BloodMoon.cs" />
-    <Compile Include="src\Claims.cs" />
-    <Compile Include="src\LogX.cs" />
-    <Compile Include="src\TileEntities.cs" />
-    <Compile Include="src\Timers.cs" />
-    <Compile Include="src\XFormat.cs" />
-    <Compile Include="src\GameTime.cs" />
-    <Compile Include="src\Map.cs" />
-    <Compile Include="src\MathForRPG.cs" />
-    <Compile Include="src\Misc.cs" />
-    <Compile Include="src\ModX.cs" />
-    <Compile Include="src\Players.cs" />
-    <Compile Include="src\RandomStuff.cs" />
-    <Compile Include="src\Teams.cs" />
-    <Compile Include="src\Utilz.cs" />
-    <Compile Include="src\Vectors.cs" />
+    <Compile Include="src\lib\CF_Block.cs" />
+    <Compile Include="src\lib\CF_Console.cs" />
+    <Compile Include="src\lib\CF_ConsoleMessageFilter.cs" />
+    <Compile Include="src\lib\CF_DiscordWebhook.cs" />
+    <Compile Include="src\lib\CF_Entity.cs" />
+    <Compile Include="src\lib\CF_EntityEnemy.cs" />
+    <Compile Include="src\lib\CF_Item.cs" />
+    <Compile Include="src\lib\CF_BloodMoon.cs" />
+    <Compile Include="src\lib\CF_Claim.cs" />
+    <Compile Include="src\lib\CF_JsonFile.cs" />
+    <Compile Include="src\lib\CF_Log.cs" />
+    <Compile Include="src\lib\CF_TileEntity.cs" />
+    <Compile Include="src\lib\CF_Timer.cs" />
+    <Compile Include="src\lib\CF_Format.cs" />
+    <Compile Include="src\lib\CF_WorldTime.cs" />
+    <Compile Include="src\lib\CF_Map.cs" />
+    <Compile Include="src\lib\CF_Math_RPG.cs" />
+    <Compile Include="src\lib\CF_Mod.cs" />
+    <Compile Include="src\lib\CF_Player.cs" />
+    <Compile Include="src\lib\CF_Random.cs" />
+    <Compile Include="src\lib\CF_PersistentPlayer.cs" />
+    <Compile Include="src\lib\CF_List.cs" />
+    <Compile Include="src\lib\CF_Math_Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\harmony\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

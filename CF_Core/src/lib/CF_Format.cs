@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-public class XFormat
+public class CF_Format
 {
-    public static string GetNameAndPlatform(EntityPlayer _player) => GetNameAndPlatform(_player.entityId);
-    public static string GetNameAndPlatform(int _entityId) => GetNameAndPlatform(Players.GetPlayer(_entityId));
-    public static string GetNameAndPlatform(ClientInfo _cInfo) => _cInfo == null ? "null" : $"{_cInfo.playerName} ({_cInfo.PlatformId.ReadablePlatformUserIdentifier})";
-    public static string FormatStringList(List<string> stringList)
+    public static string PlayerNameAndPlatform(EntityPlayer _player) => PlayerNameAndPlatform(_player.entityId);
+    public static string PlayerNameAndPlatform(int _entityId) => PlayerNameAndPlatform(CF_Player.GetPlayer(_entityId));
+    public static string PlayerNameAndPlatform(ClientInfo _cInfo) => _cInfo == null ? "null" : $"{_cInfo.playerName} ({_cInfo.PlatformId.ReadablePlatformUserIdentifier})";
+    public static string StringList(List<string> stringList)
     {
         if (stringList.Count == 1)
             return stringList[0];
@@ -28,7 +28,7 @@ public class XFormat
 
         return result;
     }
-    public static bool FormatItemStack(ItemStack itemStack, bool quality, bool mods, out string output)
+    public static bool ItemStack(ItemStack itemStack, bool quality, bool mods, out string output)
     {
         output = null;
 
@@ -69,7 +69,7 @@ public class XFormat
 
         return true;
     }
-    public static string GetPos(TileEntity _te)
+    public static string Position(TileEntity _te)
     {
         if (_te.EntityId == -1)
         {
@@ -85,7 +85,7 @@ public class XFormat
     }
     public const string RomanLetters = "MDCLXVI";
     public static readonly int[] RomanValues = { 1000, 500, 100, 50, 10, 5, 1 };
-    public static string IntToRoman(int num)
+    public static string Roman(int num)
     {
         if (num < 1 || num > 3999)
         {

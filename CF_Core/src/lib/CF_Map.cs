@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-public class Map
+public class CF_Map
 {
     public static PrefabInstance GetPrefabAtPosition(int x, int z)
     {

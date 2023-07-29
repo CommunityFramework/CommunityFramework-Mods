@@ -9,13 +9,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class DiscordWebhook : IDisposable
+public class CF_DiscordWebhook : IDisposable
 {
     private readonly WebClient client;
     public string webhook { get; set; }
     public string username { get; set; }
 
-    public DiscordWebhook()
+    public CF_DiscordWebhook()
     {
         client = new WebClient();
     }
@@ -27,7 +27,7 @@ public class DiscordWebhook : IDisposable
 
         try
         {
-            using (DiscordWebhook dcWeb = new DiscordWebhook())
+            using (CF_DiscordWebhook dcWeb = new CF_DiscordWebhook())
             {
                 dcWeb.username = string.IsNullOrEmpty(userName) ? "Server" : userName;
                 dcWeb.webhook = webhookURL;
@@ -65,13 +65,13 @@ public class DiscordApp
 {
     private PriorityQueue<Message> messageQueue;
     private RateLimiter rateLimiter;
-    private LogX logger;
+    private CF_Log logger;
 
     public DiscordApp()
     {
         this.messageQueue = new PriorityQueue<Message>();
         this.rateLimiter = new RateLimiter();
-        this.logger = new LogX("DiscordWebhooks");
+        this.logger = new CF_Log("DiscordWebhooks");
     }
 
     public void SendMessage(Message message)
@@ -90,13 +90,13 @@ public class DiscordApp
                 try
                 {
                     // Send message
-                    DiscordWebhook.SendMessage(nextMessage.Content, nextMessage.webhookURL, nextMessage.userName);
+                    CF_DiscordWebhook.SendMessage(nextMessage.Content, nextMessage.webhookURL, nextMessage.userName);
                     // If successful, remove message from queue
                     this.messageQueue.Dequeue();
                 }
                 catch (RateLimitException ex)
                 {
-                    Console.Out("Hit rate limit. Waiting for " + ex.RetryAfter + " milliseconds before retrying.");
+                    CF_Console.Out("Hit rate limit. Waiting for " + ex.RetryAfter + " milliseconds before retrying.");
 
                     // Get the current time
                     DateTime currentTime = DateTime.Now;
@@ -148,7 +148,7 @@ public class DiscordApp
                 var rateLimitData = JsonConvert.DeserializeObject<RateLimitData>(rateLimitResponse);
 
                 // Log and handle rate limit
-                Console.Out($"Rate limit hit. Retry after: {rateLimitData.RetryAfter} ms. Global: {rateLimitData.Global}");
+                CF_Console.Out($"Rate limit hit. Retry after: {rateLimitData.RetryAfter} ms. Global: {rateLimitData.Global}");
 
                 // Wait for rate limit to reset
                 await Task.Delay(rateLimitData.RetryAfter);
@@ -159,7 +159,7 @@ public class DiscordApp
             else if (!response.IsSuccessStatusCode)
             {
                 // Handle other possible HTTP errors
-                Console.Out($"Error sending message: {response.StatusCode}");
+                CF_Console.Out($"Error sending message: {response.StatusCode}");
             }
         }
     }

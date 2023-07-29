@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public class Players
+public class CF_Player
 {
     // ClientInfo 
     public static List<ClientInfo> GetClients() => ConnectionManager.Instance.Clients.List.ToList();
@@ -73,6 +73,7 @@ public class Players
 
         return false;
     }
+    // Game Events
     public static bool GameEvent(ClientInfo _cInfo, string gameevent)
     {
         EntityPlayer player = GetPlayer(_cInfo.entityId);
@@ -85,22 +86,82 @@ public class Players
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageGameEventResponse>().Setup(gameevent, _cInfo.entityId, "", "", NetPackageGameEventResponse.ResponseTypes.Approved));
         return true;
     }
+    // Close open windows (including the crafting)
     public static void CloseAllOpenWindows(ClientInfo _cInfo)
     {
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageCloseAllWindows>().Setup(_cInfo.entityId));
     }
+    // Write text to client console
+    public static void Console(string _msg, ClientInfo _cInfo)
+    {
+        if (_cInfo == null)
+            throw new Exception($"ConsoleMessageFilter.Out reported: Can't send to client=null.");
+
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup(_msg, false));
+    }
+    // Write multiple text lines to client console (can be usefull instead of using line breaks)
+    public static void Console(List<string> _msgs, ClientInfo _cInfo)
+    {
+        if (_cInfo == null)
+            throw new Exception($"ConsoleMessageFilter.Out reported: Can't send to client=null.");
+
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup(_msgs, false));
+    }
+    // Message all or specific player in chat
+    public static void Message(string msg, ClientInfo cInfo = null)
+    {
+        if (cInfo != null)
+            cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageChat>().Setup(EChatType.Whisper, -1, msg + "[-]", "", false, null));
+        else
+        {
+            List<ClientInfo> _clientList = CF_Player.GetClients();
+            if (_clientList == null || _clientList.Count < 1)
+                return;
+
+            for (int i = 0; i < _clientList.Count; i++)
+            {
+                ClientInfo _cInfo2 = _clientList[i];
+                if (_cInfo2 == null)
+                    continue;
+                Message(msg, _cInfo2);
+            }
+        }
+    }
+    // Message online persistent allies of a player in chat
+    public static void MessageFriends(PlatformUserIdentifierAbs _UserId, string msg)
+    {
+        PersistentPlayerData ppd = GameManager.Instance.persistentPlayers.GetPlayerData(_UserId);
+
+        if (ppd == null)
+            return;
+
+        if (ppd.ACL != null)
+        {
+            foreach (PlatformUserIdentifierAbs friend in ppd.ACL)
+            {
+                ClientInfo _cInfo = CF_Player.GetClient(friend);
+                if (_cInfo == null)
+                    continue;
+                Message(msg, _cInfo);
+            }
+        }
+    }
+    // Show toolbelt message
     public static void ShowToolbeltMessage(ClientInfo _cInfo, string _toolbeltMessage)
     {
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageShowToolbeltMessage>().Setup(_toolbeltMessage, ""));
     }
+    // Show toolbelt message with sound
     public static void ShowToolbeltMessageWithSound(ClientInfo _cInfo, string _toolbeltMessage, string _sound)
     {
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageShowToolbeltMessage>().Setup(_toolbeltMessage, _sound));
     }
+    // Play sound for player
     public static void PlaySound(ClientInfo _cInfo, string _sound)
     {
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageShowToolbeltMessage>().Setup("", _sound));
     }
+    // Open website in system browser (needs confirmation by the client)
     public static void OpenUrl(ClientInfo _cInfo, string websiteURL)
     {
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("createwebuser " + Convert.ToBase64String(Encoding.UTF8.GetBytes(websiteURL)), true));

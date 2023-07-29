@@ -33,7 +33,7 @@ public class PlayerRankManager
     }
     public static void OnChatMessage(ClientInfo _cInfo, ChatMessage _chatMsg)
     {
-        if (!GetCurrentRank(out PlayerRank _rank, (int)_cInfo.latestPlayerData.totalTimePlayed, Players.GetPermission(_cInfo), "chat"))
+        if (!GetCurrentRank(out PlayerRank _rank, (int)_cInfo.latestPlayerData.totalTimePlayed, CF_Player.GetPermission(_cInfo), "chat"))
             return;
 
         if (!string.IsNullOrEmpty(_rank.colorChat))

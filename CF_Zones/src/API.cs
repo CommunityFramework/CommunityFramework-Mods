@@ -6,8 +6,8 @@ namespace CF_Zones
 {
     public class API : IModApi
     {
-        public static ModX mod = new ModX("CF_Zones", OnConfigLoaded, OnPhrasesLoaded);
-        public static LogX x = new LogX("CF_Zones");
+        public static CF_Mod mod = new CF_Mod("CF_Zones", OnConfigLoaded, OnPhrasesLoaded);
+        public static CF_Log x = new CF_Log("CF_Zones");
         public static Harmony harmony = new Harmony("CF_Zones");
         public static string filePathZones;
         public void InitMod(Mod _modInstance)
@@ -20,7 +20,7 @@ namespace CF_Zones
 
             ChatManager.RegisterChatTrigger("zones", OnZonesCommand);
             ZoneManager.LoadZonesFromFile();
-            Timers.AddOneSecTimer(OnEvery1Sec, "CF_Zones", true);
+            CF_Timer.AddOneSecTimer(OnEvery1Sec, "CF_Zones", true);
         }
         public static void OnConfigLoaded()
         {
@@ -32,7 +32,7 @@ namespace CF_Zones
         }
         public static void OnEvery1Sec()
         {
-            Players.GetPlayers().ForEach(player =>
+            CF_Player.GetPlayers().ForEach(player =>
             {
                 ZoneManager.UpdateZonesForPlayer(player);
             });

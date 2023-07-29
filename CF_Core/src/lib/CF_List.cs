@@ -1,19 +1,7 @@
 ﻿using System.Collections.Generic;
 
-public class Utilz
+public class CF_List
 {
-    /*
-    public static bool ContainsAny(this string haystack, params string[] needles)
-    {
-        foreach (string needle in needles)
-        {
-            if (haystack.Contains(needle))
-                return true;
-        }
-
-        return false;
-    }
-    */
     public static void Shuffle<T>(ref List<T> list)
     {
         int count = list.Count;

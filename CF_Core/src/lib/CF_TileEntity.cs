@@ -1,4 +1,4 @@
-﻿public class TileEntities
+﻿public class CF_TileEntity
 {
     public static string GetPosTele(TileEntity _te)
     {
