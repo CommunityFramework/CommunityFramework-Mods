@@ -8,9 +8,29 @@ public class CF_Player
     // ClientInfo 
     public static List<ClientInfo> GetClients() => ConnectionManager.Instance.Clients.List.ToList();
     public static ClientInfo GetClient(int _entityId) => ConnectionManager.Instance.Clients.ForEntityId(_entityId);
+    public static bool GetClient(int _entityI, out ClientInfo _cInfo)
+    {
+        _cInfo = GetClient(_entityI);
+        return _cInfo != null;
+    }
     public static ClientInfo GetClient(EntityPlayer _player) => ConnectionManager.Instance.Clients.ForEntityId(_player.entityId);
+    public static bool GetClient(EntityPlayer _player, out ClientInfo _cInfo) 
+    {
+        _cInfo = GetClient(_player);
+        return _cInfo  != null; 
+    }
     public static ClientInfo GetClient(PlatformUserIdentifierAbs _user) => ConnectionManager.Instance.Clients.ForUserId(_user);
+    public static bool GetClient(PlatformUserIdentifierAbs _user, out ClientInfo _cInfo)
+    {
+        _cInfo = GetClient(_user);
+        return _cInfo != null;
+    }
     public static ClientInfo GetClient(string _platform, string _userId) => GetClient(PlatformUserIdentifierAbs.FromPlatformAndId(_platform, _userId, false));
+    public static bool GetClient(string _platform, string _userId, out ClientInfo _cInfo)
+    {
+        _cInfo = GetClient(_platform, _userId);
+        return _cInfo != null;
+    }
     public static ClientInfo GetClient(long _peer) => ConnectionManager.Instance.Clients.ForLiteNetPeer(_peer);
     public static ClientInfo GetClient(string _nameOrId) => ConnectionManager.Instance.Clients.GetForNameOrId(_nameOrId);
 
