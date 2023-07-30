@@ -1,5 +1,4 @@
-﻿using Epic.OnlineServices.Presence;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +10,7 @@ public class CF_Player
     public static ClientInfo GetClient(int _entityId) => ConnectionManager.Instance.Clients.ForEntityId(_entityId);
     public static ClientInfo GetClient(EntityPlayer _player) => ConnectionManager.Instance.Clients.ForEntityId(_player.entityId);
     public static ClientInfo GetClient(PlatformUserIdentifierAbs _user) => ConnectionManager.Instance.Clients.ForUserId(_user);
-    public static ClientInfo GetClient(string _platform, string _platformAuth) => GetClient(PlatformUserIdentifierAbs.FromPlatformAndId(_platform, _platformAuth, false));
+    public static ClientInfo GetClient(string _platform, string _userId) => GetClient(PlatformUserIdentifierAbs.FromPlatformAndId(_platform, _userId, false));
     public static ClientInfo GetClient(long _peer) => ConnectionManager.Instance.Clients.ForLiteNetPeer(_peer);
     public static ClientInfo GetClient(string _nameOrId) => ConnectionManager.Instance.Clients.GetForNameOrId(_nameOrId);
 
@@ -19,6 +18,16 @@ public class CF_Player
     public static List<EntityPlayer> GetPlayers() => new List<EntityPlayer>(GameManager.Instance.World.Players.dict.Values.ToList());
     public static EntityPlayer GetPlayer(ClientInfo _cInfo) => GetPlayer(_cInfo.entityId);
     public static EntityPlayer GetPlayer(int _entityId) => GameManager.Instance.World.Players.dict.ContainsKey(_entityId)? GameManager.Instance.World.Players.dict[_entityId] : null;
+    public static bool GetPlayer(ClientInfo _cInfo, out EntityPlayer _player)
+    {
+        _player = GetPlayer(_cInfo.entityId);
+        return _player != null;
+    }
+    public static bool GetPlayer(int _entityId, out EntityPlayer _player)
+    {
+        _player = GetPlayer(_entityId);
+        return _player != null;
+    }
 
     // PersistentPlayerData
     public static PersistentPlayerData GetPersistent(EntityPlayer _player) => GetPersistent(_player.entityId);
