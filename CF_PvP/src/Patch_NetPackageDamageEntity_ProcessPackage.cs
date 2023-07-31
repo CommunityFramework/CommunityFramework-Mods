@@ -2,6 +2,7 @@
 using System;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking.Types;
 using static CF_PvP.API;
 
 namespace CF_PvP
@@ -41,7 +42,7 @@ namespace CF_PvP
 
                 // Add the damage details to the hit log manager for further processing
                 float distance = Vector3.Distance(playerA.position, playerV.position);
-                HitLogManager.Add(playerA, playerV, ___strength, ___bFatal, ___attackingItem, distance, (Utils.EnumHitDirection)___hitDirection, (EnumBodyPartHit)___hitBodyPart);
+                HitLog.AddEntry(__instance.Sender, cInfoA, cInfoV, playerA, playerV, ___strength, ___ArmorDamage, ___bFatal, ___attackingItem, (Utils.EnumHitDirection)___hitDirection, (EnumBodyPartHit)___hitBodyPart, ServerMonitor.FPS);
 
                 // If the attacker is not the package sender or the distance is too great, return false to prevent processing
                 if (___attackerEntityId != __instance.Sender.entityId || distance > 200)
