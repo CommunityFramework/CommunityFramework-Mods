@@ -171,7 +171,7 @@ namespace CF_Firewall
 
                 foreach (KeyValuePair<string, CheckedIP> kv in new Dictionary<string, CheckedIP>(checkedIPs))
                 {
-                    if (kv.Value.last.AddHours(ipHubKeep) < DateTime.Now)
+                    if (kv.Value.last.AddHours(ipHubKeep) < DateTime.UtcNow)
                         checkedIPs.Remove(kv.Key);
                 }
 
@@ -198,7 +198,7 @@ namespace CF_Firewall
             {
                 try
                 {
-                    if (checkedIPs.ContainsKey(_cInfo.ip) && (checkedIPs[_cInfo.ip].data == null || checkedIPs[_cInfo.ip].last.AddHours(ipHubRecheck) > DateTime.Now))
+                    if (checkedIPs.ContainsKey(_cInfo.ip) && (checkedIPs[_cInfo.ip].data == null || checkedIPs[_cInfo.ip].last.AddHours(ipHubRecheck) > DateTime.UtcNow))
                         CheckIPhub.CheckIPdata(_cInfo);
                     else IPHubResponse.Check(_cInfo, CheckIPhub.ProcessIpHubResponse);
                 }
@@ -235,7 +235,7 @@ namespace CF_Firewall
         public static bool Ban(ClientInfo _cInfo, string _reason, string _details)
         {
             x.Log($"Banned {_cInfo} for reason: {_reason} details: {_details}");
-            GameManager.Instance.adminTools.Blacklist.AddBan(_cInfo.playerName, _cInfo.PlatformId, DateTime.Now.AddYears(10), _reason);
+            GameManager.Instance.adminTools.Blacklist.AddBan(_cInfo.playerName, _cInfo.PlatformId, DateTime.UtcNow.AddYears(10), _reason);
             GameUtils.KickPlayerForClientInfo(_cInfo, new GameUtils.KickPlayerData(GameUtils.EKickReason.ManualKick, _customReason: _reason));
             Ban(_cInfo.ip);
             return true;
@@ -245,7 +245,7 @@ namespace CF_Firewall
             if (checkedIPs.ContainsKey(_ip))
             {
                 checkedIPs[_ip].ipBan = true;
-                checkedIPs[_ip].last = DateTime.Now;
+                checkedIPs[_ip].last = DateTime.UtcNow;
 
                 /*
                 foreach (Database.Player dbPlayer in Database.GetPlayers(true))
@@ -260,7 +260,7 @@ namespace CF_Firewall
             else checkedIPs.Add(_ip, new CheckedIP());
 
             checkedIPs[_ip].ipBan = false;
-            checkedIPs[_ip].last = DateTime.Now;
+            checkedIPs[_ip].last = DateTime.UtcNow;
 
             x.Log($"IP: {_ip} banned.");
 
@@ -274,7 +274,7 @@ namespace CF_Firewall
                 return false;
 
             checkedIPs[IP].ipBan = false;
-            checkedIPs[IP].last = DateTime.Now;
+            checkedIPs[IP].last = DateTime.UtcNow;
 
             x.Log($"IP: {IP} unbanned by command.");
 

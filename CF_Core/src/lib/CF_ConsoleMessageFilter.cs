@@ -70,16 +70,16 @@ public class CF_ConsoleMessageFilter
         // Check if the message is on cooldown
         if (matchingPattern != null && messageCooldowns.TryGetValue(matchingPattern, out MessageInfo messageInfo))
         {
-            var elapsedTime = (int)(DateTime.Now - messageInfo.LastSentTime).TotalSeconds;
+            var elapsedTime = (int)(DateTime.UtcNow - messageInfo.LastSentTime).TotalSeconds;
 
             // Print the stats if the elapsed time exceeds the MaxStatsPrintInterval
-            if ((DateTime.Now - messageInfo.lastStatsPrintTime).TotalSeconds >= MinStatsPrintInterval)
+            if ((DateTime.UtcNow - messageInfo.lastStatsPrintTime).TotalSeconds >= MinStatsPrintInterval)
             {
                 int remainingCooldown = messageInfo.Cooldown - elapsedTime;
                 CF_Console.Out($"[Cooldown] {_msg} (x{messageInfo.Count}, Cooldown: {remainingCooldown}s)");
 
                 // Update the last time stats were printed
-                messageInfo.lastStatsPrintTime = DateTime.Now;
+                messageInfo.lastStatsPrintTime = DateTime.UtcNow;
             }
 
             // Continue with the regular cooldown logic
@@ -90,7 +90,7 @@ public class CF_ConsoleMessageFilter
             else
             {
                 messageInfo.Count++;
-                messageInfo.LastSentTime = DateTime.Now;
+                messageInfo.LastSentTime = DateTime.UtcNow;
 
                 if (messageInfo.Count >= MaxCountBeforeCooldownIncrease)
                 {
@@ -109,7 +109,7 @@ public class CF_ConsoleMessageFilter
             {
                 Cooldown = DefaultCooldown,
                 Count = 1,
-                LastSentTime = DateTime.Now
+                LastSentTime = DateTime.UtcNow
             };
         }
 

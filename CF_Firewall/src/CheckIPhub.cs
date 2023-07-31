@@ -18,7 +18,7 @@ namespace CF_Firewall
                 if (checkedIPs.ContainsKey(_cInfo.ip))
                 {
                     checkedIPs[_cInfo.ip].data = response;
-                    checkedIPs[_cInfo.ip].last = DateTime.Now;
+                    checkedIPs[_cInfo.ip].last = DateTime.UtcNow;
                 }
                 else checkedIPs.Add(_cInfo.ip, new CheckedIP(response));
 

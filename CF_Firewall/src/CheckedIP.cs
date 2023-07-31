@@ -14,12 +14,12 @@ namespace CF_Firewall
         public CheckedIP(IPHubResponse response)
         {
             this.data = response;
-            this.last = DateTime.Now;
+            this.last = DateTime.UtcNow;
         }
         public CheckedIP()
         {
             this.ipBan = true;
-            this.last = DateTime.Now;
+            this.last = DateTime.UtcNow;
 
         }
     }

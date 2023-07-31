@@ -99,13 +99,13 @@ public class DiscordApp
                     CF_Console.Out("Hit rate limit. Waiting for " + ex.RetryAfter + " milliseconds before retrying.");
 
                     // Get the current time
-                    DateTime currentTime = DateTime.Now;
+                    DateTime currentTime = DateTime.UtcNow;
 
                     // Calculate the time to wait until
                     DateTime waitUntil = currentTime.AddMilliseconds(ex.RetryAfter.TotalMilliseconds);
 
                     // Wait until the specified time
-                    while (DateTime.Now < waitUntil)
+                    while (DateTime.UtcNow < waitUntil)
                     {
                         // Sleep for a short amount of time to avoid busy waiting
                         Thread.Sleep(100);
@@ -246,18 +246,18 @@ public class RateLimiter
 
     public RateLimiter()
     {
-        this.resetTime = DateTime.Now;
+        this.resetTime = DateTime.UtcNow;
         this.remainingRequests = 0;
     }
 
     public bool CanMakeRequest()
     {
-        return DateTime.Now >= this.resetTime && this.remainingRequests > 0;
+        return DateTime.UtcNow >= this.resetTime && this.remainingRequests > 0;
     }
 
     public TimeSpan GetResetTime()
     {
-        return this.resetTime - DateTime.Now;
+        return this.resetTime - DateTime.UtcNow;
     }
 
     public void UpdateRateLimitInfo(int remaining, DateTime reset)
