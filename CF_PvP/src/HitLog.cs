@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using static Prefab;
 
 public class HitLog
 {
     public static List<HitLogEntry> entries = new List<HitLogEntry>();
 
     // Method to add a new hit log entry to the list
-    public static void AddEntry(HitLogEntry entry)
+    public static void AddEntry(ClientInfo source, ClientInfo attacker, ClientInfo victim, EntityPlayer playerA, EntityPlayer playerV, int damage, int armorDamage, bool fatal, ItemValue weapon, Utils.EnumHitDirection direction, EnumBodyPartHit hitbox, float fps)
     {
-        entries.Add(entry);
-    }
-    public static void AddEntry(DateTime timestamp, ClientInfo attacker, ClientInfo victim, EntityPlayer playerA, EntityPlayer playerV, int damage, int armor, int health, float stamina, bool fatal, string weapon, int distance, Utils.EnumHitDirection direction, EnumBodyPartHit hitbox)
-    {
-        HitLogEntry entry = new HitLogEntry(DateTime timestamp, ClientInfo attacker, ClientInfo victim, EntityPlayer playerA, EntityPlayer playerV, int damage, int armor, int health, float stamina, bool fatal, string weapon, int distance, Utils.EnumHitDirection direction, EnumBodyPartHit hitbox);
+        var entry = new HitLogEntry(source, attacker, victim, playerA, playerV, damage, armorDamage, fatal, weapon, direction, hitbox, fps);
         entries.Add(entry);
     }
     // Method to retrieve all hit log entries for a specific player
@@ -50,7 +45,7 @@ public class HitLog
     // Method to Retrieve Entries with Low Health
     public static List<HitLogEntry> GetLowHealthEntries(int threshold)
     {
-        return entries.Where(entry => entry.health <= threshold).ToList();
+        return entries.Where(entry => entry.healthA <= threshold).ToList();
     }
     // Method to Retrieve Entries with Specific Weapon Used
     public static List<HitLogEntry> GetEntriesWithWeapon(string weaponName)
@@ -86,7 +81,7 @@ public class HitLog
             return false;
 
         // Calculate average hit distance and hitbox distribution
-        float averageDistance = (float)playerEntries.Average(entry => entry.distance);
+        float averageDistance = (float)playerEntries.Average(entry => entry.Distance());
         Dictionary<EnumBodyPartHit, int> hitboxCounts = new Dictionary<EnumBodyPartHit, int>();
 
         foreach (var entry in playerEntries)

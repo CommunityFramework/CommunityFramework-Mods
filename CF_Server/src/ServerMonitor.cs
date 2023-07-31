@@ -19,6 +19,7 @@ public class ServerMonitor
     public static List<float> FPSlist_3m = new List<float>();
     public static List<float> FPSlist_5m = new List<float>();
     public static List<float> FPSlist_10m = new List<float>();
+    public static float FPS => FPSlist_10s.Count > 0 ? FPSlist_10s[0] : 1000;
     public static void FillFpsLists()
     {
         float fps = GameManager.Instance.fps.Counter;

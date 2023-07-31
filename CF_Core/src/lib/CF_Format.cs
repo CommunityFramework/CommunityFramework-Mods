@@ -29,46 +29,61 @@ public class CF_Format
 
         return result;
     }
-    public static bool ItemStack(ItemStack itemStack, bool quality, bool mods, out string output)
+    public static void ItemStack(ItemStack itemStack, out string output, bool quality = false, bool mods = false, bool seed = false)
     {
-        output = null;
-
+        output = ItemStack(itemStack, quality, mods, seed);
+    }
+    public static string ItemStack(ItemStack itemStack, bool quality = false, bool mods = false, bool seed = false)
+    {
+        ItemValue itemValue = itemStack.itemValue;
         if (itemStack.IsEmpty())
-            return false;
+            return "";
 
         StringBuilder sb = new StringBuilder();
 
-        sb.Append($"x{itemStack.count} {itemStack.itemValue.ItemClass.Name}");
+        sb.Append($"x{itemStack.count} ");
+        sb.Append(Item(itemValue, quality, mods, seed));
 
-        if (quality && itemStack.itemValue.ItemClass.HasQuality)
+        return sb.ToString();
+    }
+    public static void Item(ItemValue itemValue, out string output, bool quality = false, bool mods = false, bool seed = false)
+    {
+        output = Item(itemValue, quality, mods, seed);
+    }
+    public static string Item(ItemValue itemValue, bool quality = false, bool mods = false, bool seed = false)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append($"{itemValue.ItemClass.Name}");
+
+        if (quality && itemValue.ItemClass.HasQuality)
         {
-            sb.Append($" Q: {itemStack.itemValue.Quality}");
-            if (itemStack.itemValue.Seed > 0)
-                sb.Append($" ({itemStack.itemValue.Seed})");
+            sb.Append($" Q: {itemValue.Quality}");
+            if (seed && itemValue.Seed > 0)
+                sb.Append($" ({itemValue.Seed})");
         }
 
-        if (mods && itemStack.itemValue.Modifications != null && itemStack.itemValue.Modifications.Length > 0)
+        if (mods && itemValue.Modifications != null && itemValue.Modifications.Length > 0)
         {
             sb.Append($" Mods (");
             int count = 0;
-            for (int iMod = 0; iMod < itemStack.itemValue.Modifications.Length; iMod++)
+            ItemValue[] itemMods = itemValue.Modifications;
+            for (int iMod = 0; iMod < itemMods.Length; iMod++)
             {
-                if (itemStack.itemValue.Modifications[iMod] == null || itemStack.itemValue.Modifications[iMod].IsEmpty())
+                if (itemMods[iMod] == null || itemMods[iMod].IsEmpty())
                     continue;
 
                 count++;
 
                 if (count > 1)
-                    sb.Append(count == itemStack.itemValue.Modifications.Length - 1 ? " & " : ", ");
+                    sb.Append(count == itemMods.Length - 1 ? " & " : ", ");
 
-                sb.Append(itemStack.itemValue.Modifications[iMod].ItemClass.Name);
+                sb.Append(itemMods[iMod].ItemClass.Name);
             }
             sb.Append($")");
         }
 
-        output = sb.ToString();
-
-        return true;
+        return sb.ToString();
     }
     public static string Position(TileEntity _te)
     {
