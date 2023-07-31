@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 public class CF_Player
 {
@@ -194,5 +195,18 @@ public class CF_Player
     public static void OpenUrl(ClientInfo _cInfo, string websiteURL)
     {
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup("createwebuser " + Convert.ToBase64String(Encoding.UTF8.GetBytes(websiteURL)), true));
+    }
+    // Teleport
+    public static void Teleport(ClientInfo _cInfo, Vector3 _pos)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(_pos));
+    }
+    public static void Teleport(ClientInfo _cInfo, Vector3 _pos, Vector3 _viewDirection)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(_pos, _viewDirection));
+    }
+    public static void Teleport(ClientInfo _cInfo, Vector3 _pos, Vector3 _viewDirection, bool _onlyIfNotflying)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(_pos, _viewDirection, _onlyIfNotflying));
     }
 }
