@@ -12,7 +12,7 @@ public class ZonePlayerInfo
     public ZonePlayerInfo(EntityPlayer _player, Vector3 _outPos)
     {
         entityId = _player.entityId;
-        entered = DateTime.Now;
+        entered = DateTime.UtcNow;
         outPos = _outPos;
         enterPos = _player.position;
         lastPos = _player.position;
