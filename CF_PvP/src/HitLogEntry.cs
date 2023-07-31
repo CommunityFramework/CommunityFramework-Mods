@@ -18,6 +18,7 @@ public class HitLogEntry
     public bool fatal;
     public string weapon;
     public string weaponEx;
+    public ItemValue itemValue;
     public Utils.EnumHitDirection direction;
     public EnumBodyPartHit hitbox;
     public Vector3 attackerPos;
@@ -39,6 +40,7 @@ public class HitLogEntry
         this.healthV = playerV.Health;
         this.staminaV = playerV.Stamina;
         this.fatal = fatal;
+        this.itemValue = itemValue.Clone();
         this.weapon = CF_Format.Item(weapon);
         this.weaponEx = CF_Format.Item(weapon, true, true, true);
         this.direction = direction;
