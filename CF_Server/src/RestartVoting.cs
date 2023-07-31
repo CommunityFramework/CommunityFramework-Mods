@@ -27,7 +27,7 @@ internal class RestartVoting
             if(restartVoteExpire < 1)
                 continue; // Infinite 
 
-            if(kv.Value.AddMinutes(restartVoteExpire) > DateTime.Now)
+            if(kv.Value.AddMinutes(restartVoteExpire) > DateTime.UtcNow)
                 continue; // Not expired yet
 
             // Expired
@@ -47,7 +47,7 @@ internal class RestartVoting
             return;
         }
 
-        if((DateTime.Now-serverStarted).TotalMinutes < restartVoteMinUptime)
+        if((DateTime.UtcNow-serverStarted).TotalMinutes < restartVoteMinUptime)
         {
             CF_Player.Message($"Server need to be up for at least {restartVoteMinUptime} minutes to be able to vote for a server restart.", _cInfo);
             return;
@@ -59,7 +59,7 @@ internal class RestartVoting
             return;
         }
 
-        votes.Add(_cInfo.entityId,DateTime.Now);
+        votes.Add(_cInfo.entityId,DateTime.UtcNow);
 
         int votesLeft = GetVotesRequired();
 

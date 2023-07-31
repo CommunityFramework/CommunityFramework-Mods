@@ -51,7 +51,7 @@ public class RestartManager
             return;
 
         // Min uptime
-        if ((DateTime.Now - serverStarted).TotalMinutes < minUptime)
+        if ((DateTime.UtcNow - serverStarted).TotalMinutes < minUptime)
             return;
 
         // Blood moon
@@ -117,7 +117,7 @@ public class RestartManager
         }
         */
     }
-    public static DateTime lastWorldSave = DateTime.Now;
+    public static DateTime lastWorldSave = DateTime.UtcNow;
     public static int countdown = -1;
     public static int restartAttempts = 0;
     public static bool locked = false;
@@ -293,9 +293,9 @@ public class RestartManager
                     case 5:
                     case 1:
                         // Save World
-                        if (lastWorldSave.AddSeconds(10) > DateTime.Now)
+                        if (lastWorldSave.AddSeconds(10) > DateTime.UtcNow)
                         {
-                            lastWorldSave = DateTime.Now;
+                            lastWorldSave = DateTime.UtcNow;
                             x.Log($"ShutdownX=> Save World");
                             Log.Out($"ShutdownX=> Save World"); ;
                             GameManager.Instance.SaveWorld();
