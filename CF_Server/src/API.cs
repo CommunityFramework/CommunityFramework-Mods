@@ -14,7 +14,7 @@ namespace CF_Server
 
         public void InitMod(Mod _modInstance)
         {
-            serverStarted = DateTime.Now;
+            serverStarted = DateTime.UtcNow;
 
             mod.Activate();
 

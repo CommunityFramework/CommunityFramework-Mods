@@ -40,8 +40,8 @@ namespace CF_Server
             //Chat.Message($"Ent: {Entity.InstanceCount} Ply: {GameManager.Instance.World.Players.list.Count}+ Raids: {Raids.raidZones.Count}", _cInfo);
             CF_Player.Message($"Zom: {zombies} Ani: {animals} Items: {EntityItem.ItemInstanceCount}", _cInfo);
             CF_Player.Message($"Veh: {vehicles + gyro} Gyro: {gyro} Air: {supplyCrates}", _cInfo);
-            CF_Player.Message($"Uptime: {(DateTime.Now - serverStarted).ToString(@"hh\:mm\:ss")}", _cInfo);
-            //Chat.Message($"Uptime: {(DateTime.Now - serverStarted).ToString(@"hh\:mm\:ss")} Players Seen: {Database.GetPlayers(true).Count}", _cInfo);
+            CF_Player.Message($"Uptime: {(DateTime.UtcNow - serverStarted).ToString(@"hh\:mm\:ss")}", _cInfo);
+            //Chat.Message($"Uptime: {(DateTime.UtcNow - serverStarted).ToString(@"hh\:mm\:ss")} Players Seen: {Database.GetPlayers(true).Count}", _cInfo);
             if (ServerMonitor.FPSlist_1m.Count > 5)
             {
                 if (_adv)
