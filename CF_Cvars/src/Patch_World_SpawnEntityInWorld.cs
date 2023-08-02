@@ -14,7 +14,7 @@ namespace CF_Cvars
             {
                 if (_entity is EntityPlayer)
                 {
-                    CvarManager.UpdatePlayer(_entity as EntityPlayer);
+                    CF_CvarManager.UpdatePlayer(_entity as EntityPlayer);
                 }
             }
             catch (Exception e)

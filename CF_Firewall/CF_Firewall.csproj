@@ -169,14 +169,14 @@
     <Compile Include="src\API.cs" />
     <Compile Include="src\AsnRange.cs" />
     <Compile Include="src\CheckedIP.cs" />
-    <Compile Include="src\CheckIPhub.cs" />
-    <Compile Include="src\CheckSteam.cs" />
+    <Compile Include="src\IPhub.cs" />
+    <Compile Include="src\Steam.cs" />
     <Compile Include="src\CmdIPBan.cs" />
     <Compile Include="src\CmdWhitelist.cs" />
     <Compile Include="src\IPHubResponse.cs" />
     <Compile Include="src\Patch_AdminTools.cs" />
-    <Compile Include="src\VacBanWebResponse.cs" />
-    <Compile Include="src\Whitelist.cs" />
+    <Compile Include="src\SteamVacBanResponse.cs" />
+    <Compile Include="src\NoNamespace\CF_Whitelist.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

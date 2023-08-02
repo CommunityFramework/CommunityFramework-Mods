@@ -152,12 +152,13 @@
     <Compile Include="src\ChatTrigger_ServerStats.cs" />
     <Compile Include="src\CmdRestart.cs" />
     <Compile Include="src\Patch_GameManager_OpenTileEntityAllowed.cs" />
-    <Compile Include="src\RestartManager.cs" />
-    <Compile Include="src\ServerMonitor.cs" />
-    <Compile Include="src\RestartVoting.cs" />
+    <Compile Include="src\NoNamespace\CF_RestartManager.cs" />
+    <Compile Include="src\NoNamespace\CF_ServerMonitor.cs" />
+    <Compile Include="src\NoNamespace\CF_RestartVoting.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

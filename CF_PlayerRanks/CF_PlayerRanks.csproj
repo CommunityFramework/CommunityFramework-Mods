@@ -146,8 +146,8 @@
   <ItemGroup>
     <Compile Include="..\Properties\AssemblyInfo.cs" />
     <Compile Include="src\API.cs" />
-    <Compile Include="src\PlayerRank.cs" />
-    <Compile Include="src\PlayerRankManager.cs" />
+    <Compile Include="src\NoNamespace\CF_PlayerRank.cs" />
+    <Compile Include="src\NoNamespace\CF_PlayerRankManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

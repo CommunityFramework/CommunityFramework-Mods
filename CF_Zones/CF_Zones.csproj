@@ -149,11 +149,12 @@
   <ItemGroup>
     <Compile Include="..\Properties\AssemblyInfo.cs" />
     <Compile Include="src\API.cs" />
-    <Compile Include="src\Zone.cs" />
-    <Compile Include="src\ZoneAlive.cs" />
-    <Compile Include="src\ZoneClass.cs" />
-    <Compile Include="src\ZoneManager.cs" />
-    <Compile Include="src\ZonePlayerInfo.cs" />
+    <Compile Include="src\CmdZonesManager.cs" />
+    <Compile Include="src\CF_Zone.cs" />
+    <Compile Include="src\CF_ZoneAlive.cs" />
+    <Compile Include="src\CF_ZoneClass.cs" />
+    <Compile Include="src\CF_ZoneManager.cs" />
+    <Compile Include="src\CF_ZonePlayerInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

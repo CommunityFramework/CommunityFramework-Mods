@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DE848111-8841-4720-B831-780253E8666A}</ProjectGuid>
+    <ProjectGuid>{B4765BDF-B649-45D1-A350-2EB371966D67}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CF_PvP</RootNamespace>
@@ -153,9 +153,9 @@
   <ItemGroup>
     <Compile Include="..\Properties\AssemblyInfo.cs" />
     <Compile Include="src\API.cs" />
-    <Compile Include="src\HitLog.cs" />
-    <Compile Include="src\HitLogEntry.cs" />
-    <Compile Include="src\Patch_NetPackageDamageEntity_ProcessPackage.cs" />
+    <Compile Include="src\CF_HitLog.cs" />
+    <Compile Include="src\CF_HitLogEntry.cs" />
+    <Compile Include="src\Patch_NetPackageDamageEntity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

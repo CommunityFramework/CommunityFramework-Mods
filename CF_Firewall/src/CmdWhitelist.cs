@@ -46,44 +46,44 @@ namespace CF_Firewall
                     {
                         case "vpn":
                         case "v":
-                            if (!Whitelist.VPN(_params[1]))
+                            if (!CF_Whitelist.VPN(_params[1]))
                             {
-                                Whitelist.VPNAdd(_params[1]);
+                                CF_Whitelist.VPNAdd(_params[1]);
                                 SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Successfully granted VPN immunity.");
-                                Whitelist.Save();
+                                CF_Whitelist.Save();
                             }
                             else SingletonMonoBehaviour<SdtdConsole>.Instance.Output("VAC immunity already set.");
                             break;
                         case "vac":
                         case "steam":
                         case "s":
-                            if (!Whitelist.Steam(_params[1]))
+                            if (!CF_Whitelist.Steam(_params[1]))
                             {
-                                Whitelist.SteamAdd(_params[1]);
+                                CF_Whitelist.SteamAdd(_params[1]);
                                 SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Successfully granted VAC immunity.");
-                                Whitelist.Save();
+                                CF_Whitelist.Save();
                             }
                             else SingletonMonoBehaviour<SdtdConsole>.Instance.Output("VAC immunity already set.");
                             break;
                         case "country":
                         case "count":
                         case "c":
-                            if (!Whitelist.Country(_params[1]))
+                            if (!CF_Whitelist.Country(_params[1]))
                             {
-                                Whitelist.CountryAdd(_params[1]);
+                                CF_Whitelist.CountryAdd(_params[1]);
                                 SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Successfully granted country filter immunity.");
-                                Whitelist.Save();
+                                CF_Whitelist.Save();
                             }
                             SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Country filter immunity already set.");
                             break;
                         case "family":
                         case "fam":
                         case "f":
-                            if (!Whitelist.FamilyShare(_params[1]))
+                            if (!CF_Whitelist.FamilyShare(_params[1]))
                             {
-                                Whitelist.FamilyShareAdd(_params[1]);
+                                CF_Whitelist.FamilyShareAdd(_params[1]);
                                 SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Successfully granted family sharing immunity.");
-                                Whitelist.Save();
+                                CF_Whitelist.Save();
                             }
                             SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Family sharing immunity already set.");
                             break;

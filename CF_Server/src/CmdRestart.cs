@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZeroRestart
+namespace CF_Server
 {
     internal class CmdRestart : ConsoleCmdAbstract
     {
@@ -24,17 +24,17 @@ namespace ZeroRestart
                 {
                     if (int.TryParse(_params[0], out int delay))
                     {
-                        RestartManager.Restart(delay, $"admin", true);
+                        CF_RestartManager.Restart(delay, $"admin", true);
                     }
                 }
                 else if (_params.Count == 2)
                 {
                     if (int.TryParse(_params[0], out int delay))
                     {
-                        RestartManager.Restart(delay, _params[1], true);
+                        CF_RestartManager.Restart(delay, _params[1], true);
                     }
                 }
-                else RestartManager.AbortRestart($"", true);
+                else CF_RestartManager.AbortRestart($"", true);
             }
             catch (Exception e) { Log.Out($"Error in ShutdownX.Execute: {e}"); }
         }

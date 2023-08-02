@@ -152,7 +152,7 @@ namespace CF_Firewall
             ipHubCountryList = ipHubCountryFilter.Split(',');
 
             LoadIPdata();
-            Whitelist.Load();
+            CF_Whitelist.Load();
         }
         public static void OnPhrasesLoaded()
         {
@@ -199,15 +199,15 @@ namespace CF_Firewall
                 try
                 {
                     if (checkedIPs.ContainsKey(_cInfo.ip) && (checkedIPs[_cInfo.ip].data == null || checkedIPs[_cInfo.ip].last.AddHours(ipHubRecheck) > DateTime.UtcNow))
-                        CheckIPhub.CheckIPdata(_cInfo);
-                    else IPHubResponse.Check(_cInfo, CheckIPhub.ProcessIpHubResponse);
+                        IPhub.CheckIPdata(_cInfo);
+                    else IPHubResponse.Check(_cInfo, IPhub.ProcessIpHubResponse);
                 }
                 catch (Exception e) { x.Error($"CheckPlayer.IPHub reported: {e}"); }
             }
 
             if (_cInfo.PlatformId.PlatformIdentifier == EPlatformIdentifier.Steam 
                 && steamFamilyShare 
-                && Whitelist.FamilyShare(_cInfo))
+                && CF_Whitelist.FamilyShare(_cInfo))
             {
                 try
                 {
@@ -227,9 +227,9 @@ namespace CF_Firewall
 
             if (_cInfo.PlatformId.PlatformIdentifier == EPlatformIdentifier.Steam 
                 && !string.IsNullOrEmpty(steamToken) 
-                && (steamVacBan || steamCommunityBan || steamGameBan) && Whitelist.Steam(_cInfo))
+                && (steamVacBan || steamCommunityBan || steamGameBan) && CF_Whitelist.Steam(_cInfo))
             {
-                VacBanWebResponse.Check(_cInfo, CheckSteam.ProcesssVacBanWebResponse);
+                SteamVacBanResponse.Check(_cInfo, Steam.ProcesssVacBanWebResponse);
             }
         }
         public static bool Ban(ClientInfo _cInfo, string _reason, string _details)

@@ -8,7 +8,7 @@
         {
             mod.Activate();
 
-            ModEvents.ChatMessage.RegisterHandler(ChatManager.OnChatMessage);
+            ModEvents.ChatMessage.RegisterHandler(CF_ChatManager.OnChatMessage);
         }
         public static string discordWebhookURL;
         public static bool discordFilterCmds;

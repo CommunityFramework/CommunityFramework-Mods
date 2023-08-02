@@ -146,8 +146,8 @@
   <ItemGroup>
     <Compile Include="..\Properties\AssemblyInfo.cs" />
     <Compile Include="src\API.cs" />
-    <Compile Include="src\CustomCvar.cs" />
-    <Compile Include="src\CvarManager.cs" />
+    <Compile Include="src\CF_CustomCvar.cs" />
+    <Compile Include="src\CF_CvarManager.cs" />
     <Compile Include="src\Patch_World_SpawnEntityInWorld.cs" />
   </ItemGroup>
   <ItemGroup>

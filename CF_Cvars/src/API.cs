@@ -16,7 +16,7 @@ namespace CF_Cvars
         {
             mod.Activate();
             harmony.PatchAll();
-            CF_Timer.AddOneSecTimer(CvarManager.OnEvery1Sec, "CF_Cvars", false);
+            CF_Timer.AddOneSecTimer(CF_CvarManager.OnEvery1Sec, "CF_Cvars", false);
         }
         public static void OnConfigLoaded()
         {

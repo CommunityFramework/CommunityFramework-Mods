@@ -12,7 +12,25 @@ namespace CF_Server
     internal class ChatTrigger_ServerStats
     {
         static AccessTools.FieldRef<AIDirectorBloodMoonComponent, int> bmDayRef = AccessTools.FieldRefAccess<AIDirectorBloodMoonComponent, int>("bmDay");
+
         public static void ServerStats(ClientInfo _cInfo, bool _adv)
+        {
+            var stats = GetEntityStats();
+
+            CF_Player.Message("== SERVER STATS ==", _cInfo);
+            CF_Player.Message($"Bloodmoon: Day {bmDayRef(GameManager.Instance.World.aiDirector.BloodMoonComponent)}", _cInfo);
+            CF_Player.Message($"Ent: {Entity.InstanceCount} Ply: {GameManager.Instance.World.Players.list.Count}", _cInfo);
+            CF_Player.Message($"Zom: {stats.Zombies} Ani: {stats.Animals} Items: {EntityItem.ItemInstanceCount}", _cInfo);
+            CF_Player.Message($"Veh: {stats.Vehicles + stats.Gyro} Gyro: {stats.Gyro} Air: {stats.SupplyCrates}", _cInfo);
+            CF_Player.Message($"Uptime: {(DateTime.UtcNow - serverStarted).ToString(@"hh\:mm\:ss")}", _cInfo);
+            CF_Player.Message($"Fps | Delta: {CF_ServerMonitor.CurrentFPS} | {Time.deltaTime:F2}ms", _cInfo);
+            CF_Player.Message($"Avg FPS (1m|10m): {CF_ServerMonitor.GetAverageFPS(TimeSpan.FromMinutes(1)):F2} | {CF_ServerMonitor.GetAverageFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
+            CF_Player.Message($"95th percentile FPS (1m|10m): {CF_ServerMonitor.Get95thPercentileFPS(TimeSpan.FromMinutes(1)):F2} | {CF_ServerMonitor.Get95thPercentileFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
+            CF_Player.Message($"99th percentile FPS (1m|10m): {CF_ServerMonitor.Get99thPercentileFPS(TimeSpan.FromMinutes(1)):F2} | {CF_ServerMonitor.Get99thPercentileFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
+            CF_Player.Message($"Peak memory usage: {(float)System.Diagnostics.Process.GetCurrentProcess().PeakWorkingSet64 / (1024 * 1024):F2} MB", _cInfo);
+        }
+
+        private static EntityStats GetEntityStats()
         {
             int zombies = 0, animals = 0, vehicles = 0, gyro = 0, supplyCrates = 0;
             List<Entity> _entities = GameManager.Instance.World.Entities.list;
@@ -34,34 +52,23 @@ namespace CF_Server
                     supplyCrates++;
             }
 
-            CF_Player.Message($"== SERVER STATS ==", _cInfo);
-            CF_Player.Message($"Bloodmoon: Day {bmDayRef(GameManager.Instance.World.aiDirector.BloodMoonComponent)}", _cInfo);
-            CF_Player.Message($"Ent: {Entity.InstanceCount} Ply: {GameManager.Instance.World.Players.list.Count}", _cInfo);
-            //Chat.Message($"Ent: {Entity.InstanceCount} Ply: {GameManager.Instance.World.Players.list.Count}+ Raids: {Raids.raidZones.Count}", _cInfo);
-            CF_Player.Message($"Zom: {zombies} Ani: {animals} Items: {EntityItem.ItemInstanceCount}", _cInfo);
-            CF_Player.Message($"Veh: {vehicles + gyro} Gyro: {gyro} Air: {supplyCrates}", _cInfo);
-            CF_Player.Message($"Uptime: {(DateTime.UtcNow - serverStarted).ToString(@"hh\:mm\:ss")}", _cInfo);
-            //Chat.Message($"Uptime: {(DateTime.UtcNow - serverStarted).ToString(@"hh\:mm\:ss")} Players Seen: {Database.GetPlayers(true).Count}", _cInfo);
-            if (ServerMonitor.FPSlist_1m.Count > 5)
+            return new EntityStats
             {
-                if (_adv)
-                {
-                    CF_Player.Message($"Delta Time: {Time.deltaTime} s", _cInfo);
-                    CF_Player.Message($"== FPS STATS ==", _cInfo);
-                    CF_Player.Message($"10s => Avg: {ServerMonitor.FPSlist_10s.Average()} Min: {ServerMonitor.FPSlist_10s.Min()}", _cInfo);
-                    CF_Player.Message($"30s => Avg: {ServerMonitor.FPSlist_30s.Average()} Min: {ServerMonitor.FPSlist_30s.Min()}", _cInfo);
-                    CF_Player.Message($"1m => Avg: {ServerMonitor.FPSlist_1m.Average()} Min: {ServerMonitor.FPSlist_1m.Min()}", _cInfo);
-                    CF_Player.Message($"3m => Avg: {ServerMonitor.FPSlist_3m.Average()} Min: {ServerMonitor.FPSlist_3m.Min()}", _cInfo);
-                    CF_Player.Message($"5m => Avg: {ServerMonitor.FPSlist_5m.Average()} Min: {ServerMonitor.FPSlist_5m.Min()}", _cInfo);
-                    CF_Player.Message($"10m => Avg: {ServerMonitor.FPSlist_10m.Average()} Min: {ServerMonitor.FPSlist_10m.Min()}", _cInfo);
-                    //Chat.Message($"FPS => Avg: {ServerMonitor.FPSlist_1m.Average()} Worst: {ServerMonitor.FPSlist_1m.Min()} Lags: {FPSlist.Where(x => x < (float)FPSveryLow).Count()}", _cInfo);
-                    //Utilz.Message($"FPS => Cur: {FPSlist.GetRange(Math.Max(0, FPSlist.Count - 4), FPSlist.Count - 1).ToList<float>()}", _cInfo);
-                }
-                else
-                {
-                    CF_Player.Message($"FPS last minute => Avg: {ServerMonitor.FPSlist_1m.Average()} Min: {ServerMonitor.FPSlist_1m.Min()}", _cInfo);
-                }
-            }
+                Zombies = zombies,
+                Animals = animals,
+                Vehicles = vehicles,
+                Gyro = gyro,
+                SupplyCrates = supplyCrates
+            };
+        }
+
+        private struct EntityStats
+        {
+            public int Zombies;
+            public int Animals;
+            public int Vehicles;
+            public int Gyro;
+            public int SupplyCrates;
         }
     }
 }

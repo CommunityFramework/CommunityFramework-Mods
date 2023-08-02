@@ -2,13 +2,13 @@
 using HarmonyLib;
 using CF_Core;
 
-namespace CF_Zones
+namespace CF_ZonesManager
 {
     public class API : IModApi
     {
-        public static CF_Mod mod = new CF_Mod("CF_Zones", OnConfigLoaded, OnPhrasesLoaded);
-        public static CF_Log x = new CF_Log("CF_Zones");
-        public static Harmony harmony = new Harmony("CF_Zones");
+        public static CF_Mod mod = new CF_Mod("CF_ZonesManager", OnConfigLoaded, OnPhrasesLoaded);
+        public static CF_Log log = new CF_Log("CF_ZonesManager");
+        public static Harmony harmony = new Harmony("CF_ZonesManager");
         public static string filePathZones;
         public void InitMod(Mod _modInstance)
         {
@@ -18,9 +18,9 @@ namespace CF_Zones
 
             ModEvents.PlayerSpawnedInWorld.RegisterHandler(OnPlayerSpawnedInWorld);
 
-            ChatManager.RegisterChatTrigger("zones", OnZonesCommand);
-            ZoneManager.LoadZonesFromFile();
-            CF_Timer.AddOneSecTimer(OnEvery1Sec, "CF_Zones", true);
+            CF_ChatManager.RegisterChatTrigger("zones", OnZonesCommand);
+            CF_Zones.LoadZonesFromFile();
+            CF_Timer.AddOneSecTimer(OnEvery1Sec, "CF_ZonesManager", true);
         }
         public static void OnConfigLoaded()
         {
@@ -34,7 +34,7 @@ namespace CF_Zones
         {
             CF_Player.GetPlayers().ForEach(player =>
             {
-                ZoneManager.UpdateZonesForPlayer(player);
+                CF_Zones.UpdateZonesForPlayer(player);
             });
         }
         public static void OnPlayerSpawnedInWorld(ClientInfo _cInfo, RespawnType _respawnReason, Vector3i _pos)// Spawning player
@@ -42,7 +42,7 @@ namespace CF_Zones
             if (_cInfo == null)
                 return;
 
-            ZoneManager.OnPlayerSpawnedInWorld(_cInfo, _respawnReason, _pos);
+            CF_Zones.OnPlayerSpawnedInWorld(_cInfo, _respawnReason, _pos);
         }
         private void OnZonesCommand(ClientInfo _cInfo, string _command, List<string> _params)
         {

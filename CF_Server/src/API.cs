@@ -20,10 +20,10 @@ namespace CF_Server
 
             harmony.PatchAll();
 
-            ChatManager.RegisterChatTrigger("serverstats,ss,server", OnServerStatsCommand);
+            CF_ChatManager.RegisterChatTrigger("serverstats,ss,server", OnServerStatsCommand);
 
-            CF_Timer.AddOneSecTimer(ServerMonitor.OnEverySec, "ServerMonitor", false);
-            CF_Timer.AddOneSecTimer(RestartManager.OnEverySec, "RestartManager", false);
+            CF_Timer.AddOneSecTimer(CF_ServerMonitor.OnEverySec, "ServerMonitor", false);
+            CF_Timer.AddOneSecTimer(CF_RestartManager.OnEverySec, "RestartManager", false);
         }
         public static string eventS;
         public static int restartBloodmoonHours;
@@ -74,7 +74,7 @@ namespace CF_Server
             mod.AddSetting("Shutdown_Instance", "1", "", ".", out instanceName);
             mod.AddSetting("AdminIgnore", 0, -1, 1000, "", out adminPermIgnore);
 
-            ChatManager.RegisterChatTrigger(restartVoteCommands, RestartVoting.OnVoteRestart);
+            CF_ChatManager.RegisterChatTrigger(restartVoteCommands, CF_RestartVoting.OnVoteRestart);
         }
         public static string msgCountdown;
         public static string msgCountdownM;
