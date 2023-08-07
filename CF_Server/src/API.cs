@@ -9,7 +9,7 @@ namespace CF_Server
     {
         public static DateTime serverStarted;
         public static CF_Mod mod = new CF_Mod("CF_Server", OnConfigLoaded, OnPhrasesLoaded);
-        public static CF_Log x = new CF_Log("CF_Server");
+        public static CF_Log log = new CF_Log("CF_Server");
         Harmony harmony = new Harmony("CF_Server");
 
         public void InitMod(Mod _modInstance)

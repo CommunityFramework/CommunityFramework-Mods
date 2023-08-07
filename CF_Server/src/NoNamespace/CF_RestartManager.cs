@@ -19,7 +19,7 @@ public class CF_RestartManager
         else 
             CF_Player.Message(msgCountdownStarted.Replace("{REASON}", msgCountdownByAdmin));
 
-        x.Log($"CoundownExec => Seconds: {seconds} Manual: {manual} Reason: {_reason}");
+        log.Log($"CoundownExec => Seconds: {seconds} Manual: {manual} Reason: {_reason}");
         Log.Out($"CoundownExec => Seconds: {seconds} Manual: {manual} Reason: {_reason}");
     }
     public static void AbortRestart(string _reason, bool manual = false)
@@ -44,10 +44,10 @@ public class CF_RestartManager
         float veryLow = (float)FPSveryLow;
         if (GameManager.Instance.World.aiDirector.BloodMoonComponent.BloodMoonActive)
             veryLow = (float)FPSveryLowBM;
-        int lowFPS = CF_ServerMonitor.CountLowerFPS(FPSveryLow, TimeSpan.FromSeconds(30));
+        int lowFPS = CF_ServerMonitor.GetLowerFPSCount(FPSveryLow, TimeSpan.FromSeconds(30));
 
         // Server restarting already within timewindow
-        if (countdown > -1 && countdown < restartCountdown)
+        if (countdown > -1 || countdown < restartCountdown)
             return;
 
         // Min uptime
@@ -72,7 +72,7 @@ public class CF_RestartManager
 
         if (averageFPS > 0 && averageFPS < lowAverage)
         {
-            x.Warn($"Low FPS detected (average): {averageFPS:F1}. Restarting server.");
+            log.Warn($"Low FPS detected (average): {averageFPS:F1}. Restarting server.");
             CF_Player.Message("[ff0000]Bad server performance detected!");
             Shutdown(restartCountdown);
             return;
@@ -85,37 +85,11 @@ public class CF_RestartManager
 
         if (veryLowSamples > 0 && lowFPS > veryLowSamples)
         {
-            x.Warn($"Low FPS detected: {lowFPS} of / {CF_ServerMonitor.CountLowerFPS(FPSveryLow, TimeSpan.FromSeconds(30))}s below {FPSveryLow}. Restarting server.");
+            log.Warn($"Low FPS detected: {lowFPS} of / {CF_ServerMonitor.GetLowerFPSCount(FPSveryLow, TimeSpan.FromSeconds(30))}s below {FPSveryLow}. Restarting server.");
             CF_Player.Message("[ff0000]Bad server performance detected!");
             Shutdown(restartCountdown);
             return;
         }
-
-        /*
-        // Max Items
-        if (GameManager.Instance.fps.Counter > maxItems)
-        {
-            Shutdown(restartCountdown);
-            return;
-        }
-
-        long totalMemory = GC.GetTotalMemory(false); // Maybe req full = true?
-
-        // RAM RSS
-        float RSS = ((float)((double)GetRSS.GetCurrentRSS() / 1024.0 / 1024.0));
-        if (lowFPS > ramRSS)
-        {
-            Shutdown(restartCountdown);
-            return;
-        }
-
-        // RAM Heap
-        if (((float)totalMemory / 1048576f) > ramHeap)
-        {
-            Shutdown(restartCountdown);
-            return;
-        }
-        */
     }
     public static DateTime lastWorldSave = DateTime.UtcNow;
     public static int countdown = -1;
@@ -125,7 +99,7 @@ public class CF_RestartManager
     {
         if (seconds == -1)
         {
-            x.Log($"ShutdownX=> Aborted");
+            log.Log($"ShutdownX=> Aborted");
             countdown = seconds;
             restartAttempts = 0;
             locked = false;
@@ -135,7 +109,7 @@ public class CF_RestartManager
         else if (seconds > 0)
         {
 
-            x.Log($"ShutdownX=> {seconds}s");
+            log.Log($"ShutdownX=> {seconds}s");
             countdown = seconds;
             lastS = -1;
             lastM = -1;
@@ -144,7 +118,7 @@ public class CF_RestartManager
 
         restartAttempts += 1;
 
-        x.Log($"ShutdownX=> Shutdown: {restartAttempts}");
+        log.Log($"ShutdownX=> Shutdown: {restartAttempts}");
 
         if (restartAttempts > 20)
         {
@@ -164,7 +138,7 @@ public class CF_RestartManager
                     latestPlayerData.Save(GameIO.GetPlayerDataDir(), cInfo.InternalId.CombinedString);
 
                 // Kick
-                x.Log($"ShutdownX(Kick)=> {cInfo.playerName} ({cInfo.PlatformId.ReadablePlatformUserIdentifier})");
+                log.Log($"ShutdownX(Kick)=> {cInfo.playerName} ({cInfo.PlatformId.ReadablePlatformUserIdentifier})");
                 GameUtils.KickPlayerForClientInfo(cInfo, new GameUtils.KickPlayerData(GameUtils.EKickReason.ManualKick, _customReason: "Server restarting..."));
             }
 
@@ -172,11 +146,11 @@ public class CF_RestartManager
         }
 
         // Save Local Player
-        x.Log($"ShutdownX=> Save Local Player Data");
+        log.Log($"ShutdownX=> Save Local Player Data");
         GameManager.Instance.SaveLocalPlayerData();
 
         // Save World
-        x.Log($"ShutdownX=> Save World");
+        log.Log($"ShutdownX=> Save World");
         GameManager.Instance.SaveWorld();
 
         KillServer();
@@ -184,7 +158,7 @@ public class CF_RestartManager
     public static void KillServer()
     {
         // Shutdown
-        x.Log($"ShutdownX=> Shutting server down...");
+        log.Log($"ShutdownX=> Shutting server down...");
 
         if (shutdownMode == 1)
         {
@@ -296,7 +270,7 @@ public class CF_RestartManager
                         if (lastWorldSave.AddSeconds(10) > DateTime.UtcNow)
                         {
                             lastWorldSave = DateTime.UtcNow;
-                            x.Log($"ShutdownX=> Save World");
+                            log.Log($"ShutdownX=> Save World");
                             Log.Out($"ShutdownX=> Save World"); ;
                             GameManager.Instance.SaveWorld();
                         }
@@ -317,7 +291,7 @@ public class CF_RestartManager
                     case 2:
                     case 1:
 
-                        x.Log($"COUNTDOWN => {countdown}m");
+                        log.Log($"COUNTDOWN => {countdown}m");
                         Log.Out($"COUNTDOWN => {countdown}m");
                         CF_Player.Message(msgCountdownM.Replace("{COUNTDOWN}", countdown.ToString()));
 
@@ -327,7 +301,7 @@ public class CF_RestartManager
                             if (list != null && list.Count > 0)
                             {
                                 for (int index = 0; index < list.Count; ++index)
-                                    CF_Player.GameEvent(list[index], eventS);
+                                    CF_Player.FireGameEvent(list[index], eventS);
                             }
                         }
                         break;
@@ -346,7 +320,7 @@ public class CF_RestartManager
                 case 1:
                 case 0:
                     // Save World
-                    x.Log($"ShutdownX=> Save World");
+                    log.Log($"ShutdownX=> Save World");
                     Log.Out($"ShutdownX=> Save World");
                     break;
             }
@@ -365,7 +339,7 @@ public class CF_RestartManager
                 case 3:
                 case 2:
                 case 1:
-                    x.Log($"COUNTDOWN => {countdown}s");
+                    log.Log($"COUNTDOWN => {countdown}s");
                     Log.Out($"COUNTDOWN => {countdown}s");
                     CF_Player.Message(msgCountdown.Replace("{COUNTDOWN}", countdown.ToString()));
                     CF_Player.Message(msgLogout);
@@ -376,7 +350,7 @@ public class CF_RestartManager
                         if (list != null && list.Count > 0)
                         {
                             for (int index = 0; index < list.Count; ++index)
-                                CF_Player.GameEvent(list[index], eventS);
+                                CF_Player.FireGameEvent(list[index], eventS);
                         }
                     }
                     break;

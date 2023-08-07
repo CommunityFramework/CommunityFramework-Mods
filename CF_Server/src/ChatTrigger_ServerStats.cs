@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static CF_Server.API;
+using static CF_ServerMonitor;
 
 namespace CF_Server
 {
@@ -19,15 +20,27 @@ namespace CF_Server
 
             CF_Player.Message("== SERVER STATS ==", _cInfo);
             CF_Player.Message($"Bloodmoon: Day {bmDayRef(GameManager.Instance.World.aiDirector.BloodMoonComponent)}", _cInfo);
-            CF_Player.Message($"Ent: {Entity.InstanceCount} Ply: {GameManager.Instance.World.Players.list.Count}", _cInfo);
-            CF_Player.Message($"Zom: {stats.Zombies} Ani: {stats.Animals} Items: {EntityItem.ItemInstanceCount}", _cInfo);
-            CF_Player.Message($"Veh: {stats.Vehicles + stats.Gyro} Gyro: {stats.Gyro} Air: {stats.SupplyCrates}", _cInfo);
-            CF_Player.Message($"Uptime: {(DateTime.UtcNow - serverStarted).ToString(@"hh\:mm\:ss")}", _cInfo);
-            CF_Player.Message($"Fps | Delta: {CF_ServerMonitor.CurrentFPS} | {Time.deltaTime:F2}ms", _cInfo);
-            CF_Player.Message($"Avg FPS (1m|10m): {CF_ServerMonitor.GetAverageFPS(TimeSpan.FromMinutes(1)):F2} | {CF_ServerMonitor.GetAverageFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
-            CF_Player.Message($"95th percentile FPS (1m|10m): {CF_ServerMonitor.Get95thPercentileFPS(TimeSpan.FromMinutes(1)):F2} | {CF_ServerMonitor.Get95thPercentileFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
-            CF_Player.Message($"99th percentile FPS (1m|10m): {CF_ServerMonitor.Get99thPercentileFPS(TimeSpan.FromMinutes(1)):F2} | {CF_ServerMonitor.Get99thPercentileFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
-            CF_Player.Message($"Peak memory usage: {(float)System.Diagnostics.Process.GetCurrentProcess().PeakWorkingSet64 / (1024 * 1024):F2} MB", _cInfo);
+
+            if (_adv)
+                CF_Player.Message($"Entities: {Entity.InstanceCount} Players: {GameManager.Instance.World.Players.list.Count}", _cInfo);
+            else CF_Player.Message($"Players: {GameManager.Instance.World.Players.list.Count}", _cInfo);
+
+            if (_adv)
+                CF_Player.Message($"Zombies: {stats.Zombies} Animals: {stats.Animals} Items: {EntityItem.ItemInstanceCount}", _cInfo);
+            else CF_Player.Message($"Zombies: {stats.Zombies} Animals: {stats.Animals}", _cInfo);
+
+            if (_adv)
+                CF_Player.Message($"Veh: {stats.Vehicles + stats.Gyro} Gyro: {stats.Gyro} Air: {stats.SupplyCrates}", _cInfo);
+
+            CF_Player.Message($"Uptime: {DateTime.UtcNow - serverStarted:hh\\:mm\\:ss}", _cInfo);
+            CF_Player.Message($"Avg FPS (1m|10m): {GetAverageFPS(TimeSpan.FromMinutes(1)):F2} | {GetAverageFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
+
+            if (_adv)
+            {
+                CF_Player.Message($"95th perc. FPS (1m|10m): {Get95thPercentileFPS(TimeSpan.FromMinutes(1)):F2} | {Get95thPercentileFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
+                CF_Player.Message($"99th perc. FPS (1m|10m): {Get99thPercentileFPS(TimeSpan.FromMinutes(1)):F2} | {Get99thPercentileFPS(TimeSpan.FromMinutes(10)):F2}", _cInfo);
+                CF_Player.Message($"Fps | Delta: {CurrentFPS:F2} | {(Time.deltaTime * 1000f):F2}ms Heap: {Stats[(int)EnumSS.Heap]}MB", _cInfo);
+            }
         }
 
         private static EntityStats GetEntityStats()

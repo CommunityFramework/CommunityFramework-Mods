@@ -19,7 +19,7 @@ namespace CF_Server
                 ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
                 if (cInfo == null)
                 {
-                    x.Error($"No ClientInfo for id {_entityIdThatOpenedIt}");
+                    log.Error($"No ClientInfo for id {_entityIdThatOpenedIt}");
                     __result = false;
                     return false;
                 }
@@ -28,7 +28,7 @@ namespace CF_Server
                 {
                     if (!CF_RestartManager.CanOpenLootContainer(cInfo, _te))
                     {
-                        x.Log($"ServerManager denied access for id {_entityIdThatOpenedIt} opening a {_te.GetTileEntityType()} at {CF_TileEntity.GetPosTele(_te)}");
+                        log.Log($"ServerManager denied access for id {_entityIdThatOpenedIt} opening a {_te.GetTileEntityType()} at {CF_TileEntity.GetPosTele(_te)}");
                         __result = false;
                         return false;
                     }
@@ -36,7 +36,7 @@ namespace CF_Server
                 }
                 catch (Exception e)
                 {
-                    x.Error($"OpenTileEntityAllowed: {e}");
+                    log.Error($"OpenTileEntityAllowed: {e}");
                 }
 
                 return true;
@@ -58,7 +58,7 @@ namespace CF_Server
                 }
                 catch (Exception e)
                 {
-                    x.Error($"OnOpenTileEntityAllowed_Patch_Post reported: {e}");
+                    log.Error($"OnOpenTileEntityAllowed_Patch_Post reported: {e}");
                 }
             }
         }

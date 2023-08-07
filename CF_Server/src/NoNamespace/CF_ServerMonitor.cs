@@ -53,6 +53,18 @@ public class CF_ServerMonitor
 
         return relevantDataPoints.Min(point => point.Item1);
     }
+    public static float GetMaximumFPS(TimeSpan? timeWindow = null)
+    {
+        var minTimestamp = DateTime.UtcNow.Subtract(timeWindow ?? maxTimeWindow);
+        var relevantDataPoints = fpsDataPoints.FindAll(point => point.Item2 > minTimestamp);
+        if (!relevantDataPoints.Any()) return 0;
+        return relevantDataPoints.Max(point => point.Item1);
+    }
+    public static double GetTimeSpentBelowThreshold(float threshold, TimeSpan? timeWindow = null)
+    {
+        var belowThresholdDataPoints = GetLowerFPSCount(threshold, timeWindow);
+        return belowThresholdDataPoints * 1.0; // assuming each data point represents 1 second
+    }
     public static float GetFPSPercentile(int percentile, TimeSpan? timeWindow = null)
     {
         if (percentile < 0 || percentile > 100)
@@ -73,22 +85,106 @@ public class CF_ServerMonitor
         index = Math.Min(index, orderedFPSValues.Count - 1); // Make sure we don't go out of bounds
         return orderedFPSValues[index];
     }
-
+    public static float Get1stPercentileFPS(TimeSpan? timeWindow = null) => GetFPSPercentile(1, timeWindow);
+    public static float Get5thPercentileFPS(TimeSpan? timeWindow = null) => GetFPSPercentile(5, timeWindow);
+    public static float Get50thPercentileFPS(TimeSpan? timeWindow = null) => GetFPSPercentile(50, timeWindow);
     public static float Get95thPercentileFPS(TimeSpan? timeWindow = null) => GetFPSPercentile(95, timeWindow);
-
     public static float Get99thPercentileFPS(TimeSpan? timeWindow = null) => GetFPSPercentile(99, timeWindow);
-    public static int CountLowerFPS(float threshold, TimeSpan? timeWindow = null)
+    public static float GetMedianFPS(TimeSpan? timeWindow = null) => GetFPSPercentile(50, timeWindow);
+    public static int GetLowerFPSCount(float threshold, TimeSpan? timeWindow = null)
     {
         var minTimestamp = DateTime.UtcNow.Subtract(timeWindow ?? maxTimeWindow);
         var relevantDataPoints = fpsDataPoints.FindAll(point => point.Item2 > minTimestamp);
         return relevantDataPoints.Count(point => point.Item1 < threshold);
     }
-
-    public static int CountHigherFPS(float threshold, TimeSpan? timeWindow = null)
+    public static int GetHigherFPSCount(float threshold, TimeSpan? timeWindow = null)
     {
         var minTimestamp = DateTime.UtcNow.Subtract(timeWindow ?? maxTimeWindow);
         var relevantDataPoints = fpsDataPoints.FindAll(point => point.Item2 > minTimestamp);
         return relevantDataPoints.Count(point => point.Item1 > threshold);
+    }
+    public static float GetFPSVariability(TimeSpan? timeWindow = null)
+    {
+        var minTimestamp = DateTime.UtcNow.Subtract(timeWindow ?? maxTimeWindow);
+        var relevantDataPoints = fpsDataPoints.FindAll(point => point.Item2 > minTimestamp);
+        if (!relevantDataPoints.Any()) return 0;
+        float avg = relevantDataPoints.Average(point => point.Item1);
+        return (float)Math.Sqrt(relevantDataPoints.Average(point => Math.Pow(point.Item1 - avg, 2)));
+    }
+    public static float GetLastNDataPointsAverage(int n)
+    {
+        if (fpsDataPoints.Count < n) return 0;
+        return fpsDataPoints.Skip(fpsDataPoints.Count - n).Take(n).Average(point => point.Item1);
+    }
+    public static int GetDurationOfLastDropBelowThreshold(float threshold)
+    {
+        var reversedDataPoints = fpsDataPoints.AsEnumerable().Reverse();
+        int duration = 0;
+        foreach (var point in reversedDataPoints)
+        {
+            if (point.Item1 < threshold)
+                duration++;
+            else
+                break;
+        }
+        return duration;
+    }
+    public static double GetPercentageTimeBelowThreshold(float threshold, TimeSpan? timeWindow = null)
+    {
+        int totalDataPoints = fpsDataPoints.Count;
+        int belowThresholdDataPoints = GetLowerFPSCount(threshold, timeWindow);
+        return (belowThresholdDataPoints / (double)totalDataPoints) * 100;
+    }
+    public static int GetLongestStreakBelowThreshold(float threshold, TimeSpan? timeWindow = null)
+    {
+        var minTimestamp = DateTime.UtcNow.Subtract(timeWindow ?? maxTimeWindow);
+        var relevantDataPoints = fpsDataPoints.FindAll(point => point.Item2 > minTimestamp);
+        int longestStreak = 0, currentStreak = 0;
+        foreach (var point in relevantDataPoints)
+        {
+            if (point.Item1 < threshold)
+            {
+                currentStreak++;
+                if (currentStreak > longestStreak) longestStreak = currentStreak;
+            }
+            else
+                currentStreak = 0;
+        }
+        return longestStreak;
+    }
+    public static int GetNumberOfFPSFluctuations(float value, TimeSpan? timeWindow = null)
+    {
+        var minTimestamp = DateTime.UtcNow.Subtract(timeWindow ?? maxTimeWindow);
+        var relevantDataPoints = fpsDataPoints.FindAll(point => point.Item2 > minTimestamp);
+        int count = 0;
+        for (int i = 1; i < relevantDataPoints.Count; i++)
+        {
+            float diff = Math.Abs(relevantDataPoints[i].Item1 - relevantDataPoints[i - 1].Item1);
+            if (diff > value) count++;
+        }
+        return count;
+    }
+    public static double GetPercentageOfDropsAboveValue(float value, TimeSpan? timeWindow = null)
+    {
+        int totalDataPoints = fpsDataPoints.Count - 1; // Since we're comparing with previous
+        var totalDropsAboveValue = GetNumberOfFPSFluctuations(value, timeWindow);
+        return (totalDropsAboveValue / (double)totalDataPoints) * 100;
+    }
+    public static int GetFPSDropFrequency(float threshold, TimeSpan? timeWindow = null)
+    {
+        return GetLowerFPSCount(threshold, timeWindow);
+    }
+    public static int GetFrequencyOfRisesAboveThreshold(float threshold, TimeSpan? timeWindow = null)
+    {
+        var minTimestamp = DateTime.UtcNow.Subtract(timeWindow ?? maxTimeWindow);
+        var relevantDataPoints = fpsDataPoints.FindAll(point => point.Item2 > minTimestamp);
+        int count = 0;
+        for (int i = 1; i < relevantDataPoints.Count; i++)
+        {
+            float rise = relevantDataPoints[i].Item1 - relevantDataPoints[i - 1].Item1;
+            if (rise > threshold) count++;
+        }
+        return count;
     }
     private static void UpdateFpsList()
     {
