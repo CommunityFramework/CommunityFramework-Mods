@@ -12,7 +12,7 @@ namespace CF_ZonesManager
         public static string filePathZones;
         public void InitMod(Mod _modInstance)
         {
-            filePathZones = mod.modDatabasePath + "/zones.json";
+            filePathZones = mod.modConfigPath + "/zones.json";
             mod.Activate();
             harmony.PatchAll();
 
