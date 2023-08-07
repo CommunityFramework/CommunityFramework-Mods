@@ -191,6 +191,9 @@ public class CF_Zones
     }
     public static void SaveZonesToFile()
     {
+        if (!Directory.Exists(mod.modConfigPath))
+            Directory.CreateDirectory(mod.modConfigPath);
+
         Dictionary<string, CF_Zone> baseZones =
     Zones.ToDictionary(
         k => k.Key,
