@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -18,9 +16,21 @@ public class CF_HitLog
     private static Dictionary<int, int> totalDamageByPlayer = new Dictionary<int, int>();
     private static Dictionary<int, int> latestHealthByPlayer = new Dictionary<int, int>();
 
+    private static readonly List<Action<CF_HitLogEntry>> hitLogEntryCallbacks = new List<Action<CF_HitLogEntry>>();
+    public static void RegisterHitLogEntryCallback(Action<CF_HitLogEntry> callback)
+    {
+        hitLogEntryCallbacks.Add(callback);
+    }
+
     public static void AddEntry(ClientInfo source, ClientInfo attacker, ClientInfo victim, EntityPlayer playerA, EntityPlayer playerV, int damage, int armorDamage, bool fatal, ItemValue weapon, Utils.EnumHitDirection direction, EnumBodyPartHit hitbox, float fps)
     {
         var entry = new CF_HitLogEntry(source, attacker, victim, playerA, playerV, damage, armorDamage, fatal, weapon, direction, hitbox, fps);
+
+        // Invoke callbacks
+        foreach (var callback in hitLogEntryCallbacks)
+        {
+            callback.Invoke(entry);
+        }
 
         // Add the entry to the main list
         lock (entriesLock)
