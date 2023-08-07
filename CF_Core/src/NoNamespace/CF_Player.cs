@@ -104,16 +104,15 @@ public class CF_Player
         return false;
     }
     // Game Events
-    public static bool GameEvent(ClientInfo _cInfo, string gameevent)
+    public static bool FireGameEvent(ClientInfo _cInfo, string _sequenceName)
     {
-        EntityPlayer player = GetPlayer(_cInfo.entityId);
-        if (player == null || player.IsDead() || !player.IsSpawned())
+        if (!GetPlayer(_cInfo, out EntityPlayer _player) || !_player.IsAlive() || !_player.IsSpawned())
         {
             throw new Exception($"GameEvent can't be triggered only on alive players: {_cInfo}");
         }
 
-        GameEventManager.Current.HandleAction(gameevent, null, player, false, "");
-        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageGameEventResponse>().Setup(gameevent, _cInfo.entityId, "", "", NetPackageGameEventResponse.ResponseTypes.Approved));
+        GameEventManager.Current.HandleAction(_sequenceName, null, _player, false, "");
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageGameEventResponse>().Setup(_sequenceName, _cInfo.entityId, "", "", NetPackageGameEventResponse.ResponseTypes.Approved));
         return true;
     }
     // Close open windows (including the crafting)
@@ -122,40 +121,40 @@ public class CF_Player
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageCloseAllWindows>().Setup(_cInfo.entityId));
     }
     // Write text to client console
-    public static void Console(string _msg, ClientInfo _cInfo)
+    public static void Console(ClientInfo _cInfo, string _msg, bool _bExecute = false)
     {
         if (_cInfo == null)
             throw new Exception($"ConsoleMessageFilter.Out reported: Can't send to client=null.");
 
-        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup(_msg, false));
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup(_msg, _bExecute));
     }
     // Write multiple text lines to client console (can be usefull instead of using line breaks)
-    public static void Console(List<string> _msgs, ClientInfo _cInfo)
+    public static void Console(ClientInfo _cInfo, List<string> _msgs, bool _bExecute = false)
     {
         if (_cInfo == null)
             throw new Exception($"ConsoleMessageFilter.Out reported: Can't send to client=null.");
 
-        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup(_msgs, false));
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageConsoleCmdClient>().Setup(_msgs, _bExecute));
     }
     // Message all or specific player in chat
-    public static void Message(string msg, ClientInfo cInfo = null)
+    public static void Message(string msg)
+    {
+        List<ClientInfo> _clientList = CF_Player.GetClients();
+        if (_clientList == null || _clientList.Count < 1)
+            return;
+
+        for (int i = 0; i < _clientList.Count; i++)
+        {
+            ClientInfo _cInfo2 = _clientList[i];
+            if (_cInfo2 == null)
+                continue;
+            Message(msg, _cInfo2);
+        }
+    }
+    public static void Message(string msg, ClientInfo cInfo)
     {
         if (cInfo != null)
             cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageChat>().Setup(EChatType.Whisper, -1, msg + "[-]", "", false, null));
-        else
-        {
-            List<ClientInfo> _clientList = CF_Player.GetClients();
-            if (_clientList == null || _clientList.Count < 1)
-                return;
-
-            for (int i = 0; i < _clientList.Count; i++)
-            {
-                ClientInfo _cInfo2 = _clientList[i];
-                if (_cInfo2 == null)
-                    continue;
-                Message(msg, _cInfo2);
-            }
-        }
     }
     // Message online persistent allies of a player in chat
     public static void MessageFriends(PlatformUserIdentifierAbs _UserId, string msg)

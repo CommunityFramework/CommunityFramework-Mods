@@ -117,7 +117,7 @@ public class CF_ConsoleMessageFilter
         if (_cInfo != null)
         {
             // Send the message to the client
-            CF_Player.Console(_msg, _cInfo);
+            CF_Player.Console(_cInfo, _msg);
         }
         else
         {

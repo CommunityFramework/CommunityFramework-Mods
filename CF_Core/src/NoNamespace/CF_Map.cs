@@ -2,16 +2,24 @@
 using System.Collections.Generic;
 public class CF_Map
 {
-    public static PrefabInstance GetPrefabAtPosition(int x, int z)
+    public static byte GetBiomeAt(Vector3i pos)
+    {
+        Chunk chunk = (Chunk)GameManager.Instance.World.GetChunkFromWorldPos(pos);
+        if (chunk == null)
+            return 0;
+
+        return chunk.DominantBiome;
+    }
+    public static PrefabInstance GetPrefabAt(int x, int z)
     {
         PrefabInstance final = null;
-        using (List<PrefabInstance>.Enumerator enumerator = ((GameManager)GameManager.Instance).GetDynamicPrefabDecorator().GetDynamicPrefabs().GetEnumerator())
+        using (List<PrefabInstance>.Enumerator enumerator = (GameManager.Instance).GetDynamicPrefabDecorator().GetDynamicPrefabs().GetEnumerator())
         {
             while (enumerator.MoveNext())
             {
                 PrefabInstance current = enumerator.Current;
                 Vector3i boundingBoxPosition = (Vector3i)current.boundingBoxPosition;
-                Vector3i vector3i = new Vector3i((int)(current.boundingBoxPosition.x + current.boundingBoxSize.x), (int)(current.boundingBoxPosition.y + current.boundingBoxSize.y), (int)(current.boundingBoxPosition.z + current.boundingBoxSize.z)); ;
+                Vector3i vector3i = new Vector3i((int)(current.boundingBoxPosition.x + current.boundingBoxSize.x), (int)(current.boundingBoxPosition.y + current.boundingBoxSize.y), (int)(current.boundingBoxPosition.z + current.boundingBoxSize.z));
                 int num1 = boundingBoxPosition.x;
                 int num2 = boundingBoxPosition.z;
                 int num3 = vector3i.x;
