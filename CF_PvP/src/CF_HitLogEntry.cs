@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEngine;
 
 public class CF_HitLogEntry
@@ -7,7 +8,7 @@ public class CF_HitLogEntry
     public int sourceId;
     public int attackerId;
     public string attackerName;
-    public int victim;
+    public int victimId;
     public string victimName;
     public int damage;
     public int armorDamage;
@@ -33,7 +34,7 @@ public class CF_HitLogEntry
         this.sourceId = source.entityId;
         this.attackerId = attacker.entityId;
         this.attackerName = attacker.playerName;
-        this.victim = victim.entityId;
+        this.victimId = victim.entityId;
         this.victimName = victim.playerName;
         this.damage = damage;
         this.armorDamage = armorDamage;
@@ -53,16 +54,26 @@ public class CF_HitLogEntry
         this.victimRot = playerV.rotation;
         this.fps = fps;
     }
+    public bool IsCriticalHit()
+    {
+        return damage >= 100;
+    }
+    public int TotalDamage() => damage + armorDamage;
+    public bool IsHeadshot() =>  hitbox == EnumBodyPartHit.Head;
     public float Distance() => Vector3.Distance(attackerPos, victimPos);
     public override string ToString()
     {
         return $"{timestamp}: {attackerName} dealt {damage} damage to {victimName} with {weapon}. {(fatal ? "Fatal hit." : "Non-fatal hit.")}";
     }
+    public string GetFormattedTimestamp()
+    {
+        return timestamp.ToString("dd-MMM-yyyy HH:mm:ss");
+    }
     public string ToStringEx()
     {
         return $"Timestamp: {timestamp}\n" +
                $"Attacker ID: {attackerId}, Attacker Name: {attackerName}\n" +
-               $"Victim ID: {victim}, Victim Name: {victimName}\n" +
+               $"Victim ID: {victimId}, Victim Name: {victimName}\n" +
                $"Damage: {damage}, Armor: {armorDamage}, Health: {healthA}\n" +
                $"Fatal: {fatal}, Weapon: {weapon}\n" +
                $"Distance: {Distance()}, Direction: {direction}, Hitbox: {hitbox}\n";
@@ -85,4 +96,8 @@ public class CF_HitLogEntry
                $"{(sourceId != attackerId ? "*BAD_SOURCE" : "")} " +
                $"{(Distance() > 200 ? "*BAD_DISTANCE" : "")}";
     }
+    public ClientInfo GetClientAttacker() => CF_Player.GetClient(attackerId);
+    public ClientInfo GetClientVictim() => CF_Player.GetClient(victimId);
+    public EntityPlayer GetPlayerAttacker() => CF_Player.GetPlayer(attackerId);
+    public EntityPlayer GetPlayerVictim() => CF_Player.GetPlayer(victimId);
 }
