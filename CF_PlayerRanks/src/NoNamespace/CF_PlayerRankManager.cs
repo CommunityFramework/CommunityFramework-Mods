@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.SqlServer.Server;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using static CF_PlayerRanks.API;
 
 public class CF_PlayerRankManager
@@ -53,8 +55,11 @@ public class CF_PlayerRankManager
     }
     public static bool LoadFile()
     {
+        if (!Directory.Exists(mod.modConfigPath))
+            Directory.CreateDirectory(mod.modConfigPath);
+
         if (!File.Exists(filePathPlayerRanks))
-            return false;
+            SaveToFile();
 
         try
         {
@@ -66,6 +71,13 @@ public class CF_PlayerRankManager
             x.Error($"Failed loading from {filePathPlayerRanks}: {e}");
             return false;
         }
+    }
+    public static void SaveToFile()
+    {
+        if (!Directory.Exists(mod.modConfigPath))
+            Directory.CreateDirectory(mod.modConfigPath);
+
+        File.WriteAllText(filePathPlayerRanks, JsonConvert.SerializeObject(ranks.Count, Formatting.Indented));
     }
     private static void OnFileChanged(object source, FileSystemEventArgs e)
     {
