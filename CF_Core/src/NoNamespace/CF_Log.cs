@@ -1,21 +1,23 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Concurrent;
+using System.Threading;
 
 public class CF_Log
 {
     // Log Levels
     public enum LogLevel { Trace, Debug, Info, Warn, Error, Fatal, Corruption, Alert };
 
-    private readonly string folder;
-    private readonly string subfolder;
-    private readonly LogLevel thresholdLevel;
-    private readonly LogLevel minimumLevel;
-    private readonly LogLevel discordThreshold;
-    private readonly string discordWebhookURL;
+    public readonly string folder;
+    public readonly string subfolder;
+    public readonly bool playerFolders;
+    public LogLevel thresholdLevel;
+    public LogLevel minimumLevel;
+    public LogLevel discordThreshold;
+    public readonly string discordWebhookURL;
     private readonly ConcurrentQueue<string> logQueue = new ConcurrentQueue<string>();
 
-    public CF_Log(string folder = "logs", string subfolder = "", LogLevel thresholdLevel = LogLevel.Error, LogLevel minimumLevel = LogLevel.Trace, string discordWebhookURL = "", LogLevel discordThreshold = LogLevel.Corruption)
+    public CF_Log(string folder = "logs", string subfolder = "", LogLevel thresholdLevel = LogLevel.Error, LogLevel minimumLevel = LogLevel.Trace, string discordWebhookURL = "", LogLevel discordThreshold = LogLevel.Corruption, bool playerFolders = false)
     {
         this.folder = folder;
         this.subfolder = subfolder;
@@ -23,7 +25,7 @@ public class CF_Log
         this.minimumLevel = minimumLevel;
         this.discordWebhookURL = discordWebhookURL;
         this.discordThreshold = discordThreshold;
-        ProcessingThread();
+        this.playerFolders = playerFolders;
     }
 
     // Main Log method with timestamp and tags.
@@ -32,44 +34,33 @@ public class CF_Log
         // Ignore log messages below the minimum level
         if (level < minimumLevel)
             return;
-
-        var baseLogFileName = cInfo == null ? $"{DateTime.UtcNow:yyyyMMdd}"
-                                            : $"{CF_Format.PlayerNameAndPlatform(cInfo)}_{DateTime.UtcNow:yyyyMMdd}";
-
-        var logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mod_Logs", folder, subfolder);
-        Directory.CreateDirectory(logDirectory);
-
-        var logFileName = (level >= thresholdLevel)
-            ? $"{baseLogFileName}-{level}.log"
-            : $"{baseLogFileName}.log";
-
-        var logFilePath = Path.Combine(logDirectory, logFileName);
-        var logMessage = withTimestamp ? $"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss.fff zzz} [{level}] {message}"
-                                       : $"{level} {message}";
-
-        logQueue.Enqueue($"{logFilePath}|{logMessage}");
-
-        // If level is above the discordThreshold, send message to Discord
-        if (!string.IsNullOrEmpty(discordWebhookURL) && level >= discordThreshold)
+        try
         {
-            CF_DiscordWebhook.SendMessage(logMessage, discordWebhookURL);
-        }
-    }
+            var baseLogFileName = cInfo == null || playerFolders ? $"{DateTime.UtcNow:yyyy_MM_dd}"
+                                                : $"{CF_Format.PlayerNameAndPlatform(cInfo)}_{DateTime.UtcNow:yyyy_MM_dd}";
 
-    private void ProcessingThread()
-    {
-        ThreadManager.AddSingleTaskMainThread("LogX", new ThreadManager.MainThreadTaskFunctionDelegate(ProcessQueue), null);
-    }
+            var logDirectory = cInfo == null || !playerFolders ? Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder)
+                                                              : Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder, CF_Format.PlayerNameAndPlatform(cInfo));
 
-    private void ProcessQueue(object _parameter)
-    {
-        int count = 0;
-        while (logQueue.TryDequeue(out var logItem) && count < 20)
-        {
-            count++;
-            var logParts = logItem.Split('|');
-            File.AppendAllText(logParts[0], $"{logParts[1]}\n");
+            Directory.CreateDirectory(logDirectory);
+
+            var logFileName = (level >= thresholdLevel)
+                ? $"{baseLogFileName}-{level}.log"
+                : $"{baseLogFileName}.log";
+
+            var logFilePath = Path.Combine(logDirectory, logFileName);
+            var logMessage = withTimestamp ? $"{DateTime.UtcNow:HH:mm:ss} [{level}] {message}"
+                                           : $"{level} {message}";
+
+            File.AppendAllText(logFilePath, $"{logMessage}\n");
+
+            // If level is above the discordThreshold, send message to Discord
+            if (!string.IsNullOrEmpty(discordWebhookURL) && level >= discordThreshold)
+            {
+                CF_DiscordWebhook.SendMessage(logMessage, discordWebhookURL);
+            }
         }
+        catch (Exception){}
     }
 
     // Overloads for the Log method.
