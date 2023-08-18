@@ -143,4 +143,162 @@ public class CF_HitLogEntry
 
         return sb.ToString();
     }
+    public string GenerateKillMessage()
+    {
+        if (!fatal)
+        {
+            return ""; // If it's not a kill, return an empty string (no kill message).
+        }
+        string[] headshotMessages = {
+            $"{attackerName} drew fast and scored a clean headshot on {victimName} with {weaponName}!",
+            $"{attackerName} delivered a deadly headshot to {victimName} using {weaponName} like a true gunslinger!",
+            $"{victimName} fell down like a sack of potatoes after {attackerName}'s accurate headshot with {weaponName}!",
+            $"Headshot! {attackerName} made a name for themselves by taking down {victimName} with {weaponName}!",
+            $"{attackerName} took down {victimName} in a blink of an eye with a precise headshot from {weaponName}!",
+            $"{victimName} met their fate with a fatal headshot from {attackerName}'s {weaponName}!",
+            $"{attackerName} showed no mercy, landing a lethal headshot on {victimName} using {weaponName}!",
+            $"A clean headshot by {attackerName} sent {victimName} to the afterlife with {weaponName}!",
+            $"{attackerName} proved to be an expert marksman with a headshot on {victimName} from {weaponName}!",
+            $"{victimName} won't forget the pain of {attackerName}'s perfect headshot using {weaponName}!",
+            $"{attackerName} displayed unrivaled precision, hitting {victimName} in the head with {weaponName}!",
+            $"{victimName} went down with a shattered skull after {attackerName}'s headshot with {weaponName}!",
+            $"{attackerName} took a moment to aim and landed a deadly headshot on {victimName} using {weaponName}!",
+            $"Headshot! {attackerName} skillfully took down {victimName} with a shot from {weaponName}!",
+            $"{attackerName} proved themselves as the fastest draw in the west with a headshot on {victimName} using {weaponName}!"
+        };
+        string[] criticalHitMessages = {
+            $"{attackerName} hit {victimName} right in the heart with a powerful shot from {weaponName}!",
+            $"{victimName} ain't gonna forget the sting of {attackerName}'s critical hit using {weaponName}!",
+            $"{attackerName}'s shot found its mark, leaving {victimName} in a heap with {weaponName}!",
+            $"Critical Hit! {attackerName} put an end to {victimName} using {weaponName}!",
+            $"{attackerName} struck {victimName} with a deadly critical hit from {weaponName}!",
+            $"{victimName} felt the wrath of {attackerName}'s critical hit using {weaponName}!",
+            $"{attackerName} delivered a crushing blow with a critical hit on {victimName} using {weaponName}!",
+            $"Critical Hit! {attackerName} left {victimName} reeling with a shot from {weaponName}!",
+            $"{attackerName} dealt a devastating critical hit to {victimName} using {weaponName}!",
+            $"{victimName} won't forget the pain of {attackerName}'s critical hit from {weaponName}!",
+            $"{attackerName} displayed deadly accuracy, landing a critical hit on {victimName} with {weaponName}!",
+            $"{victimName} couldn't withstand the impact of {attackerName}'s critical hit using {weaponName}!",
+            $"{attackerName} made a critical shot, leaving {victimName} in agony with {weaponName}!",
+            $"Critical Hit! {attackerName} skillfully took down {victimName} with a powerful shot from {weaponName}!",
+            $"{attackerName} unleashed a brutal critical hit, ending {victimName}'s life with {weaponName}!"
+        };
+        string[] eliminationMessages = {
+            $"{attackerName} eliminated {victimName} with {weaponName} like a true gunslinger!",
+            $"{attackerName} put an end to {victimName} using {weaponName}!",
+            $"{victimName} met their demise at the hands of {attackerName} and {weaponName}!",
+            $"{attackerName} claimed victory by taking down {victimName} with {weaponName}!",
+            $"{attackerName} delivered a fatal shot, sending {victimName} to meet their maker with {weaponName}!",
+            $"{victimName} was no match for {attackerName}'s quick draw and fell to {weaponName}!",
+            $"{attackerName} emerged victorious in the showdown, defeating {victimName} with {weaponName}!",
+            $"{victimName} learned the hard way not to cross paths with {attackerName} and {weaponName}!",
+            $"{attackerName} proved their mettle by eliminating {victimName} with {weaponName}!",
+            $"{victimName} met their end with a bullet from {attackerName}'s {weaponName}!",
+            $"{attackerName} stood tall as they defeated {victimName} using {weaponName}!",
+            $"{victimName} underestimated {attackerName}'s skill and paid the price with {weaponName}!",
+            $"{attackerName} put {victimName} in the ground with a precise shot from {weaponName}!",
+            $"{victimName} won't be causing any trouble anymore after {attackerName}'s shot with {weaponName}!",
+            $"{attackerName} proved to be the deadliest shooter, taking down {victimName} with {weaponName}!"
+        };
+        string[] longDistanceMessages = {
+            $"{attackerName} shot down {victimName} from a distance that'd make a hawk jealous using {weaponName}!",
+            $"{victimName} never saw it comin' when {attackerName} picked 'em off from a mile away with {weaponName}!",
+            $"Unbelievable! {attackerName} pulled off a kill on {victimName} from a range that'd make legends proud with {weaponName}!",
+            $"{attackerName} displayed incredible sharpshooting and scored a kill on {victimName} from a jaw-dropping distance with {weaponName}!",
+            $"{attackerName} made an astonishing kill on {victimName} from an incredible distance using {weaponName}!",
+            $"{victimName} was taken down by a precise shot from {attackerName} at an immense distance with {weaponName}!",
+            $"{attackerName} proved their sniper skills by eliminating {victimName} from an extreme distance using {weaponName}!",
+            $"{attackerName} delivered a death shot to {victimName} with {weaponName} from a staggering distance!",
+            $"{attackerName} shot {victimName} with deadly accuracy from a distance that seemed impossible with {weaponName}!",
+            $"{victimName} never stood a chance against {attackerName}'s deadly shot from {weaponName} at an incredible distance!",
+            $"{attackerName} displayed unparalleled marksmanship by taking down {victimName} from an astonishing distance with {weaponName}!",
+            $"{victimName} couldn't believe their eyes when they fell to {attackerName}'s shot from {weaponName} at such a range!",
+            $"{attackerName} proved to be the long-range ace, making a lethal shot on {victimName} using {weaponName}!",
+            $"{victimName} was surprised by a deadly shot from {attackerName} at a distance that seemed impossible with {weaponName}!",
+            $"{attackerName} demonstrated expert precision, eliminating {victimName} from an astounding distance with {weaponName}!"
+        };
+        string[] superMessages = {
+            $"{attackerName} proved to be a master marksman, landing an astonishing headshot on {victimName} from an incredible distance with {weaponName}!",
+            $"{attackerName} displayed unparalleled precision, eliminating {victimName} with a jaw-dropping long-range headshot from {weaponName}!",
+            $"{victimName} never saw it coming when {attackerName} picked them off with a precise headshot from a mile away using {weaponName}!",
+            $"Unbelievable! {attackerName} pulled off an incredible feat, scoring a headshot on {victimName} from a range that'd make legends proud with {weaponName}!",
+            $"{attackerName} took down {victimName} with a masterful shot, hitting the bullseye on a long-range headshot using {weaponName}!",
+            $"{victimName} fell to the incredible accuracy of {attackerName}, who scored a headshot from an astonishing distance with {weaponName}!",
+            $"{attackerName} showcased their deadly sniping skills, delivering a fatal headshot to {victimName} from an immense distance with {weaponName}!",
+            $"{attackerName} proved themselves as a long-range ace, making a lethal headshot on {victimName} using {weaponName}!",
+            $"{victimName} was left in disbelief after being struck by {attackerName}'s perfectly aimed headshot from an incredible distance with {weaponName}!",
+            $"{attackerName} unleashed an astounding shot, hitting a headshot on {victimName} from a staggering distance using {weaponName}!",
+            $"{attackerName} demonstrated expert precision, taking down {victimName} with a headshot from an astonishing distance using {weaponName}!",
+            $"{victimName} couldn't believe their eyes when they fell to {attackerName}'s headshot from a seemingly impossible range with {weaponName}!",
+            $"{attackerName} proved to be the ultimate sharpshooter, scoring a headshot on {victimName} at an extreme distance with {weaponName}!",
+            $"{victimName} was taken out by {attackerName} with a jaw-dropping headshot from an incredible range using {weaponName}!",
+            $"{attackerName} displayed unmatched marksmanship, delivering a deadly headshot to {victimName} from a distance that seemed impossible with {weaponName}!"
+        };
+
+        string killMessage = "";
+        if (Distance() > 200)
+        {
+            if (IsHeadshot())
+            {
+                killMessage = superMessages[CF_Random.Rnd(headshotMessages.Length)];
+            }
+            else
+            {
+                killMessage += longDistanceMessages[CF_Random.Rnd(longDistanceMessages.Length)];
+            }
+        }
+        else if (IsHeadshot())
+        {
+            killMessage = headshotMessages[CF_Random.Rnd(headshotMessages.Length)];
+        }
+        else if (IsCriticalHit())
+        {
+            killMessage = criticalHitMessages[CF_Random.Rnd(criticalHitMessages.Length)];
+        }
+        else
+        {
+            killMessage = eliminationMessages[CF_Random.Rnd(eliminationMessages.Length)];
+        }
+
+        // Apply colors to all possible placeholders using the AddColorToPlaceholder method
+        killMessage = AddStringBeforeSubstring(killMessage, "{attackerName}", ColorAttacker);
+        killMessage = AddStringBeforeSubstring(killMessage, "{victimName}", ColorVictim);
+        killMessage = AddStringBeforeSubstring(killMessage, "{damage}", ColorDamage);
+        killMessage = AddStringBeforeSubstring(killMessage, "{weapon}", ColorWeapon);
+        killMessage = AddStringBeforeSubstring(killMessage, "{headshot}", ColorHeadshot);
+        killMessage = AddStringBeforeSubstring(killMessage, "{criticalHit}", ColorCriticalHit);
+        killMessage = AddStringBeforeSubstring(killMessage, "{general}", ColorGeneral);
+
+        return killMessage;
+    }
+
+    // Define color variables
+    private string ColorAttacker = "[4F77FF]"; // Sky bluean
+    private string ColorVictim = "[B4B4B4]";   // Cloud gray
+    private string ColorDamage = "[61FF00]";  // Grass green
+    private string ColorWeapon = "[FFFF00]";  // Yellow
+    private string ColorHeadshot = "[FF8C00]"; // Dark orange
+    private string ColorCriticalHit = "[FF0000]"; // Red
+    private string ColorGeneral = "[B4B4B4]"; // Cloud gray
+    private string ColorReset = "[-]"; // Reset to default color (white)
+
+    public static string AddStringBeforeSubstring(string source, string substringToFind, string stringToAdd)
+    {
+        StringBuilder result = new StringBuilder();
+        int previousIndex = 0;
+        int index = source.IndexOf(substringToFind);
+
+        while (index != -1)
+        {
+            result.Append(source.Substring(previousIndex, index - previousIndex));
+            result.Append(stringToAdd);
+
+            previousIndex = index;
+            index = source.IndexOf(substringToFind, index + substringToFind.Length);
+        }
+
+        result.Append(source.Substring(previousIndex));
+
+        return result.ToString();
+    }
 }
