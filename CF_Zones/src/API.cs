@@ -32,10 +32,17 @@ namespace CF_ZonesManager
         }
         public static void OnEvery1Sec()
         {
-            CF_Player.GetPlayers().ForEach(player =>
+            List<EntityPlayer> players = CF_Player.GetPlayers();
+            if (players == null)
+                return;
+
+            foreach(EntityPlayer player in players)
             {
+                if(player == null)
+                    continue;
+
                 CF_Zones.UpdateZonesForPlayer(player);
-            });
+            }
         }
         public static void OnPlayerSpawnedInWorld(ClientInfo _cInfo, RespawnType _respawnReason, Vector3i _pos)// Spawning player
         {
