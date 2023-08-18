@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Epic.OnlineServices.Presence;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
 public class CF_Format
 {
-    public static string PlayerNameAndPlatform(EntityPlayer _player) => PlayerNameAndPlatform(_player.entityId);
-    public static string PlayerNameAndPlatform(int _entityId) => PlayerNameAndPlatform(CF_Player.GetPlayer(_entityId));
     public static string PlayerNameAndPlatform(ClientInfo _cInfo) => _cInfo == null ? "null" : $"{_cInfo.playerName} ({_cInfo.PlatformId.ReadablePlatformUserIdentifier})";
-    public static string StringList(List<string> stringList)
+    public static string PlayerNameAndPlatform(int _entityId) => PlayerNameAndPlatform(CF_Player.GetPlayer(_entityId));
+    public static string PlayerNameAndPlatform(EntityPlayer _player) => PlayerNameAndPlatform(_player.entityId);
+    public static string PlayerNameAndPlatform(PersistentPlayerData _persistentPlayerData) => _persistentPlayerData == null ? "null" : $"{_persistentPlayerData.PlayerName} ({_persistentPlayerData.PlatformUserIdentifier.ReadablePlatformUserIdentifier})";
+    public static string ListToString(List<string> stringList)
     {
         if (stringList.Count == 1)
             return stringList[0];
@@ -25,6 +28,29 @@ public class CF_Format
                 else if (stringList.Count > 1)// all other entries
                     result += stringList[i] + ", "; // append the entry followed by a comma
             }
+        }
+
+        return result;
+    }
+    public static string DictionaryToString(Dictionary<string, int> dict)
+    {
+        if (dict.Count == 0)
+            return string.Empty;
+
+        if (dict.Count == 1)
+            return $"{dict.Values.First()}x {dict.Keys.First()}";
+
+        string result = "";
+        var entries = dict.Select(kvp => $"{kvp.Value}x {kvp.Key}").ToList();
+
+        for (int i = 0; i < entries.Count; i++)
+        {
+            if (i == entries.Count - 1 && entries.Count > 1) // last entry and more than 1 entry
+                result += " & " + entries[i]; // append "&" before the last entry
+            else if (i == entries.Count - 2) // second last entry
+                result += entries[i]; // append the second last entry
+            else if (entries.Count > 1) // all other entries
+                result += entries[i] + ", "; // append the entry followed by a comma
         }
 
         return result;
@@ -63,7 +89,8 @@ public class CF_Format
                 sb.Append($" ({itemValue.Seed})");
         }
 
-        if (mods && itemValue.Modifications != null && itemValue.Modifications.Length > 0)
+        if (mods && itemValue.Modifications != null && itemValue.Modifications.Length > 0 
+            && CF_Array.ContainsNonNull(itemValue.Modifications))
         {
             sb.Append($" Mods (");
             int count = 0;
