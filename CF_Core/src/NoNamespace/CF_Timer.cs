@@ -13,7 +13,7 @@ namespace CF_Core
             if (aTimer.Enabled)
                 return;
 
-            x.Log($"Started main timer.");
+            log.Log($"Started main timer.");
 
             aTimer.Interval = 1000;
             aTimer.AutoReset = true;
@@ -26,7 +26,7 @@ namespace CF_Core
         public static List<Action> callOneSecSync = new List<Action>();
         public static void AddOneSecTimer(Action action, string name, bool sync)
         {
-            x.Log($"Added new timer listener: {name}");
+            log.Log($"Added new timer listener: {name}");
 
             if(sync)
                 callOneSecSync.Add(action);
@@ -37,7 +37,7 @@ namespace CF_Core
             foreach (Action action in callOneSec)
                 action();
 
-            ThreadManager.AddSingleTaskMainThread("Zlib_1s_Timer", new ThreadManager.MainThreadTaskFunctionDelegate(mainThreadSync), null);
+            ThreadManager.AddSingleTaskMainThread("CF_1s_Timer", new ThreadManager.MainThreadTaskFunctionDelegate(mainThreadSync), null);
         }
         private static void mainThreadSync(object _parameter)
         {
