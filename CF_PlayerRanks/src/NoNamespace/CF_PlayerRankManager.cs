@@ -29,8 +29,6 @@ public class CF_PlayerRankManager
             fileWatcher = true;
         }
 
-        AddDefaultGroups();
-
         CF_ChatManager.RegisterHandler(OnChatMessage);
     }
     public static void OnChatMessage(ClientInfo _cInfo, CF_ChatMessage _chatMsg)
@@ -59,7 +57,10 @@ public class CF_PlayerRankManager
             Directory.CreateDirectory(mod.modConfigPath);
 
         if (!File.Exists(filePathPlayerRanks))
+        {
+            AddDefaultGroups();
             SaveToFile();
+        }
 
         try
         {
@@ -77,7 +78,7 @@ public class CF_PlayerRankManager
         if (!Directory.Exists(mod.modConfigPath))
             Directory.CreateDirectory(mod.modConfigPath);
 
-        File.WriteAllText(filePathPlayerRanks, JsonConvert.SerializeObject(ranks.Count, Formatting.Indented));
+        File.WriteAllText(filePathPlayerRanks, JsonConvert.SerializeObject(ranks, Formatting.Indented));
     }
     private static void OnFileChanged(object source, FileSystemEventArgs e)
     {
