@@ -8,11 +8,11 @@ namespace CF_Firewall
     {
         public override string GetDescription()
         {
-            return string.Format("Door Keeper - IP ban commands.");
+            return string.Format("IP ban commands.");
         }
         protected override string[] getCommands()
         {
-            return new string[] { "dk-ipban", "ipban" };
+            return new string[] { "ipban" };
         }
         protected override string getDescription()
         {
@@ -68,7 +68,7 @@ namespace CF_Firewall
                     SingletonMonoBehaviour<SdtdConsole>.Instance.Output(this.GetHelp());
                 }
             }
-            catch (Exception e) { Log.Out($"Error in CmdIPban.Execute: {e.Message}"); }
+            catch (Exception e) { Log.Out($"Error in CmdIPban.Execute: {e}"); }
         }
     }
 }
