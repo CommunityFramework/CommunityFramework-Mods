@@ -10,8 +10,14 @@ public class CF_RestartManager
 {
     static AccessTools.FieldRef<AIDirectorBloodMoonComponent, int> bmDayRef = AccessTools.FieldRefAccess<AIDirectorBloodMoonComponent, int>("bmDay");
     public static bool Restarting() => countdown != -1;
-    public static void Restart(int seconds, string _reason, bool manual = false)
+    public static void Restart(int seconds, string _reason, bool _manual = false)
     {
+        if(seconds < 1)
+        {
+            AbortRestart(_reason, _manual);
+            return;
+        }
+
         countdown = seconds;
 
         if(!string.IsNullOrEmpty(_reason))
@@ -19,16 +25,21 @@ public class CF_RestartManager
         else 
             CF_Player.Message(msgCountdownStarted.Replace("{REASON}", msgCountdownByAdmin));
 
-        log.Log($"CoundownExec => Seconds: {seconds} Manual: {manual} Reason: {_reason}");
-        Log.Out($"CoundownExec => Seconds: {seconds} Manual: {manual} Reason: {_reason}");
+        log.Log($"CoundownExec => Seconds: {seconds} Manual: {_manual} Reason: {_reason}");
+        Log.Out($"CoundownExec => Seconds: {seconds} Manual: {_manual} Reason: {_reason}");
     }
     public static void AbortRestart(string _reason, bool manual = false)
     {
-        if (countdown != -1)
+        if (countdown == -1)
             return;
 
         countdown = -1;
-        CF_Player.Message(msgAborted);
+        locked = false;
+
+        if (!string.IsNullOrEmpty(_reason))
+            CF_Player.Message(msgAborted.Replace("{REASON}", _reason));
+        else
+            CF_Player.Message(msgAborted.Replace("{REASON}", msgCountdownByAdmin));
     }
     public static void OnEverySec() // Main timer (async)
     {
