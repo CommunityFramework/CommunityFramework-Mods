@@ -1,7 +1,9 @@
-﻿using System;
+﻿using LiteNetLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static CF_PvP.API;
 
 public class CF_HitLog
 {
@@ -24,48 +26,53 @@ public class CF_HitLog
 
     public static void AddEntry(ClientInfo source, ClientInfo attacker, ClientInfo victim, EntityPlayer playerA, EntityPlayer playerV, int damage, int armorDamage, bool fatal, ItemValue weapon, Utils.EnumHitDirection direction, EnumBodyPartHit hitbox, float fps)
     {
-        var entry = new CF_HitLogEntry(source, attacker, victim, playerA, playerV, damage, armorDamage, fatal, weapon, direction, hitbox, fps);
-
-        // Invoke callbacks
-        foreach (var callback in hitLogEntryCallbacks)
+        ThreadManager.AddSingleTaskMainThread("CF_AddHitLogEntry", (_taskInfo =>
         {
-            callback.Invoke(entry);
-        }
+            var entry = new CF_HitLogEntry(source, attacker, victim, playerA, playerV, damage, armorDamage, fatal, weapon, direction, hitbox, fps);
 
-        // Add the entry to the main list
-        lock (entriesLock)
-        {
-            entries.Add(entry);
-        }
+            log.Out(entry.ToStringLog());
 
-        // Add the entry to the dictionary based on attacker and victim IDs
-        lock (entriesByPlayerIdLock)
-        {
-            if (!entriesByPlayerId.ContainsKey(attacker.entityId))
-                entriesByPlayerId[attacker.entityId] = new List<CF_HitLogEntry>();
-            entriesByPlayerId[attacker.entityId].Add(entry);
+            // Invoke callbacks
+            foreach (var callback in hitLogEntryCallbacks)
+            {
+                callback.Invoke(entry);
+            }
 
-            if (!entriesByPlayerId.ContainsKey(victim.entityId))
-                entriesByPlayerId[victim.entityId] = new List<CF_HitLogEntry>();
-            entriesByPlayerId[victim.entityId].Add(entry);
-        }
+            // Add the entry to the main list
+            lock (entriesLock)
+            {
+                entries.Add(entry);
+            }
 
-        // Update cached data
-        lock (totalDamageByPlayerLock)
-        {
-            if (!totalDamageByPlayer.ContainsKey(attacker.entityId))
-                totalDamageByPlayer[attacker.entityId] = 0;
-            totalDamageByPlayer[attacker.entityId] += damage;
+            // Add the entry to the dictionary based on attacker and victim IDs
+            lock (entriesByPlayerIdLock)
+            {
+                if (!entriesByPlayerId.ContainsKey(attacker.entityId))
+                    entriesByPlayerId[attacker.entityId] = new List<CF_HitLogEntry>();
+                entriesByPlayerId[attacker.entityId].Add(entry);
 
-            if (!totalDamageByPlayer.ContainsKey(victim.entityId))
-                totalDamageByPlayer[victim.entityId] = 0;
-            totalDamageByPlayer[victim.entityId] += damage;
-        }
+                if (!entriesByPlayerId.ContainsKey(victim.entityId))
+                    entriesByPlayerId[victim.entityId] = new List<CF_HitLogEntry>();
+                entriesByPlayerId[victim.entityId].Add(entry);
+            }
 
-        lock (latestHealthByPlayerLock)
-        {
-            latestHealthByPlayer[victim.entityId] = playerV.Health;
-        }
+            // Update cached data
+            lock (totalDamageByPlayerLock)
+            {
+                if (!totalDamageByPlayer.ContainsKey(attacker.entityId))
+                    totalDamageByPlayer[attacker.entityId] = 0;
+                totalDamageByPlayer[attacker.entityId] += damage;
+
+                if (!totalDamageByPlayer.ContainsKey(victim.entityId))
+                    totalDamageByPlayer[victim.entityId] = 0;
+                totalDamageByPlayer[victim.entityId] += damage;
+            }
+
+            lock (latestHealthByPlayerLock)
+            {
+                latestHealthByPlayer[victim.entityId] = playerV.Health;
+            }
+        }));
     }
     // All hit log entries for a specific player
     public static List<CF_HitLogEntry> GetEntriesForPlayer(int playerId)
@@ -153,7 +160,7 @@ public class CF_HitLog
     // Specific Weapon Used
     public static List<CF_HitLogEntry> GetEntriesWithWeapon(string weaponName)
     {
-        return entries.Where(entry => entry.weapon.Equals(weaponName, StringComparison.OrdinalIgnoreCase)).ToList();
+        return entries.Where(entry => entry.weaponName.Equals(weaponName, StringComparison.OrdinalIgnoreCase)).ToList();
     }
     // Sorted by Damage
     public static List<CF_HitLogEntry> GetEntriesSortedByDamage(bool ascending = true)
