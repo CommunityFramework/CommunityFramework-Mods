@@ -9,19 +9,23 @@ public class CF_CustomCvar
     public class CustomCvarReturn
     {
         public float value { get; set; }
-        public CustomCvarReturn(float value)
+        public float defaultValue { get; }
+        public CustomCvarReturn(float _value, float _defaultValue)
         {
-            this.value = value;
+            value = _value;
+            defaultValue = _defaultValue;
         }
     }
     public string name;
     public int updateinterval;
+    public float defaultValue { get; }
     public Action<EntityPlayer, CustomCvarReturn> OnUpdate;
-    public CF_CustomCvar(string name, Action<EntityPlayer, CustomCvarReturn> callback = null, int interval = 30)
+    public CF_CustomCvar(string name, float _defaultValue, Action<EntityPlayer, CustomCvarReturn> callback = null, int interval = 30)
     {
         this.name = name;
         updateinterval = interval;
         OnUpdate = callback;
+        defaultValue = _defaultValue;
 
         CF_CvarManager.cvars.Add(this);
     }
@@ -41,7 +45,7 @@ public class CF_CustomCvar
             return;
 
         float oldValue = player.GetCVar(this.name);
-        CustomCvarReturn customCvarReturn = new CustomCvarReturn(oldValue);
+        CustomCvarReturn customCvarReturn = new CustomCvarReturn(oldValue, defaultValue);
 
         OnUpdate(player, customCvarReturn);
 

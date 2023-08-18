@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,16 @@ public class CF_CvarManager
         {
             if (timer % cvar.updateinterval == 0)
                 cvar.UpdateAll();
+        }
+    }
+    public static void CheckPlayer(EntityPlayer _player)
+    {
+        foreach (CF_CustomCvar cvar in cvars)
+        {
+            if (_player.Buffs.CVars.ContainsKey(cvar.name))
+                continue;
+
+            cvar.UpdatePlayer(_player, cvar.defaultValue);
         }
     }
     public static void UpdatePlayer(EntityPlayer _player)
