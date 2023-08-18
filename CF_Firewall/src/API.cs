@@ -54,8 +54,8 @@ namespace CF_Firewall
 
         public static void OnConfigLoaded()
         {
-            mod.AddSetting("Ban_IP", true, "Ban IP when banned.", out banIP);
-            mod.AddSetting("Ban_IP2", true, "If enabled banning accounts joining with a banned IP.", out banIP2);
+            mod.AddSetting("Ban_IP", false, "Ban IP when banned.", out banIP);
+            mod.AddSetting("Ban_IP2", false, "If enabled banning accounts joining with a banned IP.", out banIP2);
             mod.AddSetting("KeepPerms_Enable", true, "Don't remove permissions when getting banned.", out keepPermissions);
             mod.AddSetting("KeepPerms_MaxBanLength", 0, 0, 9999999, "Max banlength in minutes to prevent permission drop. 0: Unlimited", out maxBanTime);
             mod.AddSetting("IPdata_Keep", 999999, 0, 999999, "Hours before deleting an IP data (including IP bans).", out ipHubKeep);
