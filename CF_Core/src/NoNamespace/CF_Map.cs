@@ -1,7 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+
 public class CF_Map
 {
+    public static string FormatPosition(Vector3i position)
+    {
+        string eastWestPrefix = position.x >= 0 ? "E" : "W";
+        string northSouthPrefix = position.z >= 0 ? "N" : "S";
+
+        return $"{eastWestPrefix} {Math.Abs(position.x)} {northSouthPrefix} {Math.Abs(position.z)}";
+    }
+    public static string FormatPosition(Vector3 position)
+    {
+        string eastWestPrefix = position.x >= 0 ? "E" : "W";
+        string northSouthPrefix = position.z >= 0 ? "N" : "S";
+
+        return $"{eastWestPrefix} {Math.Abs(position.x):0} {northSouthPrefix} {Math.Abs(position.z):0}";
+    }
     public static byte GetBiomeAt(Vector3i pos)
     {
         Chunk chunk = (Chunk)GameManager.Instance.World.GetChunkFromWorldPos(pos);
