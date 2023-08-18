@@ -29,18 +29,28 @@ public class CF_Log
     }
 
     // Main Log method with timestamp and tags.
-    public void Log(string message, ClientInfo cInfo = null, LogLevel level = LogLevel.Info, bool withTimestamp = true)
+    public void Log(string message, ClientInfo cInfo = null, PersistentPlayerData pData = null, LogLevel level = LogLevel.Info, bool withTimestamp = true)
     {
         // Ignore log messages below the minimum level
         if (level < minimumLevel)
             return;
         try
         {
-            var baseLogFileName = cInfo == null || playerFolders ? $"{DateTime.UtcNow:yyyy_MM_dd}"
-                                                : $"{CF_Format.PlayerNameAndPlatform(cInfo)}_{DateTime.UtcNow:yyyy_MM_dd}";
+            var baseLogFileName = (cInfo == null && pData == null) || playerFolders 
+                ? $"{DateTime.UtcNow:yyyy_MM_dd}"
+                : (
+                    cInfo != null 
+                        ? $"{CF_Format.PlayerNameAndPlatform(cInfo)}_{DateTime.UtcNow:yyyy_MM_dd}"
+                        : $"{CF_Format.PlayerNameAndPlatform(pData)}_{DateTime.UtcNow:yyyy_MM_dd}"
+                    );
 
-            var logDirectory = cInfo == null || !playerFolders ? Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder)
-                                                              : Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder, CF_Format.PlayerNameAndPlatform(cInfo));
+            var logDirectory = (cInfo == null && pData == null) || !playerFolders
+                ? Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder)
+                : (
+                    cInfo != null
+                    ? Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder, CF_Format.PlayerNameAndPlatform(cInfo))
+                    : Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder, CF_Format.PlayerNameAndPlatform(pData))
+                );
 
             Directory.CreateDirectory(logDirectory);
 
@@ -68,102 +78,142 @@ public class CF_Log
     // Log with no authName.
     public void Log(string message)
     {
-        Log(message, null, LogLevel.Info, true);
+        Log(message, null, null, LogLevel.Info, true);
     }
 
     // Log with authName.
     public void Log(string message, ClientInfo cInfo)
     {
-        Log(message, cInfo, LogLevel.Info, true);
+        Log(message, cInfo, null, LogLevel.Info, true);
+    }
+    public void Log(string message, PersistentPlayerData pData)
+    {
+        Log(message, null, pData, LogLevel.Info, true);
     }
 
     // Log with authName and LogLevel.
     public void Log(string message, ClientInfo cInfo, LogLevel level)
     {
-        Log(message, cInfo, level, true);
+        Log(message, cInfo, null, level, true);
+    }
+    public void Log(string message, PersistentPlayerData pData, LogLevel level)
+    {
+        Log(message, null, pData, level, true);
     }
 
     // Log with LogLevel only.
     public void Log(string message, LogLevel level)
     {
-        Log(message, null, level, true);
+        Log(message, null, null, level, true);
     }
     public void Out(string message)
     {
-        Log(message, null, LogLevel.Info, true);
+        Log(message, null, null, LogLevel.Info, true);
     }
 
     // Log with authName.
     public void Out(string message, ClientInfo cInfo)
     {
-        Log(message, cInfo, LogLevel.Info, true);
+        Log(message, cInfo, null, LogLevel.Info, true);
+    }
+    public void Out(string message, PersistentPlayerData pData)
+    {
+        Log(message, null, pData, LogLevel.Info, true);
     }
 
     // Log with authName and LogLevel.
     public void Out(string message, ClientInfo cInfo, LogLevel level)
     {
-        Log(message, cInfo, level, true);
+        Log(message, cInfo, null, level, true);
+    }
+    public void Out(string message, PersistentPlayerData pData, LogLevel level)
+    {
+        Log(message, null, pData, level, true);
     }
 
     // Log with LogLevel only.
     public void Out(string message, LogLevel level)
     {
-        Log(message, null, level, true);
+        Log(message, null, null, level, true);
     }
     public void Info(string message)
     {
-        Log(message, null, LogLevel.Info, true);
+        Log(message, null, null, LogLevel.Info, true);
     }
 
     // Log with authName.
     public void Info(string message, ClientInfo cInfo)
     {
-        Log(message, cInfo, LogLevel.Info, true);
+        Log(message, cInfo, null, LogLevel.Info, true);
+    }
+    public void Info(string message, PersistentPlayerData pData)
+    {
+        Log(message, null, pData, LogLevel.Info, true);
     }
 
     // Log with authName and LogLevel.
     public void Info(string message, ClientInfo cInfo, LogLevel level)
     {
-        Log(message, cInfo, level, true);
+        Log(message, cInfo, null, level, true);
+    }
+    public void Info(string message, PersistentPlayerData pData, LogLevel level)
+    {
+        Log(message, null, pData, level, true);
     }
 
     // Log with LogLevel only.
     public void Info(string message, LogLevel level)
     {
-        Log(message, null, level, true);
+        Log(message, null, null, level, true);
     }
 
     // ...
     public void Debug(string message)
     {
-        Log(message, null, LogLevel.Debug, true);
+        Log(message, null, null, LogLevel.Debug, true);
     }
     public void Debug(string message, ClientInfo cInfo)
     {
-        Log(message, cInfo, LogLevel.Debug, true);
+        Log(message, cInfo, null, LogLevel.Debug, true);
+    }
+    public void Debug(string message, PersistentPlayerData pData)
+    {
+        Log(message, null, pData, LogLevel.Debug, true);
     }
     public void Warn(string message)
     {
-        Log(message, null, LogLevel.Warn, true);
+        Log(message, null, null, LogLevel.Warn, true);
     }
     public void Warn(string message, ClientInfo cInfo)
     {
-        Log(message, cInfo, LogLevel.Warn, true);
+        Log(message, cInfo, null, LogLevel.Warn, true);
+    }
+    public void Warn(string message, PersistentPlayerData pData)
+    {
+        Log(message, null, pData, LogLevel.Warn, true);
     }
     public void Error(string message)
     {
-        Log(message, null, LogLevel.Error, true);
+        Log(message, null, null, LogLevel.Error, true);
     }
     public void Error(string message, ClientInfo cInfo)
     {
-        Log(message, cInfo, LogLevel.Error, true);
+        Log(message, cInfo, null, LogLevel.Error, true);
+    }
+    public void Error(string message, PersistentPlayerData pData)
+    {
+        Log(message, null, pData, LogLevel.Error, true);
     }
     public void Fatal(string message)
     {
-        Log(message, null, LogLevel.Fatal, true);
+        Log(message, null, null, LogLevel.Fatal, true);
     }
     public void Fatal(string message, ClientInfo cInfo)
     {
-        Log(message, cInfo, LogLevel.Fatal, true);
+        Log(message, cInfo, null, LogLevel.Fatal, true);
+    }
+    public void Fatal(string message, PersistentPlayerData pData)
+    {
+        Log(message, null, pData, LogLevel.Fatal, true);
     }
 }
