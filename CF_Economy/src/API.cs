@@ -17,6 +17,9 @@ namespace CF_Economy
         public static CF_Mod mod = new CF_Mod("CF_Economy", OnConfigLoaded, OnPhrasesLoaded);
         public static CF_Log log = new CF_Log("CF_Economy");
         public static Harmony harmony = new Harmony("CF_Economy");
+        public static CF_JsonFile<Dictionary<string, CF_Currency>> db = new CF_JsonFile<Dictionary<string, CF_Currency>>(mod.modDatabasePath + "/Currencies.json", new Dictionary<string, CF_Currency>(), Formatting.None);
+        public static Dictionary<string, CF_BankAccount> accounts = new Dictionary<string, CF_BankAccount>();
+        public static Dictionary<int, CF_Currency> allCurrencies = new Dictionary<int, CF_Currency>();
         public void InitMod(Mod _modInstance)
         {
             mod.Activate();
