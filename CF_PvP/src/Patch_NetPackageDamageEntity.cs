@@ -11,10 +11,11 @@ namespace CF_PvP
     {
         static bool Prefix(NetPackageDamageEntity __instance,
             int ___entityId, int ___attackerEntityId,
-            ushort ___strength, float ___damageMultiplier, ItemValue ___attackingItem,
-            bool ___bFatal, int ___ArmorDamage, byte ___bonusDamageType,
+            ushort ___strength, ItemValue ___attackingItem,
+            bool ___bFatal, int ___ArmorDamage,
             int ___hitDirection, int ___hitBodyPart)
         {
+
             // Check if the attacker is invalid or attacking oneself, and ignore the package in such cases
             if (___attackerEntityId == -1 || ___attackerEntityId == ___entityId)
                 return true;
@@ -30,22 +31,19 @@ namespace CF_PvP
                 if (playerV == null || cInfoV == null)
                     return true;
 
-                // Build a log string with various information about the damage package
-                string logString = BuildLogString(__instance.Sender, cInfoA, cInfoV, ___strength, ___damageMultiplier,
-                    ___bonusDamageType, ___bFatal, ___ArmorDamage, playerA, playerV, ___attackingItem,
-                    (int)___hitDirection, ___hitBodyPart);
-
-                // Log the information for both the attacker and the victim
-                log.Out(logString, cInfoA);
-                log.Out(logString, cInfoV);
-
-                // Add the damage details to the hit log manager for further processing
-                float distance = Vector3.Distance(playerA.position, playerV.position);
                 CF_HitLog.AddEntry(__instance.Sender, cInfoA, cInfoV, playerA, playerV, ___strength, ___ArmorDamage, ___bFatal, ___attackingItem, (Utils.EnumHitDirection)___hitDirection, (EnumBodyPartHit)___hitBodyPart, CF_ServerMonitor.CurrentFPS);
 
-                // If the attacker is not the package sender or the distance is too great, return false to prevent processing
-                if (___attackerEntityId != __instance.Sender.entityId || distance > 200)
+                if (___attackerEntityId != __instance.Sender.entityId)
+                {
+                    log.Warn($"Invalid attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
                     return false;
+                }
+
+                float distance = Vector3.Distance(playerA.position, playerV.position);
+                if (distance > maxDistanceDrop)
+                {
+                    return false;
+                }
 
                 return true;
             }
@@ -63,34 +61,6 @@ namespace CF_PvP
         {
             clientInfo = CF_Player.GetClient(entityId);
             return clientInfo != null ? CF_Player.GetPlayer(entityId) : null;
-        }
-
-        // Method to build the log string
-        private static string BuildLogString(ClientInfo src, ClientInfo att, ClientInfo vic,
-        ushort str, float dmgMult, byte bonusDmgType, bool isFatal, int armDmg,
-        EntityPlayer attPlr, EntityPlayer vicPlr, ItemValue wpn, int hitDir, int hitPart)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append($"Src: {CF_Format.PlayerNameAndPlatform(src)} ");
-            sb.Append($"Att: {att.playerName} ({att.PlatformId.ReadablePlatformUserIdentifier}) ");
-            sb.Append($"Vic: {vic.playerName} ({vic.PlatformId.ReadablePlatformUserIdentifier}) ");
-            sb.Append($"Dmg: {str}{(dmgMult != 1f ? $" (x{dmgMult})" : "")}{((EnumDamageBonusType)bonusDmgType != EnumDamageBonusType.None ? $" +{(EnumDamageBonusType)bonusDmgType}" : "")}{(isFatal ? " (Fatal)" : "")} ");
-            sb.Append($"Wpn: {(wpn != null ? wpn.ItemClass.GetLocalizedItemName() : "None")} ");
-            float dist = Vector3.Distance(attPlr.position, vicPlr.position);
-            sb.Append($"Dist: {dist} ");
-            sb.Append($"{(Utils.EnumHitDirection)hitDir} {(EnumBodyPartHit)hitPart} ");
-            sb.Append($"FPS: {(int)GameManager.Instance.fps.Counter} ");
-            sb.Append($"Armor: {armDmg} Eff: {(armDmg > 0 ? (int)vicPlr.equipment.GetTotalPhysicalArmorRating(vicPlr, wpn) : 0)} ");
-            sb.Append($"AttHP: {attPlr.Health} St: {(int)attPlr.Stamina:F1} ");
-            sb.Append($"VicHP: {vicPlr.Health} St: {(int)vicPlr.Stamina:F1} ");
-            sb.Append($"AttPos: {(int)attPlr.position.x} {(int)attPlr.position.y} {(int)attPlr.position.z} ");
-            sb.Append($"VicPos: {(int)vicPlr.position.x} {(int)vicPlr.position.y} {(int)vicPlr.position.z} ");
-            if (att.entityId != attPlr.entityId)
-                sb.Append("*BAD_SOURCE");
-            if (dist > 200)
-                sb.Append("*BAD_DISTANCE");
-
-            return sb.ToString();
         }
     }
 }
