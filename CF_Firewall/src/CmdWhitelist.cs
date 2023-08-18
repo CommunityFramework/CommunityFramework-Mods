@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace CF_Firewall
 {
-    internal class CmdWhitelist : ConsoleCmdAbstract
+    internal class CmdFirewall : ConsoleCmdAbstract
     {
         protected override string[] getCommands()
         {
-            return new string[] { "dk-whitelist", "wl" };
+            return new string[] { "firewall", "fw" };
         }
         protected override string getDescription()
         {
             return "Usage:\n"
-                + "wl <whitelist type> <auth> <true|false>\n"
+                + "fw <whitelist type> <auth> <true|false>\n"
                 + "\n"
                 + "Auth can be: STEAM64, IP-Address, XBL-ID & EOS-ID\n"
                 + "Whitelist Types: steam, vpn, fam & country\n"
                 + "\n"
-                + "Example: wl vpn 765611988123123 true\n"
+                + "Example: fw vpn 765611988123123 true\n"
                 ;
         }
         public override void Execute(List<string> _params, CommandSenderInfo _senderInfo)
@@ -77,6 +77,7 @@ namespace CF_Firewall
                             SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Country filter immunity already set.");
                             break;
                         case "family":
+                        case "familysharing":
                         case "fam":
                         case "f":
                             if (!CF_Whitelist.FamilyShare(_params[1]))
@@ -86,22 +87,6 @@ namespace CF_Firewall
                                 CF_Whitelist.Save();
                             }
                             SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Family sharing immunity already set.");
-                            break;
-                    }
-                }
-                else
-                {
-                    switch (_params[0])
-                    {
-                        case "vpn":
-                            break;
-                        case "vac":
-                            break;
-                        case "ping":
-                            break;
-                        case "country":
-                            break;
-                        case "fam":
                             break;
                     }
                 }
