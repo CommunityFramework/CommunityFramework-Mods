@@ -1,7 +1,9 @@
 ﻿using HarmonyLib;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using static CF_Cvars.API;
+using static WorldGenerationEngineFinal.HighwayPlanner;
 
 namespace CF_Cvars
 {
@@ -12,9 +14,9 @@ namespace CF_Cvars
         {
             try
             {
-                if (_entity is EntityPlayer)
+                if (_entity is EntityPlayer player)
                 {
-                    CF_CvarManager.UpdatePlayer(_entity as EntityPlayer);
+                    CF_CvarManager.UpdatePlayer(player);
                 }
             }
             catch (Exception e)
