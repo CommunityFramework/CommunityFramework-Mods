@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static CF_PlayerDatabase.API;
 
 public class CF_PlayerDB
 {
+    public static CF_PlayerDB instance => CF_PlayerDatabase.API.players;
     public Dictionary<string, PlayerDBEntry> players = new Dictionary<string, PlayerDBEntry>();
+    public Dictionary<int, PlayerDBEntry> playersCached = new Dictionary<int, PlayerDBEntry>();
     public PlayerDBEntry GetPlayer(string _eosId)
     {
         if (!players.ContainsKey(_eosId))
@@ -16,27 +16,6 @@ public class CF_PlayerDB
         }
 
         return players[_eosId];
-    }
-    public bool GetPlayer(ClientInfo _cInfo, out PlayerDBEntry _playerData)
-    {
-        return GetPlayer(_cInfo, out _playerData, false);
-    }
-    public bool GetPlayer(ClientInfo _cInfo, out PlayerDBEntry _playerData, bool _allowCreate)
-    {
-        string playerId = _cInfo.InternalId.ReadablePlatformUserIdentifier;
-
-        if (!players.ContainsKey(playerId))
-        {
-            if (!_allowCreate)
-            {
-                _playerData = null;
-                return false;
-            }
-
-            players.Add(playerId, new PlayerDBEntry(_cInfo));
-        }
-        _playerData = players[playerId];
-        return _playerData != null;
     }
     public bool TryGetPlayer(string _eosId, out PlayerDBEntry _playerDbEntry)
     {
@@ -59,6 +38,7 @@ public class CF_PlayerDB
     public bool TryGetPlayer(ClientInfo _cInfo, out PlayerDBEntry _playerDbEntry, bool _allowCreate)
     {
         string eosId = _cInfo.InternalId.ReadablePlatformUserIdentifier;
+        _playerDbEntry = null;
 
         if (!players.ContainsKey(eosId))
         {
@@ -68,8 +48,8 @@ public class CF_PlayerDB
                 return false;
             }
 
-            _playerDbEntry = new PlayerDBEntry(_cInfo);
-            players.Add(eosId, _playerDbEntry);
+            if(AddPlayer(_cInfo))
+                _playerDbEntry = players[eosId];
         }
         else
         {
@@ -84,14 +64,11 @@ public class CF_PlayerDB
         if (!players.ContainsKey(playerId))
         {
             players.Add(playerId, new PlayerDBEntry(_cInfo));
+            db.Save();
             return true;
         }
 
         return false;
-    }
-    public void RemovePlayer(string eosId)
-    {
-        players.Remove(eosId);
     }
     public static int CountPlayers(Dictionary<string, PlayerDBEntry> players)
     {
@@ -103,7 +80,7 @@ public class CF_PlayerDB
     }
     public static int ActivePlayersCount(IEnumerable<PlayerDBEntry> entries, TimeSpan timespan)
     {
-        var currentTime = DateTime.Now;
+        var currentTime = DateTime.UtcNow;
         return entries.Count(e => (currentTime - e.lastSeen) <= timespan);
     }
     public int TotalPlaytime()
@@ -124,7 +101,7 @@ public class CF_PlayerDB
     }
     public static int PlayersJoinedSince(IEnumerable<PlayerDBEntry> entries, TimeSpan timespan)
     {
-        var ago = DateTime.Now.Add(timespan);
+        var ago = DateTime.UtcNow.Add(timespan);
         return entries.Count(e => e.firstSeen >= ago);
     }
     public int TotalMutedPlayers()
@@ -145,7 +122,7 @@ public class CF_PlayerDB
     }
     public void CleanupInactivePlayers(TimeSpan inactivityLimit)
     {
-        var currentTime = DateTime.Now;
+        var currentTime = DateTime.UtcNow;
         var inactivePlayers = players.Where(pair => currentTime - pair.Value.lastSeen > inactivityLimit)
                                      .Select(pair => pair.Key)
                                      .ToList();

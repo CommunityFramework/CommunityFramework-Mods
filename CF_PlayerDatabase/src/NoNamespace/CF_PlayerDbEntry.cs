@@ -14,8 +14,8 @@ public class PlayerDBEntry
     public string voteSteam;
     public string discordId;
     public string name { get; set; }
-    public DateTime firstSeen { get; } = DateTime.Now;
-    public DateTime lastSeen { get; set; } = DateTime.Now;
+    public DateTime firstSeen { get; } = DateTime.UtcNow;
+    public DateTime lastSeen { get; set; } = DateTime.UtcNow;
     public int playtime { get; set; } = 0;
     public bool isInWatchlist { get; set; } = false;
     public bool isMuted { get; set; } = false;
