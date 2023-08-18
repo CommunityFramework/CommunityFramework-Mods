@@ -6,11 +6,14 @@ using static CF_Economy.API;
 
 public class CF_Currency
 {
-    private static Dictionary<int, CF_Currency> allCurrencies = new Dictionary<int, CF_Currency>();
+    private static object currencyLock = new object();
     public int Id { get; }
     public string Name { get; }
     public string Tag { get; }
 
+    public CF_Currency()
+    {
+    }
     public CF_Currency(int id, string name, string tag)
     {
         Id = id;
@@ -23,20 +26,23 @@ public class CF_Currency
     }
     public static void RegisterCurrency(int id, string name, string tag)
     {
-        if (IsIdUsed(id))
+        lock (currencyLock)
         {
-            log.Out($"Currency with id {id} already exists!");
-            return;
-        }
+            if (IsIdUsed(id))
+            {
+                log.Out($"Currency with id {id} already exists!");
+                return;
+            }
 
-        if (IsTagUsed(tag))
-        {
-            log.Out($"Currency with tag {tag} already exists!");
-            return;
-        }
+            if (IsTagUsed(tag))
+            {
+                log.Out($"Currency with tag {tag} already exists!");
+                return;
+            }
 
-        var currency = new CF_Currency(id, name, tag);
-        allCurrencies.Add(currency.Id, currency);
+            var currency = new CF_Currency(id, name, tag);
+            allCurrencies.Add(currency.Id, currency);
+        }
     }
     public static List<CF_Currency> GetAllCurrencies()
     {
