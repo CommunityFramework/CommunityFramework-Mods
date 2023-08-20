@@ -15,8 +15,8 @@ namespace CF_PlayerDatabase
         // Harmony injections are an important tool for modding this game. Please visit https://harmony.pardeike.net/articles/intro.html for more infos
         public static Harmony harmony = new Harmony("CF_PlayerDatabase");
         // Simply helper we use from CF_Core to store data to a json file which contains some data about players
-        public static CF_PlayerDB players = null;
-        public static CF_JsonFile<CF_PlayerDB> db = new CF_JsonFile<CF_PlayerDB>(mod.modDatabasePath + "/Players.json", players, Formatting.None);
+        public static CF_PlayerDB dbData = null;
+        public static CF_JsonFile<CF_PlayerDB> db = new CF_JsonFile<CF_PlayerDB>(mod.modDatabasePath + "/Players.json", dbData, Formatting.None);
 
         // This is our entry point which is usually our Main() in C#
         // More info can be found here: https://7daystodie.fandom.com/wiki/ModAPI
@@ -24,15 +24,22 @@ namespace CF_PlayerDatabase
         {
             mod.Activate(true); // Load settings & phrases
 
+            if (!db.Load(out CF_PlayerDB data, out string err))
+            {
+                log.Error($"Could not load database: {err}");
+                dbData = new CF_PlayerDB();
+                db.Save();
+            }
+            else
+            {
+                dbData = data;
+                log.Out($"Loaded {CF_PlayerDB.players.Count} players.");
+            }
+
             harmony.PatchAll(); // Patch all harmony injections across all files of this project
 
             ModEvents.PlayerSpawning.RegisterHandler(OnPlayerSpawning); 
             ModEvents.PlayerSpawnedInWorld.RegisterHandler(OnPlayerSpawnedInWorld);
-
-            if(!db.Load<CF_PlayerDB>(out CF_PlayerDB data, out string err))
-            {
-                log.Error($"Could not load database: {err}");
-            }
         }
         // Phrases
         // All phrases created in this callback can be used after
@@ -63,13 +70,19 @@ namespace CF_PlayerDatabase
         // Called when the player is spawning, a teleport by a closed trader is also a spawn, check the respawn reason depending on what you want to do
         public static void OnPlayerSpawnedInWorld(ClientInfo _cInfo, RespawnType _respawnReason, Vector3i _pos)
         {
-            if (db == null || db.data == null)
+            if (db == null)
             {
-                log.Out("db or db.data is null.");
+                log.Out("db is null.");
                 return;
             }
 
-            if (!db.data.TryGetPlayer(_cInfo, out PlayerDBEntry _playerData, true))
+            if (db.data == null)
+            {
+                log.Out("db.data is null.");
+                return;
+            }
+
+            if (!CF_PlayerDB.TryGetPlayer(_cInfo, out PlayerDBEntry _playerData, true))
                 return;
 
             if (_cInfo == null)
@@ -119,25 +132,9 @@ namespace CF_PlayerDatabase
                     , _cInfo);
             }
         }
-        public static void MutePlayer(ClientInfo _cInfo)
-        {
-            if (db.data.TryGetPlayer(_cInfo, out PlayerDBEntry playerData))
-            {
-                playerData.isMuted = true;
-            }
-        }
-
-        public static void UnmutePlayer(ClientInfo _cInfo)
-        {
-            if (db.data.TryGetPlayer(_cInfo, out PlayerDBEntry playerData))
-            {
-                playerData.isMuted = false;
-                // Additional actions like notifying admins or logging the unmute can be performed here.
-            }
-        }
         public static void OnPlayerChat(ClientInfo _cInfo, string _message, List<string> _recipients, EChatType _type)
         {
-            if (db.data.TryGetPlayer(_cInfo, out PlayerDBEntry playerData))
+            if (CF_PlayerDB.TryGetPlayer(_cInfo, out PlayerDBEntry playerData))
             {
                 if (playerData.isMuted)
                 {

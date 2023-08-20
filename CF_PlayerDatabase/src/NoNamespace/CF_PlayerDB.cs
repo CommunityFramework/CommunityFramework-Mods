@@ -5,10 +5,8 @@ using static CF_PlayerDatabase.API;
 
 public class CF_PlayerDB
 {
-    public static CF_PlayerDB instance => CF_PlayerDatabase.API.players;
-    public Dictionary<string, PlayerDBEntry> players = new Dictionary<string, PlayerDBEntry>();
-    public Dictionary<int, PlayerDBEntry> playersCached = new Dictionary<int, PlayerDBEntry>();
-    public PlayerDBEntry GetPlayer(string _eosId)
+    public static Dictionary<string, PlayerDBEntry> players = new Dictionary<string, PlayerDBEntry>();
+    public static PlayerDBEntry GetPlayer(string _eosId)
     {
         if (!players.ContainsKey(_eosId))
         {
@@ -17,7 +15,7 @@ public class CF_PlayerDB
 
         return players[_eosId];
     }
-    public bool TryGetPlayer(string _eosId, out PlayerDBEntry _playerDbEntry)
+    public static bool TryGetPlayer(string _eosId, out PlayerDBEntry _playerDbEntry)
     {
         if (!players.ContainsKey(_eosId))
         {
@@ -31,11 +29,11 @@ public class CF_PlayerDB
 
         return true;
     }
-    public bool TryGetPlayer(ClientInfo _cInfo, out PlayerDBEntry _playerDbEntry)
+    public static bool TryGetPlayer(ClientInfo _cInfo, out PlayerDBEntry _playerDbEntry)
     {
         return TryGetPlayer(_cInfo, out _playerDbEntry, false);
     }
-    public bool TryGetPlayer(ClientInfo _cInfo, out PlayerDBEntry _playerDbEntry, bool _allowCreate)
+    public static bool TryGetPlayer(ClientInfo _cInfo, out PlayerDBEntry _playerDbEntry, bool _allowCreate)
     {
         string eosId = _cInfo.InternalId.ReadablePlatformUserIdentifier;
         _playerDbEntry = null;
@@ -58,17 +56,23 @@ public class CF_PlayerDB
 
         return true;
     }
-    public bool AddPlayer(ClientInfo _cInfo)
+    public static bool AddPlayer(ClientInfo _cInfo)
     {
         string playerId = _cInfo.InternalId.ReadablePlatformUserIdentifier;
         if (!players.ContainsKey(playerId))
         {
+            log.Out($"Added {_cInfo}");
             players.Add(playerId, new PlayerDBEntry(_cInfo));
             db.Save();
             return true;
         }
 
         return false;
+    }
+    public static void Save()
+    {
+        if(db.data != null)
+            db.Save();
     }
     public static int CountPlayers(Dictionary<string, PlayerDBEntry> players)
     {
@@ -83,7 +87,7 @@ public class CF_PlayerDB
         var currentTime = DateTime.UtcNow;
         return entries.Count(e => (currentTime - e.lastSeen) <= timespan);
     }
-    public int TotalPlaytime()
+    public static int TotalPlaytime()
     {
         return players.Values.Sum(player => player.playtime);
     }
@@ -104,7 +108,7 @@ public class CF_PlayerDB
         var ago = DateTime.UtcNow.Add(timespan);
         return entries.Count(e => e.firstSeen >= ago);
     }
-    public int TotalMutedPlayers()
+    public static int TotalMutedPlayers()
     {
         return players.Values.Count(player => player.isMuted);
     }
@@ -116,11 +120,11 @@ public class CF_PlayerDB
     {
         return entries.Count(e => e.isInWatchlist);
     }
-    public int TotalPlayersInWatchlist()
+    public static int TotalPlayersInWatchlist()
     {
         return players.Values.Count(player => player.isInWatchlist);
     }
-    public void CleanupInactivePlayers(TimeSpan inactivityLimit)
+    public static void CleanupInactivePlayers(TimeSpan inactivityLimit)
     {
         var currentTime = DateTime.UtcNow;
         var inactivePlayers = players.Where(pair => currentTime - pair.Value.lastSeen > inactivityLimit)
@@ -132,13 +136,14 @@ public class CF_PlayerDB
             players.Remove(playerId);
         }
     }
-    public void Wipe()
+    public static void Wipe()
     {
         foreach (var entry in players)
         {
             entry.Value.playtime = 0;
             entry.Value.isMuted = false;
             entry.Value.isInWatchlist = false;
+            entry.Value.cooldowns.Clear();
             // Add other seasonal data resets here
         }
     }
