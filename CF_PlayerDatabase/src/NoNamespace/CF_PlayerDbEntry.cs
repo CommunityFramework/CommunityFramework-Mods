@@ -1,10 +1,7 @@
 ﻿using Platform;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using static CF_PlayerDatabase.API;
 
 public class PlayerDBEntry
 {
@@ -20,7 +17,7 @@ public class PlayerDBEntry
     public bool isInWatchlist { get; set; } = false;
     public bool isMuted { get; set; } = false;
     public CF_PlayerAdminLog penaltyLog { get; set; } = new CF_PlayerAdminLog();
-    private Dictionary<string, DateTime> cooldowns = new Dictionary<string, DateTime>();
+    public Dictionary<string, DateTime> cooldowns = new Dictionary<string, DateTime>();
     public PlayerDBEntry(ClientInfo _cInfo)
     {
         eosId = _cInfo.InternalId.ReadablePlatformUserIdentifier;
