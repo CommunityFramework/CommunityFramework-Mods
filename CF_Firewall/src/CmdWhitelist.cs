@@ -52,7 +52,7 @@ namespace CF_Firewall
                                 SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Successfully granted VPN immunity.");
                                 CF_Whitelist.Save();
                             }
-                            else SingletonMonoBehaviour<SdtdConsole>.Instance.Output("VAC immunity already set.");
+                            else SingletonMonoBehaviour<SdtdConsole>.Instance.Output("VPN immunity already set.");
                             break;
                         case "vac":
                         case "steam":
@@ -60,10 +60,10 @@ namespace CF_Firewall
                             if (!CF_Whitelist.Steam(_params[1]))
                             {
                                 CF_Whitelist.SteamAdd(_params[1]);
-                                SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Successfully granted VAC immunity.");
+                                SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Successfully granted VAC/Steam immunity.");
                                 CF_Whitelist.Save();
                             }
-                            else SingletonMonoBehaviour<SdtdConsole>.Instance.Output("VAC immunity already set.");
+                            else SingletonMonoBehaviour<SdtdConsole>.Instance.Output("VAC/Steam immunity already set.");
                             break;
                         case "country":
                         case "count":
