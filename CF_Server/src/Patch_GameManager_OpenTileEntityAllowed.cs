@@ -8,58 +8,54 @@ using static CF_Server.API;
 
 namespace CF_Server
 {
-    public class GameManager_OpenTileEntityAllowed
+    [HarmonyPatch(typeof(GameManager), "OpenTileEntityAllowed")]
+    public class Patch_GameManager_OnOpenTileEntityAllowed
     {
-        [HarmonyPatch(typeof(GameManager), "OpenTileEntityAllowed")]
-        public class OnOpenTileEntityAllowed_Patch
+        static bool Prefix(ref bool __result, int _entityIdThatOpenedIt, TileEntity _te)
         {
-            static AccessTools.FieldRef<TileEntity, Chunk> chunkRef = AccessTools.FieldRefAccess<TileEntity, Chunk>("chunk");
-            static bool Prefix(ref bool __result, int _entityIdThatOpenedIt, TileEntity _te)
+            ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
+            if (cInfo == null)
             {
-                ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
-                if (cInfo == null)
+                log.Error($"Patch_GameManager_OnOpenTileEntityAllowed_Pre reported: No ClientInfo for id {_entityIdThatOpenedIt}");
+                __result = false;
+                return false;
+            }
+
+            try
+            {
+                if (!CF_RestartManager.CanOpenLootContainer(cInfo, _te))
                 {
-                    log.Error($"No ClientInfo for id {_entityIdThatOpenedIt}");
+                    //log.Log($"ServerManager denied access for id {_entityIdThatOpenedIt} opening a {_te.GetTileEntityType()} at {CF_TileEntity.GetPosTele(_te)}", cInfo);
                     __result = false;
                     return false;
                 }
 
-                try
-                {
-                    if (!CF_RestartManager.CanOpenLootContainer(cInfo, _te))
-                    {
-                        log.Log($"ServerManager denied access for id {_entityIdThatOpenedIt} opening a {_te.GetTileEntityType()} at {CF_TileEntity.GetPosTele(_te)}");
-                        __result = false;
-                        return false;
-                    }
-
-                }
-                catch (Exception e)
-                {
-                    log.Error($"OpenTileEntityAllowed: {e}");
-                }
-
-                return true;
             }
-            static void Postfix(bool __result, int _entityIdThatOpenedIt, TileEntity _te)
+            catch (Exception e)
             {
-                try
-                {
-                    ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
-                    if (cInfo == null)
-                        return;
+                log.Error($"Patch_GameManager_OnOpenTileEntityAllowed_Pre reported: : {e}");
+            }
 
-                    if (__result)
-                        return;
+            return true;
+        }
+        static void Postfix(bool __result, int _entityIdThatOpenedIt, TileEntity _te)
+        {
+            try
+            {
+                ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
+                if (cInfo == null)
+                    return;
 
-                    // Antidupe
-                    if (CF_RestartManager.locked)
-                        CF_RestartManager.CloseAllXui(cInfo);
-                }
-                catch (Exception e)
-                {
-                    log.Error($"OnOpenTileEntityAllowed_Patch_Post reported: {e}");
-                }
+                if (__result)
+                    return;
+
+                // Antidupe
+                if (CF_RestartManager.locked)
+                    CF_RestartManager.CloseAllXui(cInfo);
+            }
+            catch (Exception e)
+            {
+                log.Error($"Patch_GameManager_OnOpenTileEntityAllowed_Post reported: {e}");
             }
         }
     }
