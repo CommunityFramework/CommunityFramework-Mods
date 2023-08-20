@@ -40,7 +40,7 @@ namespace CF_Firewall
             }
             catch (Exception e)
             {
-                x.Error($"ProcessIpHubResponse reported: {e}");
+                log.Error($"ProcessIpHubResponse reported: {e}");
             }
         }
         public static bool CheckIPdata(ClientInfo _cInfo)
@@ -49,14 +49,14 @@ namespace CF_Firewall
             {
                 if (!checkedIPs.ContainsKey(_cInfo.ip))
                 {
-                    x.Error($"CheckIPdata: IP not found {_cInfo.ip}");
+                    log.Error($"CheckIPdata: IP not found {_cInfo.ip}");
                     return true;
                 }
 
                 IPHubResponse data = checkedIPs[_cInfo.ip].data;
                 if (data == null)
                 {
-                    x.Error($"No data for checked IP: {_cInfo.ip}.");
+                    log.Error($"No data for checked IP: {_cInfo.ip}.");
                     return true;
                 }
 
@@ -86,7 +86,7 @@ namespace CF_Firewall
                     return false;
                 }
             }
-            catch (Exception e) { x.Error($"CheckIPdata reported: {e.Message}"); }
+            catch (Exception e) { log.Error($"CheckIPdata reported: {e.Message}"); }
 
             return true;
         }

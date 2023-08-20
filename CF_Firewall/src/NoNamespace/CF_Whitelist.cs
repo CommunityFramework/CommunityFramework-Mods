@@ -47,20 +47,20 @@ public class CF_Whitelist
         }
         catch (FileNotFoundException e)
         {
-            x.Error($"File not found: {e}");
+            log.Error($"File not found: {e}");
         }
         catch (Exception e)
         {
-            x.Error($"Failed loading from {filePathWhitelist}: {e}");
+            log.Error($"Failed loading from {filePathWhitelist}: {e}");
             return;
         }
 
-        x.Log($"Create new whitelist file.");
+        log.Log($"Create new whitelist file.");
         Save();
     }
     public static void Save()
     {
         File.WriteAllText(filePathWhitelist, JsonConvert.SerializeObject(whitelist, Newtonsoft.Json.Formatting.Indented));
-        x.Debug($"Saved whitelist to {filePathWhitelist}.");
+        log.Debug($"Saved whitelist to {filePathWhitelist}.");
     }
 }

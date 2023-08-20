@@ -11,7 +11,7 @@ namespace CF_Firewall
     public class API : IModApi
     {
         public static CF_Mod mod = new CF_Mod("CF_Firewall", OnConfigLoaded, OnPhrasesLoaded);
-        public static CF_Log x = new CF_Log("CF_Firewall");
+        public static CF_Log log = new CF_Log("CF_Firewall");
         public static Harmony harmony = new Harmony("CF_Firewall");
         public static string filePathIPdata;
         public static string filePathWhitelist;
@@ -82,7 +82,7 @@ namespace CF_Firewall
             {
                 if (string.IsNullOrEmpty(ans))
                 {
-                    x.Error($"Empty ANS set");
+                    log.Error($"Empty ANS set");
                     return;
                 }
 
@@ -91,12 +91,12 @@ namespace CF_Firewall
                     string[] ansRange = ans.Split(':');
                     if (!int.TryParse(ansRange[0], out int start))
                     {
-                        x.Error($"Invalid ANS range start: {ans}");
+                        log.Error($"Invalid ANS range start: {ans}");
                         return;
                     }
                     if (!int.TryParse(ansRange[1], out int end))
                     {
-                        x.Error($"Invalid ANS range end: {ans}");
+                        log.Error($"Invalid ANS range end: {ans}");
                         return;
                     }
 
@@ -106,7 +106,7 @@ namespace CF_Firewall
 
                 if (!int.TryParse(ans, out int Ans))
                 {
-                    x.Error($"Invalid ANS: {ans}");
+                    log.Error($"Invalid ANS: {ans}");
                     return;
                 }
 
@@ -118,7 +118,7 @@ namespace CF_Firewall
             {
                 if (string.IsNullOrEmpty(ans))
                 {
-                    x.Error($"Empty ANS set");
+                    log.Error($"Empty ANS set");
                     return;
                 }
 
@@ -127,12 +127,12 @@ namespace CF_Firewall
                     string[] ansRange = ans.Split(':');
                     if (!int.TryParse(ansRange[0], out int start))
                     {
-                        x.Error($"Invalid ANS range start: {ans}");
+                        log.Error($"Invalid ANS range start: {ans}");
                         return;
                     }
                     if (!int.TryParse(ansRange[1], out int end))
                     {
-                        x.Error($"Invalid ANS range end: {ans}");
+                        log.Error($"Invalid ANS range end: {ans}");
                         return;
                     }
 
@@ -142,7 +142,7 @@ namespace CF_Firewall
 
                 if (!int.TryParse(ans, out int Ans))
                 {
-                    x.Error($"Invalid ANS: {ans}");
+                    log.Error($"Invalid ANS: {ans}");
                     return;
                 }
 
@@ -181,7 +181,7 @@ namespace CF_Firewall
             }
             catch (Exception e)
             {
-                x.Error($"Failed loading from {filePathIPdata}: {e}");
+                log.Error($"Failed loading from {filePathIPdata}: {e}");
                 return false;
             }
         }
@@ -202,7 +202,7 @@ namespace CF_Firewall
                         IPhub.CheckIPdata(_cInfo);
                     else IPHubResponse.Check(_cInfo, IPhub.ProcessIpHubResponse);
                 }
-                catch (Exception e) { x.Error($"CheckPlayer.IPHub reported: {e}"); }
+                catch (Exception e) { log.Error($"CheckPlayer.IPHub reported: {e}"); }
             }
 
             if (_cInfo.PlatformId.PlatformIdentifier == EPlatformIdentifier.Steam 
@@ -222,7 +222,7 @@ namespace CF_Firewall
                         Ban(_cInfo, "FamilySharing", "User Account");
                     }
                 }
-                catch (Exception e) { x.Error($"CheckPlayer.FamilyShare reported: {e}"); }
+                catch (Exception e) { log.Error($"CheckPlayer.FamilyShare reported: {e}"); }
             }
 
             if (_cInfo.PlatformId.PlatformIdentifier == EPlatformIdentifier.Steam 
@@ -232,12 +232,17 @@ namespace CF_Firewall
                 SteamVacBanResponse.Check(_cInfo, Steam.ProcesssVacBanWebResponse);
             }
         }
+        public static bool isBanning = false;
         public static bool Ban(ClientInfo _cInfo, string _reason, string _details)
         {
-            x.Log($"Banned {_cInfo} for reason: {_reason} details: {_details}");
+            if(isBanning) 
+                return false;
+
+            log.Log($"Banned {CF_Format.PlayerNameAndPlatform(_cInfo)} for reason: {_reason} details: {_details} IP: {_cInfo.ip}");
+
             GameManager.Instance.adminTools.Blacklist.AddBan(_cInfo.playerName, _cInfo.PlatformId, DateTime.UtcNow.AddYears(10), _reason);
             GameUtils.KickPlayerForClientInfo(_cInfo, new GameUtils.KickPlayerData(GameUtils.EKickReason.ManualKick, _customReason: _reason));
-            Ban(_cInfo.ip);
+            //Ban(_cInfo.ip);
             return true;
         }
         public static bool Ban(string _ip)
@@ -255,14 +260,14 @@ namespace CF_Firewall
                 }
                 */
 
-                x.Log($"IP: {_ip} was already banned");
+                log.Log($"IP: {_ip} was already banned");
             }
             else checkedIPs.Add(_ip, new CheckedIP());
 
             checkedIPs[_ip].ipBan = false;
             checkedIPs[_ip].last = DateTime.UtcNow;
 
-            x.Log($"IP: {_ip} banned.");
+            log.Log($"IP: {_ip} banned.");
 
             SaveIPdata();
 
@@ -276,7 +281,7 @@ namespace CF_Firewall
             checkedIPs[IP].ipBan = false;
             checkedIPs[IP].last = DateTime.UtcNow;
 
-            x.Log($"IP: {IP} unbanned by command.");
+            log.Log($"IP: {IP} unbanned by command.");
 
             SaveIPdata();
 
@@ -292,7 +297,7 @@ namespace CF_Firewall
                         return true;
                 }
             }
-            catch (Exception e) { x.Error($"AnsInWhitelist reported: {e.Message}"); }
+            catch (Exception e) { log.Error($"AnsInWhitelist reported: {e.Message}"); }
 
             return false;
         }
@@ -306,7 +311,7 @@ namespace CF_Firewall
                         return true;
                 }
             }
-            catch (Exception e) { x.Error($"AnsInWhitelist reported: {e.Message}"); }
+            catch (Exception e) { log.Error($"AnsInWhitelist reported: {e.Message}"); }
 
             return false;
         }
