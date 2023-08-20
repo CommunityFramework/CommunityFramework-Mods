@@ -81,7 +81,7 @@ public class CF_HitLogEntry
     public int TotalDamage() => damage + armorDamage;
     public bool IsHeadshot() =>  hitbox == EnumBodyPartHit.Head;
     public float Distance() => Vector3.Distance(attackerPos, victimPos);
-    public float GetArmorPenetration() => armorRating > 0f ? armorRating - armorRatingEff / armorRating : 0f;
+    public float GetArmorPenetration() => armorRating > 0f ? (armorRating - armorRatingEff) / armorRating : 0f;
     public string FormatArmorRating() => $"{armorRating / 100f:F1}";
     public string FormatEffectiveArmorRating() => $"{armorRatingEff / 100f:F1}";
     public string FormatArmorPenetration() => $"{GetArmorPenetration() / 100f:F1}";
