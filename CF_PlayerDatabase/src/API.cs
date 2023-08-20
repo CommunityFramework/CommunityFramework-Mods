@@ -63,10 +63,22 @@ namespace CF_PlayerDatabase
         // Called when the player is spawning, a teleport by a closed trader is also a spawn, check the respawn reason depending on what you want to do
         public static void OnPlayerSpawnedInWorld(ClientInfo _cInfo, RespawnType _respawnReason, Vector3i _pos)
         {
+            if (db == null || db.data == null)
+            {
+                log.Out("db or db.data is null.");
+                return;
+            }
+
             if (!db.data.TryGetPlayer(_cInfo, out PlayerDBEntry _playerData, true))
                 return;
 
-            switch (_respawnReason) 
+            if (_cInfo == null)
+            {
+                log.Out("_cInfo is null.");
+                return;
+            }
+
+            switch (_respawnReason)
             {
                 case RespawnType.JoinMultiplayer:
                 case RespawnType.EnterMultiplayer:
@@ -78,10 +90,22 @@ namespace CF_PlayerDatabase
         }
         public static void SendWelcomeMessage(ClientInfo _cInfo, PlayerDBEntry _playerData)
         {
+            if (_playerData == null)
+            {
+                log.Out("_playerData is null.");
+                return;
+            }
+
             TimeSpan passed = DateTime.UtcNow - _playerData.lastSeen;
             string timespan = passed.ToString();
 
-            if(passed.Seconds == 0)
+            if (string.IsNullOrEmpty(welcomeMessage) || string.IsNullOrEmpty(welcomeBackMessage))
+            {
+                log.Out("welcomeMessage or welcomeBackMessage is null or empty.");
+                return;
+            }
+
+            if (passed.Seconds == 0)
             {
                 CF_Player.Message(welcomeMessage
                     .Replace("{PLAYERNAME}", _cInfo.playerName)
