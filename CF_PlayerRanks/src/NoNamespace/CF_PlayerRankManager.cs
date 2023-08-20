@@ -53,8 +53,8 @@ public class CF_PlayerRankManager
     }
     public static bool LoadFile()
     {
-        if (!Directory.Exists(mod.modConfigPath))
-            Directory.CreateDirectory(mod.modConfigPath);
+        if (!Directory.Exists(mod.modDatabasePath))
+            Directory.CreateDirectory(mod.modDatabasePath);
 
         if (!File.Exists(filePathPlayerRanks))
         {
@@ -75,9 +75,6 @@ public class CF_PlayerRankManager
     }
     public static void SaveToFile()
     {
-        if (!Directory.Exists(mod.modConfigPath))
-            Directory.CreateDirectory(mod.modConfigPath);
-
         File.WriteAllText(filePathPlayerRanks, JsonConvert.SerializeObject(ranks, Formatting.Indented));
     }
     private static void OnFileChanged(object source, FileSystemEventArgs e)
