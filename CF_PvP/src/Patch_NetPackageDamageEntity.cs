@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using static CF_PvP.API;
@@ -9,6 +10,8 @@ namespace CF_PvP
     [HarmonyPatch(typeof(NetPackageDamageEntity), "ProcessPackage")]
     public class Patch_NetPackageDamageEntity
     {
+        private static Dictionary<int, DateTime> fatalHitTime = new Dictionary<int, DateTime>();
+        private static TimeSpan fatalHitThreshold = TimeSpan.FromSeconds(10);
         static bool Prefix(NetPackageDamageEntity __instance,
             int ___entityId, int ___attackerEntityId,
             ushort ___strength, ItemValue ___attackingItem,
@@ -31,21 +34,45 @@ namespace CF_PvP
                 if (playerV == null || cInfoV == null)
                     return true;
 
-                CF_HitLog.AddEntry(__instance.Sender, cInfoA, cInfoV, playerA, playerV, ___strength, ___ArmorDamage, ___bFatal, ___attackingItem, (Utils.EnumHitDirection)___hitDirection, (EnumBodyPartHit)___hitBodyPart, CF_ServerMonitor.CurrentFPS);
+                bool allow = true;
+
+                if (!playerV.Spawned)
+                {
+                    log.Warn($"Player not spawned. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    allow = false;
+                }
+
+                if (!playerV.IsAlive())
+                {
+                    log.Warn($"Player not alive. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    allow = false;
+                }
+
+                // If the player died decently then he may be shown where he died as tpose and can get damage while respawned somewher else already
+                if (fatalHitTime.TryGetValue(___entityId, out DateTime lastHit) && (DateTime.UtcNow - lastHit) < fatalHitThreshold)
+                {
+                    log.Warn($"Player already dead. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    allow = false;
+                }
+                if (___bFatal)
+                    fatalHitTime[___entityId] = DateTime.UtcNow;
 
                 if (___attackerEntityId != __instance.Sender.entityId)
                 {
-                    log.Warn($"Invalid attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
-                    return false;
+                    log.Warn($"Invalid attacker. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    allow = false;
                 }
 
                 float distance = Vector3.Distance(playerA.position, playerV.position);
                 if (distance > maxDistanceDrop)
                 {
-                    return false;
+                    log.Warn($"Bad distance ({distance:F1}m). Attacker: {___attackerEntityId} ({CF_Map.FormatPosition(playerA.position)}) sender: {__instance.Sender.entityId} Target: {___entityId} ({CF_Map.FormatPosition(playerV.position)}). Blocked.");
+                    allow = false;
                 }
 
-                return true;
+                CF_HitLog.AddEntry(__instance.Sender, cInfoA, cInfoV, playerA, playerV, ___strength, ___ArmorDamage, ___bFatal, ___attackingItem, (Utils.EnumHitDirection)___hitDirection, (EnumBodyPartHit)___hitBodyPart, CF_ServerMonitor.CurrentFPS, allow);
+
+                return allow;
             }
             catch (Exception e)
             {
