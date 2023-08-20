@@ -120,7 +120,7 @@ public class CF_Format
             return $"{pos.x} {pos.y} {pos.z}";
         }
 
-        Entity entity = Entities.GetEntity(_te.EntityId);
+        Entity entity = CF_Entity.GetEntity(_te.EntityId);
         if (entity == null)
             return "null";
 
