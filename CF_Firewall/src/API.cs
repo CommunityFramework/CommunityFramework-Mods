@@ -242,7 +242,6 @@ namespace CF_Firewall
 
             GameManager.Instance.adminTools.Blacklist.AddBan(_cInfo.playerName, _cInfo.PlatformId, DateTime.UtcNow.AddYears(10), _reason);
             GameUtils.KickPlayerForClientInfo(_cInfo, new GameUtils.KickPlayerData(GameUtils.EKickReason.ManualKick, _customReason: _reason));
-            //Ban(_cInfo.ip);
             return true;
         }
         public static bool Ban(string _ip)
@@ -252,15 +251,8 @@ namespace CF_Firewall
                 checkedIPs[_ip].ipBan = true;
                 checkedIPs[_ip].last = DateTime.UtcNow;
 
-                /*
-                foreach (Database.Player dbPlayer in Database.GetPlayers(true))
-                {
-                    if (dbPlayer.IP.Equals(IP) || dbPlayer.IPs.Contains(IP))
-                        BanManager.Ban(dbPlayer.GetUserPlatform(), dbPlayer.name, "Autoban 93", $"Matching banned IP: {IP}");
-                }
-                */
-
                 log.Log($"IP: {_ip} was already banned");
+                return true;
             }
             else checkedIPs.Add(_ip, new CheckedIP());
 
@@ -268,20 +260,6 @@ namespace CF_Firewall
             checkedIPs[_ip].last = DateTime.UtcNow;
 
             log.Log($"IP: {_ip} banned.");
-
-            SaveIPdata();
-
-            return true;
-        }
-        public static bool Unban(string IP)
-        {
-            if (!checkedIPs.ContainsKey(IP))
-                return false;
-
-            checkedIPs[IP].ipBan = false;
-            checkedIPs[IP].last = DateTime.UtcNow;
-
-            log.Log($"IP: {IP} unbanned by command.");
 
             SaveIPdata();
 

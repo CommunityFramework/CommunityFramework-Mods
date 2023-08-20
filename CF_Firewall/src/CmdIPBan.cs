@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using static CF_Firewall.API;
 
 namespace CF_Firewall
 {
@@ -60,7 +61,7 @@ namespace CF_Firewall
                         }
                         else SingletonMonoBehaviour<SdtdConsole>.Instance.Output($"IP address already unbanned.");
                     }
-                    else SingletonMonoBehaviour<SdtdConsole>.Instance.Output($"IP address already unbanned.");
+                    else SingletonMonoBehaviour<SdtdConsole>.Instance.Output($"IP address not found.");
                 }
                 else
                 {
@@ -68,7 +69,10 @@ namespace CF_Firewall
                     SingletonMonoBehaviour<SdtdConsole>.Instance.Output(this.GetHelp());
                 }
             }
-            catch (Exception e) { Log.Out($"Error in CmdIPban.Execute: {e}"); }
+            catch (Exception e) 
+            { 
+                log.Error($"CmdIPban.Execute reported: {e}"); 
+            }
         }
     }
 }
