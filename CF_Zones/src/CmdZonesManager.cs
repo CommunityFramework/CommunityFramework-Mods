@@ -32,7 +32,7 @@ namespace CF_ZonesManager
                     CF_Console.Out($"Can only be executed by a player.");
                     return;
                 }
-                EntityPlayer player = CF_Player.GetPlayer(_senderInfo.RemoteClientInfo);
+                EntityPlayer player = CF_Player.GetEntityPlayer(_senderInfo.RemoteClientInfo);
                 if (player == null || player.IsDead())
                 {
                     CF_Console.Out($"You have to be alive to use this.");

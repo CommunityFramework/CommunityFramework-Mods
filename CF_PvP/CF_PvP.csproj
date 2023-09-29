@@ -45,10 +45,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Mods\0CommunityFramework\CF_Core.dll</HintPath>
     </Reference>
-    <Reference Include="CF_Server, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Mods\0CommunityFramework\CF_Server.dll</HintPath>
-    </Reference>
     <Reference Include="GameSparks, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\7dtd-bin\GameSparks.dll</HintPath>

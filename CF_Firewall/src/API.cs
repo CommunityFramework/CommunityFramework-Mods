@@ -5,6 +5,7 @@ using System.IO;
 using Platform;
 using Platform.Steam;
 using HarmonyLib;
+using InControl.NativeDeviceProfiles;
 
 namespace CF_Firewall
 {
@@ -238,13 +239,16 @@ namespace CF_Firewall
             if(isBanning) 
                 return false;
 
-            log.Log($"Banned {CF_Format.PlayerNameAndPlatform(_cInfo)} for reason: {_reason} details: {_details} IP: {_cInfo.ip}");
+            log.Log($"Banned {CF_Player.GetNameAndPlatformId(_cInfo)} for reason: {_reason} details: {_details} IP: {_cInfo.ip}");
 
+            isBanning = true;
             GameManager.Instance.adminTools.Blacklist.AddBan(_cInfo.playerName, _cInfo.PlatformId, DateTime.UtcNow.AddYears(10), _reason);
+            isBanning = false; 
+
             GameUtils.KickPlayerForClientInfo(_cInfo, new GameUtils.KickPlayerData(GameUtils.EKickReason.ManualKick, _customReason: _reason));
             return true;
         }
-        public static bool Ban(string _ip)
+        public static bool BanIP(string _ip)
         {
             if (checkedIPs.ContainsKey(_ip))
             {
@@ -260,6 +264,27 @@ namespace CF_Firewall
             checkedIPs[_ip].last = DateTime.UtcNow;
 
             log.Log($"IP: {_ip} banned.");
+                                                                               
+            SaveIPdata();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+
+            return true;
+        }
+        public static bool BanIP(ClientInfo _cInfo)
+        {
+            if (checkedIPs.ContainsKey(_cInfo.ip))
+            {
+                checkedIPs[_cInfo.ip].ipBan = true;
+                checkedIPs[_cInfo.ip].last = DateTime.UtcNow;
+
+                log.Log($"IP: {_cInfo.ip} was already banned");
+                return true;
+            }                                                                                                                                                                                                                      
+            else checkedIPs.Add(_cInfo.ip, new CheckedIP());                                                                                                                                                                              
+
+            checkedIPs[_cInfo.ip].ipBan = false;
+            checkedIPs[_cInfo.ip].last = DateTime.UtcNow;
+
+            log.Log($"IP: {_cInfo.ip} banned. From Player: {_cInfo}");
 
             SaveIPdata();
 

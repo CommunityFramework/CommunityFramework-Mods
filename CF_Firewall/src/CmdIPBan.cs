@@ -32,31 +32,31 @@ namespace CF_Firewall
 
                 if (_params[0].Equals("add"))
                 {
-                    if (API.checkedIPs.ContainsKey(_params[0]))
+                    if (checkedIPs.ContainsKey(_params[1]))
                     {
-                        if (!API.checkedIPs[_params[0]].ipBan)
+                        if (!checkedIPs[_params[1]].ipBan)
                         {
-                            API.checkedIPs[_params[0]].ipBan = true;
-                            API.SaveIPdata();
+                            checkedIPs[_params[1]].ipBan = true;
+                            SaveIPdata();
                             SingletonMonoBehaviour<SdtdConsole>.Instance.Output($"IP address banned.");
                         }
                         else SingletonMonoBehaviour<SdtdConsole>.Instance.Output($"IP address already banned.");
                     }
                     else
                     {
-                        API.checkedIPs.Add(_params[0], new CheckedIP());
-                        API.SaveIPdata();
+                        checkedIPs.Add(_params[1], new CheckedIP());
+                        SaveIPdata();
                         SingletonMonoBehaviour<SdtdConsole>.Instance.Output($"IP address banned.");
                     }
                 }
                 else if (_params[0].Equals("del"))
                 {
-                    if (API.checkedIPs.ContainsKey(_params[0]))
+                    if (checkedIPs.ContainsKey(_params[1]))
                     {
-                        if (API.checkedIPs[_params[0]].ipBan)
+                        if (checkedIPs[_params[1]].ipBan)
                         {
-                            API.checkedIPs[_params[0]].ipBan = false;
-                            API.SaveIPdata();
+                            checkedIPs[_params[1]].ipBan = false;
+                            SaveIPdata();
                             SingletonMonoBehaviour<SdtdConsole>.Instance.Output($"IP address unbanned.");
                         }
                         else SingletonMonoBehaviour<SdtdConsole>.Instance.Output($"IP address already unbanned.");

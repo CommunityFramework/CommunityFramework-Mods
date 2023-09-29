@@ -15,6 +15,8 @@ public class CF_HitLogEntry
     public int victimId;
     public string victimName;
     public int damage;
+    public EnumDamageSource damageSrc;
+    public EnumDamageTypes damageTyp;
     public ItemValue itemValue;
     public string weaponName;
     public string weaponNameWithMods;
@@ -37,8 +39,10 @@ public class CF_HitLogEntry
     public List<string> buffsV;
     public bool fatal;
     public float fps;
+    public int pingA;
+    public int pingV;
 
-    public CF_HitLogEntry(ClientInfo _cInfo, ClientInfo _cInfoAttacker, ClientInfo _cInfoVictim, EntityPlayer _playerAttacker, EntityPlayer _playerVictim, int _damage, int _armorDamage, bool _fatal, ItemValue _itemValue, Utils.EnumHitDirection _direction, EnumBodyPartHit _hitbox, float _fps)
+    public CF_HitLogEntry(ClientInfo _cInfo, ClientInfo _cInfoAttacker, ClientInfo _cInfoVictim, EntityPlayer _playerAttacker, EntityPlayer _playerVictim, int _damage, EnumDamageSource _damageSrc, EnumDamageTypes _damageTyp, int _armorDamage, bool _fatal, ItemValue _itemValue, Utils.EnumHitDirection _direction, EnumBodyPartHit _hitbox, float _fps)
     {
         timestamp = DateTime.UtcNow;
         sourceId = _cInfo.entityId;
@@ -47,6 +51,8 @@ public class CF_HitLogEntry
         victimId = _cInfoVictim.entityId;
         victimName = _cInfoVictim.playerName;
         damage = _damage;
+        damageSrc = _damageSrc;
+        damageTyp = _damageTyp;
         armorDamage = _armorDamage;
         healthA = _playerAttacker.Health;
         healthMaxA = _playerAttacker.GetMaxHealth();
@@ -67,16 +73,18 @@ public class CF_HitLogEntry
         attackerRot = _playerAttacker.rotation;
         victimRot = _playerVictim.rotation;
         fps = _fps;
+        pingV = _cInfo.ping;
+        pingA = _cInfoAttacker.ping;
         armorRating = _playerVictim.equipment.GetTotalPhysicalArmorRating(null, null);
         armorRatingEff = _playerVictim.equipment.GetTotalPhysicalArmorRating(_playerAttacker, _itemValue);
 
         buffsA = _playerAttacker.Buffs.ActiveBuffs.Select(b => b.BuffName ).Where(n => !IgnoreBuff(n)).ToList();
         buffsV = _playerVictim.Buffs.ActiveBuffs.Select(b => b.BuffName ).Where(n => !IgnoreBuff(n)).ToList();
     }
-    public ClientInfo GetClientAttacker() => CF_Player.GetClient(attackerId);
-    public ClientInfo GetClientVictim() => CF_Player.GetClient(victimId);
-    public EntityPlayer GetPlayerAttacker() => CF_Player.GetPlayer(attackerId);
-    public EntityPlayer GetPlayerVictim() => CF_Player.GetPlayer(victimId);
+    public ClientInfo GetClientAttacker() => CF_Player.GetClientInfo(attackerId);
+    public ClientInfo GetClientVictim() => CF_Player.GetClientInfo(victimId);
+    public EntityPlayer GetPlayerAttacker() => CF_Player.GetEntityPlayer(attackerId);
+    public EntityPlayer GetPlayerVictim() => CF_Player.GetEntityPlayer(victimId);
     public bool IsCriticalHit() => damage >= 100;
     public int TotalDamage() => damage + armorDamage;
     public bool IsHeadshot() =>  hitbox == EnumBodyPartHit.Head;
@@ -126,12 +134,13 @@ public class CF_HitLogEntry
         sb.Append($"{victimName} ({victimId}) ");
         sb.Append($"causing {damage} dmg ");
         sb.Append($"{hitbox.ToStringCached().Replace("Upper", "Up").Replace("Lower", "Lo")} from {direction} {Distance():F1}m away ");
-        if(armorRating > 0)
+        sb.Append($"Type: {damageSrc.ToStringCached()} - {damageTyp.ToStringCached()}");
+        if (armorRating > 0)
             sb.Append($"Armor: {armorRatingEff:F1} ({armorRating:F1}) Pen: {GetArmorPenetration():P1} ({armorDamage} ad) ");
         sb.Append($"using {weaponNameWithMods} ");
         sb.Append($"# Server # {fps:F1} fps ");
-        sb.Append($"# Victim # {healthV:F1} hp {staminaV:F1} stamina at {(int)attackerPos.x} {(int)attackerPos.y} {(int)attackerPos.z} ({(int)attackerRot.x} {(int)attackerRot.y} {(int)attackerRot.z}) Buffs: {CF_Format.ListToString(buffsA)}");
-        sb.Append($"# Attacker # {healthA:F1} hp {staminaA:F1} stamina at {(int)victimPos.x} {(int)victimPos.y} {(int)victimPos.z} ({(int)victimRot.x} {(int)victimRot.y} {(int)victimRot.z}) Buffs: {CF_Format.ListToString(buffsV)}");
+        sb.Append($"# Victim # {healthV:F1} hp {staminaV:F1} stamina at {(int)attackerPos.x} {(int)attackerPos.y} {(int)attackerPos.z} ({(int)attackerRot.x} {(int)attackerRot.y} {(int)attackerRot.z}) Ping: {pingA} Buffs: {CF_Format.ListToString(buffsA)}");
+        sb.Append($"# Attacker # {healthA:F1} hp {staminaA:F1} stamina at {(int)victimPos.x} {(int)victimPos.y} {(int)victimPos.z} ({(int)victimRot.x} {(int)victimRot.y} {(int)victimRot.z}) Ping: {pingV} Buffs: {CF_Format.ListToString(buffsV)}");
 
         if (Distance() > maxDistanceDrop)
             sb.Append($"*BAD_DIST ");

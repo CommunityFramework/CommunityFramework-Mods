@@ -37,7 +37,7 @@ class CF_ItemMonitor
     {
         if (_te is TileEntityLootContainer lootContainer)
         {
-            log.Out($"Access start loot container at {CF_TileEntity.GetPosTele(_te)}", _cInfo, CF_Log.LogLevel.Info);
+            log.Out($"Access start loot container at {CF_Entity.GetPosTele(_te)}", _cInfo, CF_Log.LogLevel.Info);
 
             int id = _cInfo.entityId;
 
@@ -63,7 +63,7 @@ class CF_ItemMonitor
         int passes = 0;
         try
         {
-            if (!CF_Player.GetClient(_player, out ClientInfo cInfo))
+            if (!CF_Player.TryGetClientInfo(_player, out ClientInfo cInfo))
             {
                 return;
             }
@@ -185,7 +185,7 @@ class CF_ItemMonitor
         try
         {
             int entityId = _cInfo.entityId;
-            EntityPlayer _player = CF_Player.GetPlayer(entityId);
+            EntityPlayer _player = CF_Player.GetEntityPlayer(entityId);
             if (_player == null)
             {
                 return;

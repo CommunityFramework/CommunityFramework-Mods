@@ -27,11 +27,23 @@ public class CF_Mod
     Action OnModConfigLoaded;
     Action OnModPhrasesLoaded;
 
-    public SortedDictionary<string, string> settings;
-    public Dictionary<string, string> settingsDes;
+    public SortedDictionary<string, string> settings = new SortedDictionary<string, string>();
+    public Dictionary<string, string> settingsDes = new Dictionary<string, string>();
+    public Dictionary<string, string> settingsDefault = new Dictionary<string, string>();
+
+    public Dictionary<string, string> settingsRegex = new Dictionary<string, string>();
+    public Dictionary<string, int> settingsMin = new Dictionary<string, int>();
+    public Dictionary<string, int> settingsMax = new Dictionary<string, int>();
+
+    public Dictionary<string, float> settingsFloat = new Dictionary<string, float>();
+    public Dictionary<string, float> settingsMinF = new Dictionary<string, float>();
+    public Dictionary<string, float> settingsMaxF = new Dictionary<string, float>();
+
+    public Dictionary<string, DateTime> settingsDateTime = new Dictionary<string, DateTime>();
 
     public SortedDictionary<string, string> phrases;
     public Dictionary<string, string> phrasesDes;
+
 
     public CF_Mod(string Name, Action OnModConfigLoaded = null, Action OnModPhrasesLoaded = null)
     {
@@ -77,7 +89,9 @@ public class CF_Mod
     }
     public bool AddSetting(string key, string defValue, string regex, string description, out string value)
     {
-        settingsDes[key] = description;
+        settingsDes[key] = description; 
+        settingsRegex[key] = regex;
+        settingsDefault[key] = defValue;
 
         if (settings.TryGetValue(key, out string valueRaw))
         {
@@ -87,7 +101,7 @@ public class CF_Mod
                 return true;
             }
 
-            Log.Error(string.Format("ModX.AddSetting reported: Can't regex pattern didn't match setting. Mod: {1} Setting: {2} Regex: {3}. Restoring default value: {4}", valueRaw, modName, key, regex, defValue));
+            Log.Error($"{modName}<CF_Mod>.AddSetting reported: Can't regex pattern didn't match setting. Mod: {modName} Setting: {key} Regex: {regex}. Restoring default value: {defValue}");
             value = defValue;
             return false;
         }
@@ -100,6 +114,9 @@ public class CF_Mod
     public bool AddSetting(string key, int defValue, int min, int max, string description, out int value)
     {
         settingsDes[key] = description;
+        settingsDefault[key] = defValue.ToString();
+        settingsMin[key] = min;
+        settingsMax[key] = max;
 
         if (settings.TryGetValue(key, out string valueRaw))
         {
@@ -112,14 +129,14 @@ public class CF_Mod
                 }
 
                 if (min > valueParsed)
-                    Log.Error(string.Format("ModX.AddSetting reported: Error while checking values of {0}. Min: {1} Current: {2}. Using default: {3}", key, min, valueParsed, defValue));
-                else Log.Error(string.Format("ModX.AddSetting reported: Error while checking values of {0}. Max: {1} Current: {2}. Using default: {3}", key, max, valueParsed, defValue));
+                    Log.Error($"{modName}<CF_Mod>.AddSetting reported: Error while checking values of {key}. Min: {min} Current: {valueParsed}. Using default: {defValue}");
+                else Log.Error($"{modName}<CF_Mod>.AddSetting reported: Error while checking values of {key}. Max: {max} Current: {valueParsed}. Using default: {defValue}");
 
                 value = defValue;
                 return false;
             }
 
-            Log.Error(string.Format("ModX.AddSetting reported: Can't parse {0} to integer. Mod: {1} Setting: {2}. Restoring default value: {3}", valueRaw, modName, key, defValue));
+            Log.Error($"{modName}<CF_Mod>.AddSetting reported: Can't parse {valueRaw} to integer. Mod: {modName} Setting: {key}. Restoring default value: {defValue}");
             value = defValue;
             return false;
         }
@@ -129,9 +146,81 @@ public class CF_Mod
 
         return true;
     }
+    public bool AddSetting(string key, float defValue, float min, float max, string description, out float value)
+    {
+        settingsDes[key] = description;
+        settingsDefault[key] = defValue.ToString();
+        settingsMinF[key] = min;
+        settingsMaxF[key] = max;
+
+        if (!settingsFloat.TryGetValue(key, out value))
+        {
+            settingsFloat[key] = defValue;
+            value = defValue;
+            return true;
+        }
+
+        if (settings.TryGetValue(key, out string valueRaw))
+        {
+            if (float.TryParse(valueRaw, out float valueParsed))
+            {
+                if (min <= valueParsed && valueParsed <= max)
+                {
+                    value = valueParsed;
+                    return true;
+                }
+                
+                if (min > valueParsed)
+                    Log.Error($"{modName}<CF_Mod>.AddSetting reported: Error while checking values of {key}. Min: {min} Current: {valueParsed}. Using default: {defValue}");
+                else Log.Error($"{modName} <CF_Mod>.AddSetting reported: Error while checking values of {key}. Max: {max} Current: {valueParsed}. Using default: {defValue}");
+
+                value = defValue;
+                return false;
+            }
+
+            Log.Error($"{modName}<CF_Mod>.AddSetting reported: Can't parse {valueRaw} to float. Mod: {modName} Setting: {key}. Restoring default value: {defValue}");
+            value = defValue;
+            return false;
+        }
+
+        settings[key] = defValue.ToString();
+        value = defValue;
+
+        return false;
+    }
+
+    public bool AddSetting(string key, DateTime defValue, string description, out DateTime value)
+    {
+        settingsDes[key] = description;
+        settingsDefault[key] = defValue.ToString();
+
+        if (!settingsDateTime.TryGetValue(key, out value))
+        {
+            settingsDateTime[key] = defValue;
+            value = defValue;
+            return true;
+        }
+
+        if (settings.TryGetValue(key, out string valueRaw))
+        {
+            if (DateTime.TryParse(valueRaw, out DateTime valueParsed))
+            {
+                value = valueParsed;
+                return true;
+            }
+
+            Log.Error($"{modName}<CF_Mod>.AddSetting reported: Can't parse {valueRaw} to DateTime. Mod: {modName} Setting: {key}. Restoring default value: {defValue}");
+            value = defValue;
+            return false;
+        }
+
+        return false;
+    }
+
     public bool AddSetting(string key, bool defValue, string description, out bool value)
     {
         settingsDes[key] = description;
+        settingsDefault[key] = defValue.ToString();
 
         if (settings.TryGetValue(key, out string valueRaw))
         {
@@ -141,7 +230,7 @@ public class CF_Mod
                 return true;
             }
 
-            Log.Error(string.Format("ModX.AddSetting reported: Can't parse {0} to bool. Mod: {1} Setting: {2}. Restoring default value: {3}", valueRaw, modName, key, defValue));
+            Log.Error($"{modName}<CF_Mod>.AddSetting reported: Can't parse {valueRaw} to bool. Mod: {modName} Setting: {key}. Restoring default value: {defValue}");
             value = defValue;
             return false;
         }
@@ -217,7 +306,7 @@ public class CF_Mod
         }
         catch (XmlException e)
         {
-            Log.Error($"Loading mod {modName} failed: {e}");
+            Log.Error($"Loading mod {modName} reported: {e.Message} Line: {e.LineNumber} Pos: {e.LinePosition}");
             return false;
         }
     }
@@ -275,26 +364,38 @@ public class CF_Mod
                 string lastSection = "";
                 foreach (KeyValuePair<string, string> kvp in settings)
                 {
-                    // Add section seperators as comment
+                    // Add section separators as a comment
                     if (kvp.Key.Contains("_"))
                     {
                         string section = kvp.Key.Substring(0, kvp.Key.IndexOf("_", StringComparison.Ordinal));
 
                         if (!section.Equals(lastSection))
                         {
-                            sw.WriteLine("<!--");
+                            sw.WriteLine("<!-- +++++++++++++++++++++");
                             sw.WriteLine("\t\t\t{0}", section);
-                            sw.WriteLine("-->");
+                            sw.WriteLine("     +++++++++++++++++++++ -->");
                         }
 
                         lastSection = section;
                     }
 
-                    // Add settings description as comment
-                    if (settingsDes.TryGetValue(kvp.Key, out string description))
-                        sw.WriteLine("<!-- {0} -->", description.Replace("-->", "->"));
+                    sw.WriteLine($"<!-- {kvp.Key.Replace("_", "")}");
 
-                    sw.WriteLine("<{0}>{1}</{0}>", kvp.Key, SecurityElement.Escape(kvp.Value), kvp.Key);
+                    if (settingsDes.TryGetValue(kvp.Key, out string description))
+                        sw.WriteLine($"\tDescription: {description}");
+
+                    if (settingsMin.TryGetValue(kvp.Key, out int min) && settingsMax.TryGetValue(kvp.Key, out int max))
+                        sw.WriteLine($"\tMin: {min} \tMax: {max}");
+                    else if (settingsMinF.TryGetValue(kvp.Key, out float minF) && settingsMaxF.TryGetValue(kvp.Key, out float maxF))
+                        sw.WriteLine($"\tMin: {minF} \tMax: {maxF}");
+                    else if (settingsRegex.TryGetValue(kvp.Key, out string regex) && string.IsNullOrEmpty(regex))
+                        sw.WriteLine($"\tRegex: {regex}");
+                    if (settingsDefault.TryGetValue(kvp.Key, out string def))
+                        sw.WriteLine($"\tDefault: {def}");
+
+                    sw.WriteLine("-->");
+
+                    sw.WriteLine($"<{kvp.Key}>{SecurityElement.Escape(kvp.Value)}</{kvp.Key}>");
                 }
 
                 sw.WriteLine("</Settings>");
@@ -310,6 +411,7 @@ public class CF_Mod
 
         return false;
     }
+
     private void OnPhrasesFileChanged(object source, FileSystemEventArgs e)
     {
         if (File.Exists(settingsFilePath))

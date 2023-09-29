@@ -75,6 +75,9 @@ public class CF_PlayerRankManager
     }
     public static void SaveToFile()
     {
+        if (ranks == null)
+            return;
+
         File.WriteAllText(filePathPlayerRanks, JsonConvert.SerializeObject(ranks, Formatting.Indented));
     }
     private static void OnFileChanged(object source, FileSystemEventArgs e)

@@ -16,7 +16,8 @@ namespace CF_PvP
             int ___entityId, int ___attackerEntityId,
             ushort ___strength, ItemValue ___attackingItem,
             bool ___bFatal, int ___ArmorDamage,
-            int ___hitDirection, int ___hitBodyPart)
+            int ___hitDirection, int ___hitBodyPart,
+            EnumDamageSource ___damageSrc, EnumDamageTypes ___damageTyp)
         {
 
             // Check if the attacker is invalid or attacking oneself, and ignore the package in such cases
@@ -70,7 +71,7 @@ namespace CF_PvP
                     allow = false;
                 }
 
-                CF_HitLog.AddEntry(__instance.Sender, cInfoA, cInfoV, playerA, playerV, ___strength, ___ArmorDamage, ___bFatal, ___attackingItem, (Utils.EnumHitDirection)___hitDirection, (EnumBodyPartHit)___hitBodyPart, CF_ServerMonitor.CurrentFPS, allow);
+                CF_HitLog.AddEntry(__instance.Sender, cInfoA, cInfoV, playerA, playerV, ___strength, ___damageSrc, ___damageTyp, ___ArmorDamage, ___bFatal, ___attackingItem, (Utils.EnumHitDirection)___hitDirection, (EnumBodyPartHit)___hitBodyPart, GameManager.Instance.fps.Counter, allow);
 
                 return allow;
             }
@@ -86,8 +87,8 @@ namespace CF_PvP
         // Helper method to retrieve player and client information
         private static EntityPlayer GetPlayerAndClientInfo(int entityId, out ClientInfo clientInfo)
         {
-            clientInfo = CF_Player.GetClient(entityId);
-            return clientInfo != null ? CF_Player.GetPlayer(entityId) : null;
+            clientInfo = CF_Player.GetClientInfo(entityId);
+            return clientInfo != null ? CF_Player.GetEntityPlayer(entityId) : null;
         }
     }
 }

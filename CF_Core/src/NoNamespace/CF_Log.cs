@@ -27,6 +27,16 @@ public class CF_Log
         this.discordThreshold = discordThreshold;
         this.playerFolders = playerFolders;
     }
+    public CF_Log(bool playerFolders = false, string folder = "logs", string subfolder = "", LogLevel thresholdLevel = LogLevel.Error, LogLevel minimumLevel = LogLevel.Trace, string discordWebhookURL = "", LogLevel discordThreshold = LogLevel.Corruption)
+    {
+        this.folder = folder;
+        this.subfolder = subfolder;
+        this.thresholdLevel = thresholdLevel;
+        this.minimumLevel = minimumLevel;
+        this.discordWebhookURL = discordWebhookURL;
+        this.discordThreshold = discordThreshold;
+        this.playerFolders = playerFolders;
+    }
 
     // Main Log method with timestamp and tags.
     public void Log(string message, ClientInfo cInfo = null, PersistentPlayerData pData = null, LogLevel level = LogLevel.Info, bool withTimestamp = true)
@@ -40,16 +50,16 @@ public class CF_Log
                 ? $"{DateTime.UtcNow:yyyy_MM_dd}"
                 : (
                     cInfo != null 
-                        ? $"{CF_Format.PlayerNameAndPlatform(cInfo)}_{DateTime.UtcNow:yyyy_MM_dd}"
-                        : $"{CF_Format.PlayerNameAndPlatform(pData)}_{DateTime.UtcNow:yyyy_MM_dd}"
+                        ? $"{CF_Player.GetNameAndPlatformId(cInfo)}_{DateTime.UtcNow:yyyy_MM_dd}"
+                        : $"{CF_Player.GetNameAndPlatformId(pData)}_{DateTime.UtcNow:yyyy_MM_dd}"
                     );
 
             var logDirectory = (cInfo == null && pData == null) || !playerFolders
                 ? Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder)
                 : (
                     cInfo != null
-                    ? Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder, CF_Format.PlayerNameAndPlatform(cInfo))
-                    : Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder, CF_Format.PlayerNameAndPlatform(pData))
+                    ? Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder, CF_Player.GetNameAndPlatformId(cInfo))
+                    : Path.Combine(Directory.GetCurrentDirectory(), "Mod_Logs", folder, subfolder, CF_Player.GetNameAndPlatformId(pData))
                 );
 
             Directory.CreateDirectory(logDirectory);

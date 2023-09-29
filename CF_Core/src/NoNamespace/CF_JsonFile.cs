@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
+using static CF_Core.API;
 
 public class CF_JsonFile<T>
 {
@@ -25,28 +26,28 @@ public class CF_JsonFile<T>
             File.WriteAllText(filePath, JsonConvert.SerializeObject(data, format));
         }
     }
-    public bool Load<T>(out T data, out string _err)
+    public bool Load(out T dataOut, out string _err)
     {
         lock (fileLock)
         {
             if (!File.Exists(filePath))
             {
                 _err = $"File not found: {filePath}";
-                data = default(T);
+                dataOut = default;
                 return false;
             }
             else
             {
                 try
                 {
-                    data = JsonConvert.DeserializeObject<T>(File.ReadAllText(filePath));
+                    dataOut = JsonConvert.DeserializeObject<T>(File.ReadAllText(filePath));
                     _err = null;
                     return true;
                 }
                 catch (Exception e)
                 {
                     _err = $"Deserialization failed: {e.Message}";
-                    data = default(T);
+                    dataOut = default;
                     return false;
                 }
             }

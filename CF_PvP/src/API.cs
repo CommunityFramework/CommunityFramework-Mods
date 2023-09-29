@@ -23,7 +23,7 @@ namespace CF_PvP
         {
             mod.AddSetting("Damage_Dist_Drop", 200, 0, 9999, "Max distance before dropping pvp damage.", out maxDistanceDrop);
             mod.AddSetting("Damage_Dist_Report", 110, 0, 9999, "Max distance before reporting pvp damage.", out maxDistanceReport);
-            mod.AddSetting("Buffs_Ignore", "buffstatuscheck01,buffstatuscheck02,buffperkabilityupdate,buffcampfireaoe", "", "List of buffs separated by',' which should not be logged.", out buffsIgnore);
+            mod.AddSetting("Buffs_Ignore", "buffstatuscheck01,buffstatuscheck02,buffperkabilityupdate,buffcampfireaoe,buffwaterpurifier,largebackpackcheck,orangebackpackcheck,buffsafezonedisplay", "", "List of buffs separated by',' which should not be logged.", out buffsIgnore);
 
             buffsIgnoreList = buffsIgnore.Trim().Split(',').ToList();
         }

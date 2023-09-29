@@ -13,7 +13,7 @@ namespace CF_Server
     {
         static bool Prefix(ref bool __result, int _entityIdThatOpenedIt, TileEntity _te)
         {
-            ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
+            ClientInfo cInfo = CF_Player.GetClientInfo(_entityIdThatOpenedIt);
             if (cInfo == null)
             {
                 log.Error($"Patch_GameManager_OnOpenTileEntityAllowed_Pre reported: No ClientInfo for id {_entityIdThatOpenedIt}");
@@ -42,7 +42,7 @@ namespace CF_Server
         {
             try
             {
-                ClientInfo cInfo = CF_Player.GetClient(_entityIdThatOpenedIt);
+                ClientInfo cInfo = CF_Player.GetClientInfo(_entityIdThatOpenedIt);
                 if (cInfo == null)
                     return;
 

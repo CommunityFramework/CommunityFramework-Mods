@@ -142,9 +142,12 @@
   <ItemGroup>
     <Compile Include="..\Properties\AssemblyInfo.cs" />
     <Compile Include="src\API.cs" />
+    <Compile Include="src\CF_OpenAI_API.cs" />
     <Compile Include="src\CF_ChatManager.cs" />
     <Compile Include="src\CF_ChatMessage.cs" />
     <Compile Include="src\CF_ChatTrigger.cs" />
+    <Compile Include="src\RankConfig.cs" />
+    <Compile Include="src\RankConfigLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -15,8 +15,8 @@ namespace CF_PlayerDatabase
         // Harmony injections are an important tool for modding this game. Please visit https://harmony.pardeike.net/articles/intro.html for more infos
         public static Harmony harmony = new Harmony("CF_PlayerDatabase");
         // Simply helper we use from CF_Core to store data to a json file which contains some data about players
-        public static CF_PlayerDB dbData = null;
-        public static CF_JsonFile<CF_PlayerDB> db = new CF_JsonFile<CF_PlayerDB>(mod.modDatabasePath + "/Players.json", dbData, Formatting.None);
+        public static CF_PlayerDB dbClass = null;
+        public static CF_JsonFile<CF_PlayerDB> db = new CF_JsonFile<CF_PlayerDB>(mod.modDatabasePath + "/Players.json", dbClass, Formatting.None);
 
         // This is our entry point which is usually our Main() in C#
         // More info can be found here: https://7daystodie.fandom.com/wiki/ModAPI
@@ -27,12 +27,12 @@ namespace CF_PlayerDatabase
             if (!db.Load(out CF_PlayerDB data, out string err))
             {
                 log.Error($"Could not load database: {err}");
-                dbData = new CF_PlayerDB();
+                db.data = new CF_PlayerDB();
                 db.Save();
+                CF_PlayerDB.Save();
             }
             else
             {
-                dbData = data;
                 log.Out($"Loaded {CF_PlayerDB.players.Count} players.");
             }
 

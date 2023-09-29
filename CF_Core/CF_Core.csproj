@@ -138,6 +138,7 @@
   <ItemGroup>
     <Compile Include="..\Properties\AssemblyInfo.cs" />
     <Compile Include="src\API.cs" />
+    <Compile Include="src\NoNamespace\CF_AccessTools.cs" />
     <Compile Include="src\NoNamespace\CF_Array.cs" />
     <Compile Include="src\NoNamespace\CF_Block.cs" />
     <Compile Include="src\NoNamespace\CF_Console.cs" />
@@ -150,7 +151,6 @@
     <Compile Include="src\NoNamespace\CF_Claim.cs" />
     <Compile Include="src\NoNamespace\CF_JsonFile.cs" />
     <Compile Include="src\NoNamespace\CF_Log.cs" />
-    <Compile Include="src\NoNamespace\CF_TileEntity.cs" />
     <Compile Include="src\NoNamespace\CF_Timer.cs" />
     <Compile Include="src\NoNamespace\CF_Format.cs" />
     <Compile Include="src\NoNamespace\CF_WorldTime.cs" />
@@ -161,7 +161,7 @@
     <Compile Include="src\NoNamespace\CF_Random.cs" />
     <Compile Include="src\NoNamespace\CF_PersistentPlayer.cs" />
     <Compile Include="src\NoNamespace\CF_List.cs" />
-    <Compile Include="src\NoNamespace\CF_Math_Vector.cs" />
+    <Compile Include="src\NoNamespace\CF_Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

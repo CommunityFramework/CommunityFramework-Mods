@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class CF_Math_Vector
+public class CF_Vector3
 {
-    public static string Vec3ToTp(Vector3 p) => $"{(int)p.x} {(int)p.y} {(int)p.z}";
-    public static string Vec3ToTele(Vector3i p) => $"{p.x} {p.y} {p.z}";
+    public static string FormatTeleport(Vector3 p) => $"{(int)p.x} {(int)p.y} {(int)p.z}";
+    public static string FormatTeleport(Vector3i p) => $"{p.x} {p.y} {p.z}";
     public static bool MakeBox(string sp1, string sp2, out Rect box)
     {
         int[] ip1 = Array.ConvertAll(sp1.Split(' '), delegate (string s) { return int.Parse(s); });

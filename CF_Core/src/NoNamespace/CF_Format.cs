@@ -7,10 +7,6 @@ using UnityEngine;
 
 public class CF_Format
 {
-    public static string PlayerNameAndPlatform(ClientInfo _cInfo) => _cInfo == null ? "null" : $"{_cInfo.playerName} ({_cInfo.PlatformId.ReadablePlatformUserIdentifier})";
-    public static string PlayerNameAndPlatform(int _entityId) => PlayerNameAndPlatform(CF_Player.GetPlayer(_entityId));
-    public static string PlayerNameAndPlatform(EntityPlayer _player) => PlayerNameAndPlatform(_player.entityId);
-    public static string PlayerNameAndPlatform(PersistentPlayerData _persistentPlayerData) => _persistentPlayerData == null ? "null" : $"{_persistentPlayerData.PlayerName} ({_persistentPlayerData.PlatformUserIdentifier.ReadablePlatformUserIdentifier})";
     public static string ListToString(List<string> stringList)
     {
         if (stringList.Count == 1)

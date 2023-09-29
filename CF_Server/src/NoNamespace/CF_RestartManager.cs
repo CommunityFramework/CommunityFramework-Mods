@@ -110,7 +110,7 @@ public class CF_RestartManager
     {
         if (seconds == -1)
         {
-            log.Log($"ShutdownX=> Aborted");
+            log.Log($"Aborted restart countdown");
             countdown = seconds;
             restartAttempts = 0;
             locked = false;
@@ -120,7 +120,7 @@ public class CF_RestartManager
         else if (seconds > 0)
         {
 
-            log.Log($"ShutdownX=> {seconds}s");
+            log.Log($"Restarting server in {seconds}s");
             countdown = seconds;
             lastS = -1;
             lastM = -1;
@@ -129,7 +129,7 @@ public class CF_RestartManager
 
         restartAttempts += 1;
 
-        log.Log($"ShutdownX=> Shutdown: {restartAttempts}");
+        log.Log($"Shutdown attempt #{restartAttempts}");
 
         if (restartAttempts > 20)
         {

@@ -15,7 +15,7 @@ using System.Security.Cryptography;
 
 namespace CF_Firewall
 {
-    internal class Patch_AdminTools
+    internal class Patch_AdminTools_AddBan
     {
         [HarmonyPatch(typeof(AdminBlacklist), "AddBan")]
         public class AddBan
@@ -25,11 +25,11 @@ namespace CF_Firewall
                 if (!banIP)
                     return;
 
-                ClientInfo cInfo = CF_Player.GetClient(_identifier);
+                ClientInfo cInfo = CF_Player.GetClientInfo(_identifier);
                 if (cInfo == null)
                     return;
 
-                Ban(cInfo.ip);
+                BanIP(cInfo);
             }
         }
     }

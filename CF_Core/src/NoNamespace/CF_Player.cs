@@ -6,67 +6,95 @@ using UnityEngine;
 
 public class CF_Player
 {
-    // ClientInfo 
+    // Get ClientInfo 
     public static List<ClientInfo> GetClients() => ConnectionManager.Instance.Clients.List.ToList();
-    public static ClientInfo GetClient(int _entityId) => ConnectionManager.Instance.Clients.ForEntityId(_entityId);
-    public static bool GetClient(int _entityI, out ClientInfo _cInfo)
+    public static ClientInfo GetClientInfo(int _entityId) => ConnectionManager.Instance.Clients.ForEntityId(_entityId);
+    public static ClientInfo GetClientInfo(EntityPlayer _player) => ConnectionManager.Instance.Clients.ForEntityId(_player.entityId);
+    public static ClientInfo GetClientInfo(PlatformUserIdentifierAbs _user) => ConnectionManager.Instance.Clients.ForUserId(_user);
+    public static ClientInfo GetClientInfo(string _platform, string _userId) => GetClientInfo(PlatformUserIdentifierAbs.FromPlatformAndId(_platform, _userId, false));
+    public static bool TryGetClientInfo(int _entityId, out ClientInfo _cInfo)
     {
-        _cInfo = GetClient(_entityI);
+        _cInfo = GetClientInfo(_entityId);
         return _cInfo != null;
     }
-    public static ClientInfo GetClient(EntityPlayer _player) => ConnectionManager.Instance.Clients.ForEntityId(_player.entityId);
-    public static bool GetClient(EntityPlayer _player, out ClientInfo _cInfo) 
+    public static bool TryGetClientInfo(EntityPlayer _player, out ClientInfo _cInfo)
     {
-        _cInfo = GetClient(_player);
-        return _cInfo  != null; 
-    }
-    public static ClientInfo GetClient(PlatformUserIdentifierAbs _user) => ConnectionManager.Instance.Clients.ForUserId(_user);
-    public static bool GetClient(PlatformUserIdentifierAbs _user, out ClientInfo _cInfo)
-    {
-        _cInfo = GetClient(_user);
+        _cInfo = GetClientInfo(_player);
         return _cInfo != null;
     }
-    public static ClientInfo GetClient(string _platform, string _userId) => GetClient(PlatformUserIdentifierAbs.FromPlatformAndId(_platform, _userId, false));
-    public static bool GetClient(string _platform, string _userId, out ClientInfo _cInfo)
+    public static bool TryGetClientInfo(PlatformUserIdentifierAbs _user, out ClientInfo _cInfo)
     {
-        _cInfo = GetClient(_platform, _userId);
+        _cInfo = GetClientInfo(_user);
         return _cInfo != null;
     }
-    public static ClientInfo GetClient(long _peer) => ConnectionManager.Instance.Clients.ForLiteNetPeer(_peer);
-    public static ClientInfo GetClient(string _nameOrId) => ConnectionManager.Instance.Clients.GetForNameOrId(_nameOrId);
+    public static bool TryGetClientInfo(string _platform, string _userId, out ClientInfo _cInfo)
+    {
+        _cInfo = GetClientInfo(_platform, _userId);
+        return _cInfo != null;
+    }
+    public static ClientInfo GetClientInfo(long _peer) => ConnectionManager.Instance.Clients.ForLiteNetPeer(_peer);
+    public static ClientInfo GetClientInfo(string _nameOrId) => ConnectionManager.Instance.Clients.GetForNameOrId(_nameOrId);
 
-    // EntityPlayer
-    public static List<EntityPlayer> GetPlayers() => new List<EntityPlayer>(GameManager.Instance.World.Players.dict.Values.ToList());
-    public static EntityPlayer GetPlayer(ClientInfo _cInfo) => GetPlayer(_cInfo.entityId);
-    public static EntityPlayer GetPlayer(int _entityId) => GameManager.Instance.World.Players.dict.ContainsKey(_entityId)? GameManager.Instance.World.Players.dict[_entityId] : null;
-    public static bool GetPlayer(ClientInfo _cInfo, out EntityPlayer _player)
+    // Get EntityPlayer
+    public static List<EntityPlayer> GetPlayers() => GameManager.Instance.World.Players.dict.Values.ToList();
+    public static List<EntityPlayer> GetPlayersCopy() => new List<EntityPlayer>(GameManager.Instance.World.Players.dict.Values.ToList());
+    public static EntityPlayer GetEntityPlayer(ClientInfo _cInfo) => GetEntityPlayer(_cInfo.entityId);
+    public static EntityPlayer GetEntityPlayer(int _entityId) => GameManager.Instance.World.Players.dict.ContainsKey(_entityId)? GameManager.Instance.World.Players.dict[_entityId] : null;
+    public static bool TryGetEntityPlayer(ClientInfo _cInfo, out EntityPlayer _player)
     {
-        _player = GetPlayer(_cInfo.entityId);
+        _player = GetEntityPlayer(_cInfo.entityId);
         return _player != null;
     }
-    public static bool GetPlayer(int _entityId, out EntityPlayer _player)
+    public static bool TryGetEntityPlayer(int _entityId, out EntityPlayer _player)
     {
-        _player = GetPlayer(_entityId);
+        _player = GetEntityPlayer(_entityId);
         return _player != null;
     }
 
-    // PersistentPlayerData
-    public static PersistentPlayerData GetPersistent(EntityPlayer _player) => GetPersistent(_player.entityId);
-    public static PersistentPlayerData GetPersistent(ClientInfo _cInfo) => GetPersistent(_cInfo.entityId);
-    public static PersistentPlayerData GetPersistent(int _entityId) => GameManager.Instance.persistentPlayers?.GetPlayerDataFromEntityID(_entityId) ?? null;
-    public static PersistentPlayerData GetPersistent(PlatformUserIdentifierAbs _user) => GameManager.Instance.persistentPlayers?.GetPlayerData(_user) ?? null;
-    
+    // Get PersistentPlayerData
+    public static PersistentPlayerData GetPersistentPlayerData(EntityPlayer _player) => GetPersistentPlayerData(_player.entityId);
+    public static PersistentPlayerData GetPersistentPlayerData(ClientInfo _cInfo) => GetPersistentPlayerData(_cInfo.entityId);
+    public static PersistentPlayerData GetPersistentPlayerData(int _entityId) => GameManager.Instance.persistentPlayers?.GetPlayerDataFromEntityID(_entityId) ?? null;
+    public static PersistentPlayerData GetPersistentPlayerData(PlatformUserIdentifierAbs _user) => GameManager.Instance.persistentPlayers?.GetPlayerData(_user) ?? null;
+
+    // Name + PlatformID
+    public static string GetNameAndPlatformId(ClientInfo _cInfo) => _cInfo == null ? "null" : $"{_cInfo.playerName} ({_cInfo.PlatformId.ReadablePlatformUserIdentifier})";
+    public static string GetNameAndPlatformId(int _entityId)
+    {
+        if (TryGetClientInfo(_entityId, out ClientInfo cInfo))
+            return GetNameAndPlatformId(cInfo);
+
+        PersistentPlayerData pData = GetPersistentPlayerData(_entityId);
+        if (pData != null)
+            return GetNameAndPlatformId(cInfo);
+
+        return $"{_entityId}";
+    }
+    public static string GetNameAndPlatformId(PlatformUserIdentifierAbs _user)
+    {
+        if (TryGetClientInfo(_user, out ClientInfo cInfo))
+            return GetNameAndPlatformId(cInfo);
+
+        PersistentPlayerData pData = GetPersistentPlayerData(_user);
+        if (pData != null)
+            return GetNameAndPlatformId(cInfo);
+
+        return $"{_user}";
+    }
+    public static string GetNameAndPlatformId(EntityPlayer _player) => GetNameAndPlatformId(_player.entityId);
+    public static string GetNameAndPlatformId(PersistentPlayerData _persistentPlayerData) => _persistentPlayerData == null ? "null" : $"{_persistentPlayerData.PlayerName} ({_persistentPlayerData.PlatformUserIdentifier.ReadablePlatformUserIdentifier})";
+
     // Permission
-    public static int GetPermission(EntityPlayer _player) => GetPermission(GetClient(_player));
+    public static int GetPermission(EntityPlayer _player) => GetPermission(GetClientInfo(_player));
     public static int GetPermission(ClientInfo _cInfo) => GameManager.Instance.adminTools.Users.GetUserPermissionLevel(_cInfo);
     public static int GetPermission(PlatformUserIdentifierAbs _user) => GameManager.Instance.adminTools.Users.GetUserPermissionLevel(_user);
 
     // Is player online
-    public static bool IsOnline(int _entityId) => GetClient(_entityId) != null;
-    public static bool IsOnline(PlatformUserIdentifierAbs _user) => GetClient(_user) != null;
-    public static bool IsOnline(string _platform, string _platformAuth) => GetClient(_platform, _platformAuth) != null;
-    public static bool IsOnline(long _peer) => GetClient(_peer) != null;
-    public static bool IsOnline(string _nameOrId) => GetClient(_nameOrId) != null;
+    public static bool IsOnline(int _entityId) => GetClientInfo(_entityId) != null;
+    public static bool IsOnline(PlatformUserIdentifierAbs _user) => GetClientInfo(_user) != null;
+    public static bool IsOnline(string _platform, string _platformAuth) => GetClientInfo(_platform, _platformAuth) != null;
+    public static bool IsOnline(long _peer) => GetClientInfo(_peer) != null;
+    public static bool IsOnline(string _nameOrId) => GetClientInfo(_nameOrId) != null;
 
     // Get nearest player
     public static bool GetNearestPlayer(Vector3i pos, out EntityPlayer nearestPlayer, out float distance, float maxDistance = 0, bool aliveOnly = true)
@@ -106,7 +134,7 @@ public class CF_Player
     // Game Events
     public static bool FireGameEvent(ClientInfo _cInfo, string _sequenceName)
     {
-        if (!GetPlayer(_cInfo, out EntityPlayer _player) || !_player.IsAlive() || !_player.IsSpawned())
+        if (!TryGetEntityPlayer(_cInfo, out EntityPlayer _player) || !_player.IsAlive() || !_player.IsSpawned())
         {
             throw new Exception($"GameEvent can't be triggered only on alive players: {_cInfo}");
         }
@@ -168,7 +196,7 @@ public class CF_Player
         {
             foreach (PlatformUserIdentifierAbs friend in ppd.ACL)
             {
-                ClientInfo _cInfo = CF_Player.GetClient(friend);
+                ClientInfo _cInfo = CF_Player.GetClientInfo(friend);
                 if (_cInfo == null)
                     continue;
                 Message(msg, _cInfo);

@@ -24,11 +24,11 @@ public class CF_HitLog
         hitLogEntryCallbacks.Add(callback);
     }
 
-    public static void AddEntry(ClientInfo source, ClientInfo attacker, ClientInfo victim, EntityPlayer playerA, EntityPlayer playerV, int damage, int armorDamage, bool fatal, ItemValue weapon, Utils.EnumHitDirection direction, EnumBodyPartHit hitbox, float fps, bool blocked)
+    public static void AddEntry(ClientInfo source, ClientInfo attacker, ClientInfo victim, EntityPlayer playerA, EntityPlayer playerV, int damage, EnumDamageSource _damageSrc, EnumDamageTypes _damageTyp, int armorDamage, bool fatal, ItemValue weapon, Utils.EnumHitDirection direction, EnumBodyPartHit hitbox, float fps, bool blocked)
     {
         ThreadManager.AddSingleTaskMainThread("CF_AddHitLogEntry", (_taskInfo =>
         {
-            var entry = new CF_HitLogEntry(source, attacker, victim, playerA, playerV, damage, armorDamage, fatal, weapon, direction, hitbox, fps);
+            var entry = new CF_HitLogEntry(source, attacker, victim, playerA, playerV, damage, _damageSrc, _damageTyp, armorDamage, fatal, weapon, direction, hitbox, fps);
 
             log.Out(entry.ToStringLog());
 

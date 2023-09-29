@@ -23,19 +23,6 @@ namespace CF_Firewall
                 else checkedIPs.Add(_cInfo.ip, new CheckedIP(response));
 
                 SaveIPdata();
-
-                /*
-                Database.Player dbPlayer = Database.GetPlayer(_cInfo.InternalId);
-                if (dbPlayer == null)
-                    return;
-
-                dbPlayer.countryCode = response.countryCode;
-                dbPlayer.countryName = response.countryName;
-                dbPlayer.ASN = response.asn;
-                dbPlayer.ISP = response.isp;
-                dbPlayer.SetModified();
-                */
-
                 CheckIPdata(_cInfo);
             }
             catch (Exception e)
@@ -56,7 +43,7 @@ namespace CF_Firewall
                 IPHubResponse data = checkedIPs[_cInfo.ip].data;
                 if (data == null)
                 {
-                    log.Error($"No data for checked IP: {_cInfo.ip}.");
+                    IPHubResponse.Check(_cInfo, ProcessIpHubResponse);
                     return true;
                 }
 
@@ -66,9 +53,13 @@ namespace CF_Firewall
                 if (AnsInWhitelist(data.asn))
                     return true;
 
-                if (ipHubVpnMode == 1 && data.block > 0 && ipHubVpnSensitivity + 1 >= data.block)
+                if (ipHubVpnMode == 1 && data.block > 0 
+                    && 
+                    ((ipHubVpnSensitivity == 0 && data.block == 1)
+                    ||(ipHubVpnSensitivity == 1 && data.block >= 1))
+                    )
                 {
-                    Ban(_cInfo, "VPN", $"Detected VPN => [{data.countryCode}] IP: {_cInfo.ip} ASN: {data.isp} ({data.asn})");
+                    Ban(_cInfo, "VPN", $"Detected VPN => [{data.countryCode}] IP: {_cInfo.ip} ASN: {data.isp} ({data.asn}) Block: {data.block}");
                     return false;
                 }
 

@@ -34,7 +34,7 @@ public class CF_Item
         if (_cInfo == null)
             return false;
 
-        return CanTakeItem(CF_Player.GetPlayer(_cInfo), _itemValue, _count);
+        return CanTakeItem(CF_Player.GetEntityPlayer(_cInfo), _itemValue, _count);
     }
     public static bool CanTakeItem(EntityPlayer _player, ItemValue _itemValue, int _count)
     {

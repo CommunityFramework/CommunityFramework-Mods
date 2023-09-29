@@ -170,11 +170,12 @@
     <Compile Include="src\AsnRange.cs" />
     <Compile Include="src\CheckedIP.cs" />
     <Compile Include="src\IPhub.cs" />
+    <Compile Include="src\NoNamespace\CF_Blacklist.cs" />
     <Compile Include="src\Steam.cs" />
     <Compile Include="src\CmdIPBan.cs" />
     <Compile Include="src\CmdWhitelist.cs" />
     <Compile Include="src\IPHubResponse.cs" />
-    <Compile Include="src\Patch_AdminTools.cs" />
+    <Compile Include="src\NoNamespace\Patch_AdminTools_AddBan.cs" />
     <Compile Include="src\SteamVacBanResponse.cs" />
     <Compile Include="src\NoNamespace\CF_Whitelist.cs" />
   </ItemGroup>

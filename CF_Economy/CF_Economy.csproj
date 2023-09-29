@@ -146,6 +146,8 @@
     <Compile Include="src\CF_BankAccount.cs" />
     <Compile Include="src\CF_Currency.cs" />
     <Compile Include="src\CF_EconomyManager.cs" />
+    <Compile Include="src\CF_Stock.cs" />
+    <Compile Include="src\CF_StockMarketManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

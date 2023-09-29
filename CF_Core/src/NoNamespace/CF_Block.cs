@@ -15,8 +15,8 @@ public class CF_Block
     public static bool GiveBlockBackRPC(PlatformUserIdentifierAbs _UserId, BlockChangeInfo newBlockInfo)
     {
         World world = GameManager.Instance.World;
-        ClientInfo cInfo = CF_Player.GetClient(_UserId);
-        EntityPlayer player = CF_Player.GetPlayer(cInfo);
+        ClientInfo cInfo = CF_Player.GetClientInfo(_UserId);
+        EntityPlayer player = CF_Player.GetEntityPlayer(cInfo);
         string blockName = newBlockInfo.blockValue.Block.GetBlockName();
 
         try

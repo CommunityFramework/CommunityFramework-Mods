@@ -19,6 +19,18 @@ public class CF_ChatMessage
 
     public bool send;
 
+    public string Name { get; set; }
+    public string Message { get; set; }
+
+    // List of name prefixes with sort order and type (add/reset)
+    public List<NamePrefix> NamePrefixes { get; set; } = new List<NamePrefix>();
+
+    // List of name colors with sort order
+    public List<NameColor> NameColors { get; set; } = new List<NameColor>();
+
+    // List of chat colors with sort order
+    public List<ChatColor> ChatColors { get; set; } = new List<ChatColor>();
+
     public CF_ChatMessage(string msg)
     {
         type = EChatType.Global;
@@ -52,7 +64,7 @@ public class CF_ChatMessage
         isPublicTrigger = msg.IndexOf('!') == 0;
 
         string[] Args = _msg.Substring(1).Trim().Split(' ');
-        command = Args[0];
+        command = Args[0].ToLower();
         args = new List<string>(Args.Skip(1));
 
         if ((isPrivateTrigger || isPublicTrigger) && !string.IsNullOrEmpty(command) && CF_ChatManager.chatTriggers.TryGetValue(command, out CF_ChatTrigger chatTrigger))
@@ -92,5 +104,24 @@ public class CF_ChatMessage
 
             SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(recipientEntityId)?.SendPackage(NetPackageManager.GetPackage<NetPackageChat>().Setup(type, senderId, msg, name, localizeMain, null));
         }
+    }
+
+    public class NamePrefix
+    {
+        public string Prefix { get; set; }
+        public int SortOrder { get; set; }
+        public string Type { get; set; }  // "add" or "reset"
+    }
+
+    public class NameColor
+    {
+        public string ColorCode { get; set; }  // RGB code without #
+        public int SortOrder { get; set; }
+    }
+
+    public class ChatColor
+    {
+        public string ColorCode { get; set; }  // RGB code without #
+        public int SortOrder { get; set; }
     }
 }

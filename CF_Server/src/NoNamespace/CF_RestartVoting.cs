@@ -17,7 +17,7 @@ internal class CF_RestartVoting
         foreach (KeyValuePair<int, DateTime> kv in new Dictionary<int , DateTime>(votes))
         {
             int entityId = kv.Key;
-            ClientInfo cInfo = CF_Player.GetClient(entityId);
+            ClientInfo cInfo = CF_Player.GetClientInfo(entityId);
             if(cInfo == null)
             {
                 RemoveVote(entityId);
