@@ -39,22 +39,23 @@ namespace CF_PvP
 
                 if (!playerV.Spawned)
                 {
-                    log.Warn($"Player not spawned. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    log.Warn($"Victim not spawned. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
                     allow = false;
                 }
 
-                if (!playerV.IsAlive())
+                if (!playerA.IsAlive())
                 {
-                    log.Warn($"Player not alive. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    log.Warn($"Attacker not alive. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
                     allow = false;
                 }
 
                 // If the player died decently then he may be shown where he died as tpose and can get damage while respawned somewher else already
                 if (fatalHitTime.TryGetValue(___entityId, out DateTime lastHit) && (DateTime.UtcNow - lastHit) < fatalHitThreshold)
                 {
-                    log.Warn($"Player already dead. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    log.Warn($"Victim already dead. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
                     allow = false;
                 }
+
                 if (___bFatal)
                     fatalHitTime[___entityId] = DateTime.UtcNow;
 
