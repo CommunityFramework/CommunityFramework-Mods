@@ -18,7 +18,7 @@ public class CF_PlayerRankManager
         LoadFile();
 
         if (FileWatcher == null)
-            FileWatcher = new FileSystemWatcher(filePathPlayerRanks, "PlayerRanks.json");
+            FileWatcher = new FileSystemWatcher(mod.modDatabasePath, "PlayerRanks.json");
 
         if (!fileWatcher)
         {
@@ -53,9 +53,6 @@ public class CF_PlayerRankManager
     }
     public static bool LoadFile()
     {
-        if (!Directory.Exists(mod.modDatabasePath))
-            Directory.CreateDirectory(mod.modDatabasePath);
-
         if (!File.Exists(filePathPlayerRanks))
         {
             AddDefaultGroups();
@@ -75,9 +72,6 @@ public class CF_PlayerRankManager
     }
     public static void SaveToFile()
     {
-        if (ranks == null)
-            return;
-
         File.WriteAllText(filePathPlayerRanks, JsonConvert.SerializeObject(ranks, Formatting.Indented));
     }
     private static void OnFileChanged(object source, FileSystemEventArgs e)
