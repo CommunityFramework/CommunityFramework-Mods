@@ -6,12 +6,14 @@ namespace CF_Chat
     {
         public static CF_Mod mod = new CF_Mod("CF_Chat", OnConfigLoaded, OnPhrasesLoaded);
         public static CF_Log log = new CF_Log("CF_Chat");
-        public static List<RankConfig> rankConfigs;
+
+        public static Dictionary<string, RankConfig> rankConfigs = new Dictionary<string, RankConfig>();
 
         public void InitMod(Mod _modInstance)
         {
             mod.Activate();
-
+            RankConfigLoader.LoadRankConfig();
+            RankConfigLoader.InitializeFileWatcher();
             ModEvents.ChatMessage.RegisterHandler(CF_ChatManager.OnChatMessage);
         }
         public static string discordWebhookURL;
@@ -26,8 +28,6 @@ namespace CF_Chat
             mod.AddSetting("Discord_Filter_Everyone", true, "Replace @ here and @ everyone to defuse it.", out discordFilterEveryone);
 
             mod.AddSetting("OpenAI_ApiKey", "YOUR_OPENAI_API_KEY", "", "Replace with your OpenAI API key.", out OpenAI_key);
-
-            rankConfigs = RankConfigLoader.LoadRankConfig("path/to/your/config.json");
         }
         public static string discordMessageTemplate;
         public static void OnPhrasesLoaded()
