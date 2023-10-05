@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Xml;
 using System.Security;
+using System.Linq;
 
 public class CF_Mod
 {
@@ -44,7 +45,22 @@ public class CF_Mod
     public SortedDictionary<string, string> phrases;
     public Dictionary<string, string> phrasesDes;
 
-
+    public static bool IsModLoaded(string modName)
+    {
+        return mods.Any(mod => mod.UniqueName == modName);
+    }
+    public static CF_Mod GetModByName(string modName)
+    {
+        return mods.FirstOrDefault(mod => mod.UniqueName == modName);
+    }
+    public static List<string> GetAllLoadedModNames()
+    {
+        return mods.Select(mod => mod.UniqueName).ToList();
+    }
+    public static List<CF_Mod> GetAllEnabledMods()
+    {
+        return mods.Where(mod => mod.Enabled).ToList();
+    }
     public CF_Mod(string Name, Action OnModConfigLoaded = null, Action OnModPhrasesLoaded = null)
     {
         this.modName = Name;
@@ -268,10 +284,13 @@ public class CF_Mod
             if (_useDataBaseDirectory)
                 Directory.CreateDirectory(modDatabasePath);
 
-            if (!File.Exists(settingsFilePath) && OnModConfigLoaded != null)
+            bool settingsFileExists = File.Exists(settingsFilePath);
+            bool phrasesFileExists = File.Exists(phrasesFilePath);
+
+            if (!settingsFileExists && OnModConfigLoaded != null)
                 OnModConfigLoaded();
 
-            if (File.Exists(settingsFilePath))
+            if (settingsFileExists)
                 LoadSettingsFile();
             else WriteSettingsFile();
 
@@ -323,7 +342,7 @@ public class CF_Mod
             return false;
         }
 
-        XmlDocument xmlDoc = new XmlDocument();
+        var xmlDoc = new XmlDocument();
 
         try
         {
@@ -422,7 +441,7 @@ public class CF_Mod
         if (!File.Exists(phrasesFilePath))
             return false;
 
-        XmlDocument xmlDoc = new XmlDocument();
+        var xmlDoc = new XmlDocument();
 
         try
         {
@@ -497,5 +516,34 @@ public class CF_Mod
         }
 
         return false;
+    }
+    // Static method to get statistics about loaded mods.
+    public static Dictionary<string, int> GetModStatistics()
+    {
+        Dictionary<string, int> stats = new Dictionary<string, int>();
+
+        // Total number of mods
+        stats["TotalMods"] = mods.Count;
+
+        // Number of enabled mods
+        stats["EnabledMods"] = mods.Count(mod => mod.Enabled);
+
+        // Number of mods with settings
+        stats["ModsWithSettings"] = mods.Count(mod => mod.settings.Count > 0);
+
+        // Number of mods with phrases
+        stats["ModsWithPhrases"] = mods.Count(mod => mod.phrases.Count > 0);
+
+        return stats;
+    }
+
+    // Static method to print statistics to log.
+    public static void LogModStatistics()
+    {
+        var stats = GetModStatistics();
+        Log.Out($"Total Mods Loaded: {stats["TotalMods"]}");
+        Log.Out($"Enabled Mods: {stats["EnabledMods"]}");
+        Log.Out($"Mods with Settings: {stats["ModsWithSettings"]}");
+        Log.Out($"Mods with Phrases: {stats["ModsWithPhrases"]}");
     }
 }

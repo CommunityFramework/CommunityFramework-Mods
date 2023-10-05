@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class CF_Format
@@ -159,8 +160,12 @@ public class CF_Format
 
         return result.ToString();
     }
-    static string TimeSpanCompact(TimeSpan timeSpan, bool _days = true, bool _hours = true, bool _minutes = true, bool _seconds = true)
+    public static string TimeSpanCompact(TimeSpan timeSpan, bool _days = true, bool _hours = true, bool _minutes = true, bool _seconds = true)
     {
         return $"{(_days ? (int)timeSpan.TotalDays + "d " : "")}{(_hours ? timeSpan.Hours + "h " : "")}{(_minutes ? timeSpan.Minutes + "m " : "")}{(_seconds ? timeSpan.Seconds + "s" : "")}".Trim() ?? "0s";
+    }
+    public static string RemoveColorCodes(string input)
+    {
+        return Regex.Replace(input, @"\[\w{6}\]", "");
     }
 }

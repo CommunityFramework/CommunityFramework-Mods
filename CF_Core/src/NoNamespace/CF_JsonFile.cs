@@ -34,6 +34,7 @@ public class CF_JsonFile<T>
             {
                 _err = $"File not found: {filePath}";
                 dataOut = default;
+                Save();
                 return false;
             }
             else
