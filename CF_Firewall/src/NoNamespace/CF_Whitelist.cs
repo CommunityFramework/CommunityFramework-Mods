@@ -47,7 +47,7 @@ public class CF_Whitelist
         }
         catch (FileNotFoundException e)
         {
-            log.Error($"File not found: {e}");
+            Save();
         }
         catch (Exception e)
         {
