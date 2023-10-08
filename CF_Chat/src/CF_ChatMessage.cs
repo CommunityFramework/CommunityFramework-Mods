@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using static CF_Chat.API;
 
 public class CF_ChatMessage
@@ -87,24 +88,39 @@ public class CF_ChatMessage
             SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(recipientEntityId)?.SendPackage(NetPackageManager.GetPackage<NetPackageChat>().Setup(type, senderId, msg, name, localizeMain, null));
         }
     }
-
     public void ApplyNameAndChatColors()
     {
-        // Handle name color
+        switch (type)
+        {
+            case EChatType.Friends:
+                name = "[33ff33](Friends) [-]" + name;
+                break;
+            case EChatType.Party:
+                name = "[eed202](Party) [-]" + name;
+                break;
+            case EChatType.Global:
+                ApplyNameColors();
+                ApplyPreTags();
+                ApplyPostTags();
+                ApplyChatColors();
+                break;
+        }
+    }
+    private void ApplyNameColors()
+    {
         if (customNames.Count > 0)
         {
             var customName = customNames.OrderBy(c => c.SortOrder).FirstOrDefault().Tag;
             name = customName;
-            log.Debug($"Applied custom name: {customName}");
         }
         else if (nameColors.Count > 0)
         {
             var nameColor = nameColors.OrderBy(c => c.SortOrder).FirstOrDefault().ColorCode;
             name = nameColor + name;
-            log.Debug($"Applied name color: {nameColor}");
         }
-
-        // Handle name prefixes
+    }
+    private void ApplyPreTags()
+    {
         if (namePrefixes.Count > 0)
         {
             var sortedNamePrefixes = namePrefixes.OrderBy(p => p.SortOrder).ToList();
@@ -112,10 +128,10 @@ public class CF_ChatMessage
             var resetSortOrder = !resetPrefix.IsEmpty ? resetPrefix.SortOrder : int.MaxValue;
             var finalNamePrefix = string.Join("", sortedNamePrefixes.Where(p => p.SortOrder <= resetSortOrder).Select(p => p.Tag));
             name = finalNamePrefix + name;
-            log.Debug($"Applied name prefix: {finalNamePrefix}");
         }
-
-        // Handle name postfixes
+    }
+    private void ApplyPostTags()
+    {
         if (namePostfixes.Count > 0)
         {
             var sortedNamePostfixes = namePostfixes.OrderBy(p => p.SortOrder).ToList();
@@ -123,46 +139,36 @@ public class CF_ChatMessage
             var resetSortOrder = !resetPostfix.IsEmpty ? resetPostfix.SortOrder : int.MaxValue;
             var finalNamePostfix = string.Join("", sortedNamePostfixes.Where(p => p.SortOrder <= resetSortOrder).Select(p => p.Tag));
             name = name + finalNamePostfix;
-            log.Debug($"Applied name postfix: {finalNamePostfix}");
         }
-
-
-        // Handle chat color
+    }
+    private void ApplyChatColors()
+    {
         if (chatColors.Count > 0)
         {
             var chatColor = chatColors.OrderBy(c => c.SortOrder).FirstOrDefault().ColorCode;
             msg = $"{chatColor}{msg}";
-            log.Debug($"Applied chat color: {chatColor}");
         }
-
-        log.Debug("Exiting ApplyNameAndChatColors");
     }
-
     public void AddNameTagPrefix(NameTag prefix)
     {
         namePrefixes.Add(prefix);
     }
-
     public void AddNameTagPostfix(NameTag postfix)
     {
         namePostfixes.Add(postfix);
     }
-
     public void AddNameColor(NameColor color)
     {
         nameColors.Add(color);
     }
-
     public void AddCustomName(CustomName customName)
     {
         customNames.Add(customName);
     }
-
     public void AddChatColor(ChatColor color)
     {
         chatColors.Add(color);
     }
-
     public struct NameTag
     {
         public string Tag { get; set; }
@@ -173,19 +179,16 @@ public class CF_ChatMessage
             get { return SortOrder == 0 && string.IsNullOrEmpty(Tag) && !Reset; }
         }
     }
-
     public struct NameColor
     {
         public string ColorCode { get; set; }  // RGB code without #
         public int SortOrder { get; set; }
     }
-
     public struct ChatColor
     {
         public string ColorCode { get; set; }  // RGB code without #
         public int SortOrder { get; set; }
     }
-
     public struct CustomName
     {
         public string Tag { get; set; }  // RGB code without #

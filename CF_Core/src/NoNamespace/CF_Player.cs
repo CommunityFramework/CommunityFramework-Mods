@@ -236,4 +236,8 @@ public class CF_Player
     {
         _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(_pos, _viewDirection, _onlyIfNotflying));
     }
+    public static void CloseAllXui(ClientInfo _cInfo)
+    {
+        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageCloseAllWindows>().Setup(_cInfo.entityId));
+    }
 }

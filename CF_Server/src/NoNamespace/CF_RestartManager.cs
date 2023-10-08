@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
+using System.Text;
 using UnityEngine;
 using static CF_Server.API;
 
@@ -48,60 +48,91 @@ public class CF_RestartManager
     }
     public static void CheckConditions()
     {
+        if (countdown != -1)
+            return;
+
+        TimeSpan uptime = DateTime.UtcNow - serverStarted;
+        if (uptime.TotalMinutes < minUptime)
+            return;
+
+        log.Out($"CheckConditions => countdown: {countdown} uptime: {uptime.TotalMinutes}m");
+
         TimeSpan timespan = TimeSpan.FromSeconds(30);
         float averageFPS = CF_ServerMonitor.GetAverageFPS(timespan);
         float lowestFPS = CF_ServerMonitor.GetLowestFPS(timespan);
+        bool isBloodMoonActive = GameManager.Instance.World.aiDirector.BloodMoonComponent.BloodMoonActive;
 
-        float veryLow = (float)FPSveryLow;
-        if (GameManager.Instance.World.aiDirector.BloodMoonComponent.BloodMoonActive)
-            veryLow = (float)FPSveryLowBM;
-        int lowFPS = CF_ServerMonitor.GetLowerFPSCount(FPSveryLow, TimeSpan.FromSeconds(30));
+        // Set FPS thresholds based on Blood Moon status
+        float veryLow = isBloodMoonActive ? (float)FPSveryLowBM : (float)FPSveryLow;
+        int lowAverage = isBloodMoonActive ? FPSlowAverageBM : FPSlowAverage;
+        int veryLowSamples = isBloodMoonActive ? FPSveryLowSamplesBM : FPSveryLowSamples;
 
-        // Server restarting already within timewindow
-        if (countdown > -1 || countdown < restartCountdown)
-            return;
+        int lowFPS = CF_ServerMonitor.GetLowerFPSCount(veryLow, timespan);
 
-        // Min uptime
-        if ((DateTime.UtcNow - serverStarted).TotalMinutes < minUptime)
-            return;
+        // Calculate additional stats
 
-        // Blood moon
+        /*
+        // Prepare the log message
+        StringBuilder logMessage = new StringBuilder("Server Stats: ");
+        
+        logMessage.AppendFormat(" == Status ==");
+        logMessage.AppendFormat(" Countdown: {0}s, ", countdown);
+        logMessage.AppendFormat(" Default: {0}s, ", restartCountdown);
+        logMessage.AppendFormat(" == Stats ==");
+        logMessage.AppendFormat(" Uptime: {0}s, ", uptime.ToString());
+        logMessage.AppendFormat(" Timespan: {0}s, ", timespan.TotalSeconds);
+        logMessage.AppendFormat(" Average FPS: {0}, ", CF_ServerMonitor.GetAverageFPS(timespan));
+        logMessage.AppendFormat(" Lowest FPS: {0}, ", CF_ServerMonitor.GetLowestFPS(timespan));
+        logMessage.AppendFormat(" Highest FPS: {0}, ", CF_ServerMonitor.GetMaximumFPS(timespan));
+        logMessage.AppendFormat(" Median FPS: {0}, ", CF_ServerMonitor.GetMedianFPS(timespan));
+        logMessage.AppendFormat(" == Triggers ==");
+        logMessage.AppendFormat(" Low FPS Count: {0}, ", lowFPS);
+        logMessage.AppendFormat(" Very Low FPS Threshold: {0}, ", veryLow);
+        logMessage.AppendFormat(" Low Average FPS Threshold: {0}, ", lowAverage);
+        logMessage.AppendFormat(" Very Low Samples Threshold: {0}, ", veryLowSamples);
+        logMessage.AppendFormat(" Blood Moon Active: {0}", isBloodMoonActive ? "Yes" : "No");
+
+        // Output the log
+        log.Out(logMessage.ToString());
+        */
+
+        // Check for Blood Moon restart condition
         int day = GameUtils.WorldTimeToDays(GameManager.Instance.World.worldTime);
         int hour = GameUtils.WorldTimeToHours(GameManager.Instance.World.worldTime);
         int dayBM = bmDayRef(GameManager.Instance.World.aiDirector.BloodMoonComponent);
+
         if (restartBloodmoonHours != -1 && dayBM == day && hour == restartBloodmoonHours)
         {
-            CF_Player.Message("[ff3333]Pre-Bloodmoon Restart!");
-            Shutdown(restartCountdown);
+            TriggerShutdown("[ff3333]Pre-Bloodmoon Restart!", restartCountdown ,"Pre BM restart");
             return;
         }
 
-        // Low average performance
-        int lowAverage = FPSlowAverage;
-        if (GameManager.Instance.World.aiDirector.BloodMoonComponent.BloodMoonActive)
-            lowAverage = FPSlowAverageBM;
-
+        // Check for low average FPS
         if (averageFPS > 0 && averageFPS < lowAverage)
         {
-            log.Warn($"Low FPS detected (average): {averageFPS:F1}. Restarting server.");
-            CF_Player.Message("[ff0000]Bad server performance detected!");
-            Shutdown(restartCountdown);
+            TriggerShutdown("[ff0000]Bad server performance detected!", restartCountdown, $"Low FPS detected (average): {averageFPS:F1}. Restarting server.");
             return;
         }
 
-        // Much bad fps drops
-        int veryLowSamples = FPSveryLowSamples;
-        if (GameManager.Instance.World.aiDirector.BloodMoonComponent.BloodMoonActive)
-            veryLowSamples = FPSveryLowSamplesBM;
-
+        // Check for frequent low FPS
         if (veryLowSamples > 0 && lowFPS > veryLowSamples)
         {
-            log.Warn($"Low FPS detected: {lowFPS} of / {CF_ServerMonitor.GetLowerFPSCount(FPSveryLow, TimeSpan.FromSeconds(30))}s below {FPSveryLow}. Restarting server.");
-            CF_Player.Message("[ff0000]Bad server performance detected!");
-            Shutdown(restartCountdown);
+            TriggerShutdown("[ff0000]Bad server performance detected!", restartCountdown, $"Low FPS detected: {lowFPS} of / {CF_ServerMonitor.GetLowerFPSCount(veryLow, timespan)}s below {veryLow}. Restarting server.");
             return;
         }
     }
+
+    // Helper method to handle shutdown logic
+    private static void TriggerShutdown(string playerMessage, int countdown, string logMessage = null)
+    {
+        if (!string.IsNullOrEmpty(logMessage))
+        {
+            log.Warn(logMessage);
+        }
+        CF_Player.Message(playerMessage);
+        Shutdown(countdown);
+    }
+
     public static DateTime lastWorldSave = DateTime.UtcNow;
     public static int countdown = -1;
     public static int restartAttempts = 0;
@@ -240,30 +271,9 @@ public class CF_RestartManager
     public static int lastS = -1;
     public static void OnCountdownTick()
     {
-        if (countdown < 0)
-            return;
-
-        if (countdown == 0)
-            Shutdown();
-
-        if (countdown < 60)
-        {
-            TryLock();
-
-            /*
-            if (ConnectionManagerEx.joinQueueList.Count > 0)
-            {
-                foreach (string EOS in ConnectionManagerEx.joinQueueList)
-                {
-                    ClientInfo cInfo = Utilz.GetClientByEOS(EOS);
-                    if (cInfo == null)
-                        continue;
-
-                    GameUtils.KickPlayerForClientInfo(cInfo, new GameUtils.KickPlayerData(GameUtils.EKickReason.ManualKick, _customReason: "Server restarting..."));
-                }
-            }
-            */
-        }
+        if (countdown < 0) return;
+        if (countdown == 0) Shutdown();
+        if (countdown < 60) TryLock();
 
         if (countdown >= 60 && countdown % 60 == 0)
         {
@@ -371,43 +381,20 @@ public class CF_RestartManager
         if (countdown > 0)
             countdown--;
     }
-    // Lock tile entities with storage from being opened
     public static void TryLock()
     {
-        if (locked || countdown == -1 || countdown > 60)
-            return;
+        if (locked || countdown == -1 || countdown > 60) return;
 
         locked = true;
 
         List<ClientInfo> cList = CF_Player.GetClients();
-        if (cList != null && cList.Count > 0)
+        if (cList?.Count > 0)
         {
-            for (int i = 0; i < cList.Count; i++)
-            {
-                CF_Player.Message(msgLocked, cList[i]);
-                CloseAllXui(cList[i]);
-            }
+            cList.ForEach(client => {
+                CF_Player.Message(msgLocked, client);
+                CF_Player.CloseAllXui(client);
+            });
         }
     }
-    public static void CloseAllXui(ClientInfo _cInfo)
-    {
-        _cInfo.SendPackage(NetPackageManager.GetPackage<NetPackageCloseAllWindows>().Setup(_cInfo.entityId));
-    }
-    public static bool CanOpenLootContainer(ClientInfo _cInfo, TileEntity _te)
-    {
-        if (!locked)
-            return true;
 
-        if (_te is TileEntityLootContainer
-            || _te is TileEntityWorkstation
-            || _te is TileEntitySecureLootContainer
-            || _te is TileEntityVendingMachine
-            || _te is TileEntityLootContainer)
-        {
-            CF_Player.Message(msgDenied, _cInfo);
-            return false;
-        }
-
-        return true;
-    }
 }

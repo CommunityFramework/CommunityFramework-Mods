@@ -22,8 +22,8 @@ namespace CF_Server
 
             CF_ChatManager.RegisterChatTrigger("serverstats,ss,server", OnServerStatsCommand);
 
-            CF_Timer.AddOneSecTimer(CF_ServerMonitor.OnEverySec, "ServerMonitor", false);
-            CF_Timer.AddOneSecTimer(CF_RestartManager.OnEverySec, "RestartManager", false);
+            CF_Timer.AddOneSecTimer(CF_ServerMonitor.OnEverySec, "CF_ServerServerMonitor", false);
+            CF_Timer.AddOneSecTimer(CF_RestartManager.OnEverySec, "CF_ServerRestartManager", false);
         }
         public static string eventS;
         public static int restartBloodmoonHours;

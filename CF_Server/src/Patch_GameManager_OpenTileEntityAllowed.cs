@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using static CF_Server.API;
@@ -23,7 +24,7 @@ namespace CF_Server
 
             try
             {
-                if (!CF_RestartManager.CanOpenLootContainer(cInfo, _te))
+                if (!CanOpenLootContainer(cInfo, _te))
                 {
                     //log.Log($"ServerManager denied access for id {_entityIdThatOpenedIt} opening a {_te.GetTileEntityType()} at {CF_TileEntity.GetPosTele(_te)}", cInfo);
                     __result = false;
@@ -51,12 +52,29 @@ namespace CF_Server
 
                 // Antidupe
                 if (CF_RestartManager.locked)
-                    CF_RestartManager.CloseAllXui(cInfo);
+                    CF_Player.CloseAllXui(cInfo);
             }
             catch (Exception e)
             {
                 log.Error($"Patch_GameManager_OnOpenTileEntityAllowed_Post reported: {e}");
             }
+        }
+        public static bool CanOpenLootContainer(ClientInfo _cInfo, TileEntity _te)
+        {
+            if (!CF_RestartManager.locked)
+                return true;
+
+            if (_te is TileEntityLootContainer
+                || _te is TileEntityWorkstation
+                || _te is TileEntitySecureLootContainer
+                || _te is TileEntityVendingMachine
+                || _te is TileEntityLootContainer)
+            {
+                CF_Player.Message(msgDenied, _cInfo);
+                return false;
+            }
+
+            return true;
         }
     }
 }
