@@ -31,6 +31,7 @@ namespace CF_Chat
                 log.Error("RankConfigJson is null.");
                 return;
             }
+
             CopyFromJson(json);
 
             NameTagPostRaw = TagPost != null ? CF_Format.RemoveColorCodes(TagPost) : null;
@@ -68,8 +69,6 @@ namespace CF_Chat
                 NameTagPreRaw = CF_Format.RemoveColorCodes(TagPre);
             }
         }
-        public string DisplayNamePreRaw => NameTagPreRaw;
-        public string DisplayNamePostRaw => NameTagPostRaw; 
         public bool IsSpecificPlayer(ClientInfo cInfo)
         {
             if (Players.Count < 1)
