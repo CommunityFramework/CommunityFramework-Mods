@@ -262,7 +262,8 @@ public class CF_RestartManager
         {
             try
             {
-                Application.Quit();
+                ThreadManager.AddSingleTaskMainThread("Shutdown", (ThreadManager.MainThreadTaskFunctionDelegate)(_ => Application.Quit()));
+                //Application.Quit();
             }
             catch (Exception e) { Log.Error($"Shutdown reported: {e}"); }
         }
