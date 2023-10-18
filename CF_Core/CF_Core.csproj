@@ -145,6 +145,7 @@
     <Compile Include="src\NoNamespace\CF_AccessTools.cs" />
     <Compile Include="src\NoNamespace\CF_Array.cs" />
     <Compile Include="src\NoNamespace\CF_Block.cs" />
+    <Compile Include="src\NoNamespace\CF_Color.cs" />
     <Compile Include="src\NoNamespace\CF_Console.cs" />
     <Compile Include="src\NoNamespace\CF_ConsoleMessageFilter.cs" />
     <Compile Include="src\NoNamespace\CF_Cooldowns.cs" />
