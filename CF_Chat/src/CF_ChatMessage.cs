@@ -90,6 +90,11 @@ public class CF_ChatMessage
     }
     public void ApplyNameAndChatColors()
     {
+        if (isPrivateTrigger)
+        {
+            return;
+        }
+
         switch (type)
         {
             case EChatType.Friends:
@@ -119,6 +124,14 @@ public class CF_ChatMessage
             name = nameColor + name;
         }
     }
+    private void ApplyChatColors()
+    {
+        if (chatColors.Count > 0)
+        {
+            var chatColor = chatColors.OrderBy(c => c.SortOrder).FirstOrDefault().ColorCode;
+            msg = $"{chatColor}{msg}";
+        }
+    }
     private void ApplyPreTags()
     {
         if (namePrefixes.Count > 0)
@@ -139,14 +152,6 @@ public class CF_ChatMessage
             var resetSortOrder = !resetPostfix.IsEmpty ? resetPostfix.SortOrder : int.MaxValue;
             var finalNamePostfix = string.Join("", sortedNamePostfixes.Where(p => p.SortOrder <= resetSortOrder).Select(p => p.Tag));
             name = name + finalNamePostfix;
-        }
-    }
-    private void ApplyChatColors()
-    {
-        if (chatColors.Count > 0)
-        {
-            var chatColor = chatColors.OrderBy(c => c.SortOrder).FirstOrDefault().ColorCode;
-            msg = $"{chatColor}{msg}";
         }
     }
     public void AddNameTagPrefix(NameTag prefix)
