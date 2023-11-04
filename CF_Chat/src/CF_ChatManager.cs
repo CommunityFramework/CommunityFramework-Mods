@@ -64,7 +64,7 @@ public class CF_ChatManager
         chatMessage.ApplyNameAndChatColors();
         chatMessage.Send();
 
-        if (chatMessage.trigger != null && chatMessage.trigger.CanExecute(cInfo))
+        if (chatMessage.IsTrigger() && chatMessage.trigger.CanExecute(cInfo))
             chatMessage.trigger.callback(cInfo, chatMessage.command, chatMessage.args);
 
         if (string.IsNullOrEmpty(discordWebhookURL) 
@@ -91,77 +91,40 @@ public class CF_ChatManager
                                  .ThenByDescending(r => r.Value.Playtime)
                                  .ToDictionary(pair => pair.Key, pair => pair.Value);
 
-        //log.Debug("Sorted rankConfigs based on PermissionLevel and Playtime.");
-
         // Find the appropriate rank based on permissions and playtime
         RankConfig matchedRank = null;
         foreach (var rank in rankConfigs)
         {
-            //log.Debug($"Checking rank {rank.Key} for player {cInfo.playerName}");
-
             if (permissionsLevel > rank.Value.PermissionLevel)
-            {
-                //log.Debug($"Skipping rank {rank.Key} due to insufficient permissions.");
                 continue;
-            }
 
             if (totalTimePlayed < rank.Value.Playtime)
-            {
-                //log.Debug($"Skipping rank {rank.Key} due to insufficient playtime.");
                 continue;
-            }
 
             if (rank.Value.Players != null && !rank.Value.IsSpecificPlayer(cInfo))
-            {
-                //log.Debug($"Skipping rank {rank.Key} as player {cInfo.playerName} is not a specific player for this rank.");
                 continue;
-            }
 
             matchedRank = rank.Value;
-            //log.Debug($"Matched rank {rank.Key} for player {cInfo.playerName}");
             break;
         }
 
         // If a rank is found, apply its properties to the chat message
         if (matchedRank != null)
         {
-            //log.Debug($"Applying properties of matched rank {matchedRank.CustomName} to player {cInfo.playerName}");
-
             // Apply the properties from the matched rank to the chat message
             if (!string.IsNullOrEmpty(matchedRank.CustomName))
-            {
-                chatMessage.AddCustomName(new CF_ChatMessage.CustomName { Tag = matchedRank.CustomName, SortOrder = 0 });
-                //log.Debug($"Applied custom name {matchedRank.CustomName} to player {cInfo.playerName}");
-            }
+                chatMessage.AddCustomName(matchedRank.CustomName);
             else if (!string.IsNullOrEmpty(matchedRank.NameColor))
-            {
-                chatMessage.AddNameColor(new CF_ChatMessage.NameColor { ColorCode = matchedRank.NameColor, SortOrder = 0 });
-                //log.Debug($"Applied name color {matchedRank.NameColor} to player {cInfo.playerName}");
-            }
+                chatMessage.AddNameColor(matchedRank.NameColor);
 
             if (!string.IsNullOrEmpty(matchedRank.ChatColor))
-            {
-                chatMessage.AddChatColor(new CF_ChatMessage.ChatColor { ColorCode = matchedRank.ChatColor, SortOrder = 0 });
-                //log.Debug($"Applied chat color {matchedRank.ChatColor} to player {cInfo.playerName}");
-            }
+                chatMessage.AddChatColor(matchedRank.ChatColor);
 
             if (!string.IsNullOrEmpty(matchedRank.NamePre))
-            {
-                chatMessage.AddNameTagPrefix(new CF_ChatMessage.NameTag { Tag = matchedRank.NamePre, SortOrder = 0, Reset = false });
-                //log.Debug($"Applied name prefix {matchedRank.NamePre} to player {cInfo.playerName}");
-            }
+                chatMessage.AddNameTagPrefix(matchedRank.NamePre);
 
             if (!string.IsNullOrEmpty(matchedRank.NamePost))
-            {
-                chatMessage.AddNameTagPostfix(new CF_ChatMessage.NameTag { Tag = matchedRank.NamePost, SortOrder = 0, Reset = false });
-                //log.Debug($"Applied name postfix {matchedRank.NamePost} to player {cInfo.playerName}");
-            }
-
-            //log.Debug($"Applied everything to player {cInfo.playerName}");
-        }
-        else
-        {
-            //log.Debug($"No matching rank found for player {cInfo.playerName}");
+                chatMessage.AddNameTagPostfix(matchedRank.NamePost);
         }
     }
 }

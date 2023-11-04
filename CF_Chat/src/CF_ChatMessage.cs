@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Epic.OnlineServices.Presence;
+using Epic.OnlineServices.RTCAudio;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Runtime.InteropServices;
+using UnityEngine;
 using static CF_Chat.API;
+using static CF_ChatMessage;
 
 public class CF_ChatMessage
 {
@@ -80,6 +84,22 @@ public class CF_ChatMessage
 
         recipientEntityIds = recipientEntityIds.Distinct().ToList();  // Using Distinct to remove duplicate entity IDs
 
+        /*
+        bSending = true;
+
+        Mod mod = ModEvents.ChatMessage.Invoke(_cInfo, type, _senderEntityId, _msg, _mainName, _localizeMain, _recipientEntityIds);
+        string str = string.Format("Chat (from '{0}', entity id '{1}', to '{2}'): '{3}': {4}", (object)(_cInfo?.PlatformId != null ? _cInfo.PlatformId.CombinedString : "-non-player-"), (object)_senderEntityId, (object)_chatType.ToStringCached<EChatType>(), _localizeMain ? (object)Localization.Get(_mainName) : (object)_mainName, (object)Utils.FilterBbCode(_msg));
+        if (mod != null)
+            Log.Out("Chat handled by mod '{0}': {1}", new object[2]
+            {
+                (object) mod.Name,
+          (object) str
+            });
+        else Log.Out(str);
+
+        bSending = false;
+        */
+
         foreach (int recipientEntityId in recipientEntityIds)
         {
             if (recipientEntityId == -1)
@@ -116,11 +136,13 @@ public class CF_ChatMessage
         if (customNames.Count > 0)
         {
             var customName = customNames.OrderBy(c => c.SortOrder).FirstOrDefault().Tag;
+            log.Out($"{name} => {customName}");
             name = customName;
         }
         else if (nameColors.Count > 0)
         {
             var nameColor = nameColors.OrderBy(c => c.SortOrder).FirstOrDefault().ColorCode;
+            log.Out($"{nameColor + name} = {nameColor} + {name}");
             name = nameColor + name;
         }
     }
@@ -128,8 +150,8 @@ public class CF_ChatMessage
     {
         if (chatColors.Count > 0)
         {
-            var chatColor = chatColors.OrderBy(c => c.SortOrder).FirstOrDefault().ColorCode;
-            msg = $"{chatColor}{msg}";
+            string chatColor = chatColors.OrderBy(c => c.SortOrder)?.FirstOrDefault().ColorCode ?? "[-]";
+            msg = chatColor + msg;
         }
     }
     private void ApplyPreTags()
@@ -154,25 +176,25 @@ public class CF_ChatMessage
             name = name + finalNamePostfix;
         }
     }
-    public void AddNameTagPrefix(NameTag prefix)
+    public void AddNameTagPrefix(string tag, int sortOrder = 0, bool reset = false)
     {
-        namePrefixes.Add(prefix);
+        namePrefixes.Add(new NameTag { Tag = tag, SortOrder = sortOrder, Reset = reset });
     }
-    public void AddNameTagPostfix(NameTag postfix)
+    public void AddNameTagPostfix(string tag, int sortOrder = 0, bool reset = false)
     {
-        namePostfixes.Add(postfix);
+        namePostfixes.Add(new NameTag { Tag = tag, SortOrder = sortOrder, Reset = reset });
     }
-    public void AddNameColor(NameColor color)
+    public void AddNameColor(string color, int sortOrder = 0)
     {
-        nameColors.Add(color);
+        nameColors.Add(new NameColor { ColorCode = color, SortOrder = sortOrder });
     }
-    public void AddCustomName(CustomName customName)
+    public void AddCustomName(string tag, int sortOrder = 0)
     {
-        customNames.Add(customName);
+        customNames.Add(new CustomName { Tag = tag, SortOrder = sortOrder });
     }
-    public void AddChatColor(ChatColor color)
+    public void AddChatColor(string color, int sortOrder = 0)
     {
-        chatColors.Add(color);
+        chatColors.Add(new ChatColor { ColorCode = color, SortOrder = sortOrder });
     }
     public struct NameTag
     {
