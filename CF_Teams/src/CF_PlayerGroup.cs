@@ -35,7 +35,18 @@ public class CF_PlayerGroup
     public bool IsMember(ClientInfo _cInfo) => members.Keys.Contains(_cInfo.InternalId.ReadablePlatformUserIdentifier);
     public bool IsMember(PlatformUserIdentifierAbs _user) => members.Keys.Contains(_user.ReadablePlatformUserIdentifier);
     public PlatformUserIdentifierAbs GetLeader() => PlatformUserIdentifierAbs.FromPlatformAndId("EOS", leader);
-    public string GetLeaderName() => leaderName;
+    public string GetLeaderName()
+    {
+        if(!string.IsNullOrEmpty(leaderName))
+            return leaderName;
+
+        PersistentPlayerData playerData = CF_Player.GetPersistentPlayerData(PlatformUserIdentifierAbs.FromPlatformAndId("EOS", leader));
+        
+        if(playerData != null)
+            leaderName = playerData.PlayerName;
+
+        return leaderName;
+    }
     public string GetOfficersNames()
     {
         List<string> names = new List<string>();

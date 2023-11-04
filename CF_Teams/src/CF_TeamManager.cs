@@ -13,7 +13,6 @@ public class CF_TeamManager
     {
         public Dictionary<string, DateTime> TeamParty { get; set; } = new Dictionary<string, DateTime>();
         public Dictionary<string, DateTime> TeamAlly { get; set; } = new Dictionary<string, DateTime>();
-        public float LastUpdate { get; set; }
         public int CachedTeamSize { get; set; }
     }
     public class TeamDB
@@ -56,7 +55,7 @@ public class CF_TeamManager
             string json;
             lock (lockObject)
             {
-                json = JsonConvert.SerializeObject(playerDataCache);
+                json = JsonConvert.SerializeObject(playerDataCache, Formatting.Indented);
             }
             File.WriteAllText(Path.Combine(mod.modDatabasePath, dbFileName), json);
         }
@@ -118,12 +117,16 @@ public class CF_TeamManager
         if (!CF_Player.TryGetEntityPlayer(_cInfo, out EntityPlayer player))
             return;
 
+        List<string> unique = new List<string>();
         if (player?.Party != null)
         {
             foreach (EntityPlayer pplayer in player.Party.MemberList)
             {
                 string identifier = CF_Player.GetClientInfo(pplayer.entityId).InternalId.ReadablePlatformUserIdentifier;
                 playerData.TeamParty[identifier] = DateTime.UtcNow;
+
+                if(!unique.Contains(identifier))
+                    unique.Add(identifier);
             }
         }
 
@@ -134,8 +137,14 @@ public class CF_TeamManager
             foreach (PlatformUserIdentifierAbs user2 in ppd.ACL)
             {
                 playerData.TeamAlly[user2.ReadablePlatformUserIdentifier] = DateTime.UtcNow;
+
+                if (!unique.Contains(user2.ReadablePlatformUserIdentifier))
+                    unique.Add(user2.ReadablePlatformUserIdentifier);
             }
         }
+
+        if (!string.IsNullOrEmpty(cvCachedTeamSize))
+            player.SetCVar(cvTeamSize, unique.Count);
 
         playerData.CachedTeamSize = FilterByTimeSpan(playerData.TeamParty, teamSizeCacheDuration).Count + FilterByTimeSpan(playerData.TeamAlly, teamSizeCacheDuration).Count;
 
@@ -223,11 +232,11 @@ public class CF_TeamManager
         PersistentPlayerData pData = CF_Player.GetPersistentPlayerData(otherPlayerID);
         string nameOther = cInfoOther != null ? cInfoOther.playerName : pData?.PlayerName ?? "";
 
-        log.Out($"OnRemovedPost :: {cInfo.playerName} removed {nameOther}.");
+        //log.Out($"OnRemovedPost :: {cInfo.playerName} removed {nameOther}.");
 
         if (!GetGroup(playerID, out CF_PlayerGroup group))
         {
-            log.Error($"OnRemovedPost :: {cInfo.playerName} removed {nameOther} but was not in a group.");
+            log.Warn($"OnRemovedPost :: {cInfo.playerName} removed {nameOther} but was not in a group.");
             return;
         }
 
@@ -255,46 +264,41 @@ public class CF_TeamManager
         GetGroup(playerID, out CF_PlayerGroup group);
         GetGroup(otherPlayerID, out CF_PlayerGroup groupOther);
 
-        // Already in group
-        if (group != groupOther && group != null && group.members.Count > 1)
+        // Removed from old group
+        if(group != null)
         {
-            CF_Player.Message($"{prefix} {cInfo.playerName} can not accept your invite while being in another group already.", cInfoOther);
-            CF_Player.Message($"{prefix} You can't accept the invite from {cInfoOther.playerName}, you are already in another group. Type !group info for details.", cInfo);
-            log.Out($"{cInfo.playerName} tried to accept an invite from  {cInfoOther.playerName} but is already in a group with more then 1 player (Leader: )");
-            return false;
+            if (group.members.Count <= 1)
+                RemoveGroup(group);
+            else group.RemoveMember(playerID);
+            ClearAllies(playerID);
+            SaveData();
+        }
+
+        if (groupOther != null)
+        {
+            if (groupOther.members.Count >= groupLimit)
+            {
+                CF_Player.Message($"{prefix} The group reached already the full member size. Max {groupLimit} members.", cInfo);
+                return false;
+            }
+
+            // Same group
+            if (group == groupOther)
+                return true;
         }
 
         // Create new group
         if (groupOther == null)
         {
             CF_PlayerGroup groupNew = new CF_PlayerGroup(cInfoOther, cInfo);
-
+            groupNew.leaderName = cInfoOther.playerName;
             playerDataCache.Groups.Add(cInfoOther.InternalId.ReadablePlatformUserIdentifier, groupNew);
-
             log.Out($"{cInfoOther.playerName} created a new group.");
             CF_Player.Message($"{prefix} You successfully created a new group. Use !group to add a name and tag.", cInfoOther);
             CF_Player.Message($"{prefix} {cInfo.playerName} has accepted your invite, you are now leader of your group.", cInfoOther);
             CF_Player.Message($"{prefix} You are now in the group of {cInfoOther.playerName}, type !group for more info.", cInfo);
-
             SaveData();
-
             return true;
-        }
-
-        // Same group
-        if (group == groupOther)
-        {
-            //log.Out($"Both players are already in the same group. Allow.", false, "GroupSystem");
-            return true;
-        }
-
-        // Max team size
-        if (groupOther.members.Count >= groupLimit)
-        {
-            CF_Player.Message($"{prefix} {cInfo.playerName} can not accept your invite, your group has reached the max team size already.", cInfoOther);
-            CF_Player.Message($"{prefix} You can't accept the invite from {cInfoOther.playerName}, the group has reached the max team size already.", cInfo);
-            log.Out($"{cInfo.playerName} tried to accept an invite from {cInfoOther.playerName} but target group reached already max team size.");
-            return false;
         }
 
         // Add as member to group
@@ -317,77 +321,27 @@ public class CF_TeamManager
         GetGroup(playerID, out CF_PlayerGroup group);
         GetGroup(otherPlayerID, out CF_PlayerGroup groupOther);
 
-        // Both players are not in a group yet
-        if (group == null && groupOther == null)
+        if(group != null)
         {
-            //log.Out($"Both players are not in a group yet. Allow.", false, "GroupSystem");
-            CF_Player.Message($"{prefix} You invited {cInfoOther.playerName}.", cInfo);
-            CF_Player.Message($"{prefix} {cInfo.playerName} invited you. (new group)", cInfoOther);
-            return true;
-        }
-
-        // Same group
-        if (group == groupOther)
-        {
-            //log.Out($"OnInvitePre :: Both players are already in the same group. Allow.", false, "GroupSystem");
-            CF_Player.Message($"{prefix} You invited {cInfoOther.playerName}.", cInfo);
-            CF_Player.Message($"{prefix} {cInfo.playerName} invited you, you are aleady n the sam group.", cInfoOther);
-            return true;
-        }
-
-        // Only target player is in a group
-        if (group == null && groupOther != null)
-        {
-            if (groupOther.members.Count == 1)
-            {
-                //log.Out($"OnInvitePre :: {cInfoOther.playerName} is the only member in his group. Lets remove it! Allow.", false, "GroupSystem");
-                CF_Player.Message($"{prefix} You invited {cInfoOther.playerName}.", cInfo);
-                CF_Player.Message($"{prefix} {cInfo.playerName} invited you. (new group)", cInfoOther);
-                playerDataCache.Groups.Remove(groupOther.leader);
-                SaveData();
-                return true;
-            }
-
-            log.Out($"{cInfoOther.playerName} is already in a group with members. Declined.");
-            CF_Player.Message($"{prefix} {cInfoOther.playerName} is already in a group, their group leader or an officer has to invite you first.", cInfo);
-            CF_Player.Message($"{prefix} {cInfo.playerName} tried to invite you, but you are already in a group.", cInfoOther);
-            return false;
-        }
-
-        // Only inviting player is in a group
-        if (group != null && (groupOther == null || groupOther.members.Count <= 1))
-        {
-            bool leader = group.IsLeader(playerID);
-            bool officer = group.IsOfficer(playerID);
-
-            // Check Leader or Officer
-            if (!leader && !officer)
-            {
-                log.Out($"{cInfo.playerName} has no permission to invite. Decline.");
-                CF_Player.Message($"{prefix} Only the leader or an officer of your group can invite new players.", cInfo);
-                CF_Player.Message($"{prefix} {cInfo.playerName} tried to invite you, but has no leader or officer permission.", cInfoOther);
-                return false;
-            }
-
-            // Check team size
             if (group.members.Count >= groupLimit)
             {
-                log.Out($"Max group size reached. Decline.");
-                CF_Player.Message($"{prefix} Your group reached already the full member size.", cInfo);
+                CF_Player.Message($"{prefix} Your group reached already the full member size. Max {groupLimit} members.", cInfo);
                 CF_Player.Message($"{prefix} {cInfo.playerName} tried to invite you, but the group reached already the limit of {groupLimit} members.", cInfoOther);
                 return false;
             }
-
-            CF_Player.Message($"{prefix} You invited {cInfoOther.playerName}.", cInfo);
-            CF_Player.Message($"{prefix} {cInfo.playerName} invited you to join {group.groupName} (Tag: {group.groupTag} Membercount: {group.members.Count})", cInfoOther);
-            //log.Out($"Allow.", false, "GroupSystem");
-            return true;
         }
 
-        // WTF?
-        log.Out($"Decline. Already in a group with at least 2 members");
-        CF_Player.Message($"{prefix} Invite failed. {cInfoOther.playerName} is already in a different group. he needs to type '!group leave' before he can become invited by a different group.", cInfo);
-        return false;
+        if (group != null && group.members.Count > 1 && 
+            groupOther != null && groupOther.members.Count > 1)
+        {
+            CF_Player.Message($"{prefix} You are both in different groups already with 2 or more members, one of you has to leave their group first using '!group leave' in chat.", cInfo);
+            CF_Player.Message($"{prefix} {cInfo.playerName} has tried to invite you, but you are both in different groups already with 2 or more members, one of you has to leave their group first using '!group leave' in chat.", cInfoOther);
+            return false;
+        }
+
+        CF_Player.Message($"{prefix} You invited {cInfoOther.playerName}.", cInfo);
+        CF_Player.Message($"{prefix} {cInfo.playerName} invited you.", cInfoOther);
+        return true;
     }
     public static void KickMember(ClientInfo _cInfo, List<string> _argList)
     {
@@ -703,7 +657,7 @@ public class CF_TeamManager
             }
         }
     }
-    public static void ExecCommand(ClientInfo _cInfo, List<string> _argList)
+    public static void ExecCommand(ClientInfo _cInfo, string _cmd, List<string> _argList)
     {
         if (_argList.Count > 0)
         {
@@ -725,14 +679,6 @@ public class CF_TeamManager
                 case "leave":
                     Leave(_cInfo, _argList);
                     return;
-                case "promote":
-                    return;
-                case "demote":
-                    return;
-                case "makeleader":
-                    return;
-                case "delete":
-                    return;
             }
         }
 
@@ -740,7 +686,7 @@ public class CF_TeamManager
         CF_Player.Message($"Usage:", _cInfo);
         CF_Player.Message($"!group info - Group info & member list", _cInfo);
         CF_Player.Message($"!group leave - Leave your group", _cInfo);
-        CF_Player.Message($"!group kick <ID> - Kick member (only needed if you are not allied)", _cInfo);
+        CF_Player.Message($"!group kick <ID> - Kick member", _cInfo);
         CF_Player.Message($"!group setname <name> - Set group name", _cInfo);
         CF_Player.Message($"!group settag <name> - Set group chat tag", _cInfo);
     }
