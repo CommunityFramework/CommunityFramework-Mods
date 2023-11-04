@@ -136,7 +136,7 @@ public class CF_Player
     {
         if (!TryGetEntityPlayer(_cInfo, out EntityPlayer _player) || !_player.IsAlive() || !_player.IsSpawned())
         {
-            throw new Exception($"GameEvent can't be triggered only on alive players: {_cInfo}");
+            return false;
         }
 
         GameEventManager.Current.HandleAction(_sequenceName, null, _player, false, "");
