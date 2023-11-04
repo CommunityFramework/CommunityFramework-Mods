@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using HarmonyLib;
-using Platform;
+using System.IO;
 
 namespace CF_PlayerDatabase
 {
@@ -15,30 +15,25 @@ namespace CF_PlayerDatabase
         // Harmony injections are an important tool for modding this game. Please visit https://harmony.pardeike.net/articles/intro.html for more infos
         public static Harmony harmony = new Harmony("CF_PlayerDatabase");
         // Simply helper we use from CF_Core to store data to a json file which contains some data about players
-        public static CF_PlayerDB dbClass = null;
-        public static CF_JsonFile<CF_PlayerDB> db = new CF_JsonFile<CF_PlayerDB>(mod.modDatabasePath + "/Players.json", dbClass, Formatting.None);
+        public static CF_PlayerDB database;
+        //public static CF_JsonFile<CF_PlayerDB> db = new CF_JsonFile<CF_PlayerDB>(mod.modDatabasePath + "/Players.json", dbClass, Formatting.None);
 
-        // This is our entry point which is usually our Main() in C#
-        // More info can be found here: https://7daystodie.fandom.com/wiki/ModAPI
+        public static string fileName = "Players.json";
+        public static string filePath;
         public void InitMod(Mod _modInstance)
         {
             mod.Activate(true); // Load settings & phrases
 
-            if (!db.Load(out CF_PlayerDB data, out string err))
-            {
-                log.Error($"Could not load database: {err}");
-                db.data = new CF_PlayerDB();
-                db.Save();
-                CF_PlayerDB.Save();
-            }
-            else
-            {
-                log.Out($"Loaded {CF_PlayerDB.players.Count} players.");
-            }
+            filePath = Path.Combine(mod.modDatabasePath, fileName);
+
+            // Initialize FileSystemWatcher to listen for changes
+            InitializeFileWatcher();
+
+            LoadDatabase();
 
             harmony.PatchAll(); // Patch all harmony injections across all files of this project
 
-            ModEvents.PlayerSpawning.RegisterHandler(OnPlayerSpawning); 
+            ModEvents.PlayerSpawning.RegisterHandler(OnPlayerSpawning);
             ModEvents.PlayerSpawnedInWorld.RegisterHandler(OnPlayerSpawnedInWorld);
         }
         // Phrases
@@ -70,19 +65,19 @@ namespace CF_PlayerDatabase
         // Called when the player is spawning, a teleport by a closed trader is also a spawn, check the respawn reason depending on what you want to do
         public static void OnPlayerSpawnedInWorld(ClientInfo _cInfo, RespawnType _respawnReason, Vector3i _pos)
         {
-            if (db == null)
+            if (database == null)
             {
                 log.Out("db is null.");
                 return;
             }
 
-            if (db.data == null)
+            if (database.players == null)
             {
                 log.Out("db.data is null.");
                 return;
             }
 
-            if (!CF_PlayerDB.TryGetPlayer(_cInfo, out PlayerDBEntry _playerData, true))
+            if (!database.TryGetPlayer(_cInfo, out PlayerDBEntry _playerData, true))
                 return;
 
             if (_cInfo == null)
@@ -132,9 +127,53 @@ namespace CF_PlayerDatabase
                     , _cInfo);
             }
         }
+        private void InitializeFileWatcher()
+        {
+            FileSystemWatcher watcher = new FileSystemWatcher
+            {
+                Path = filePath,
+                NotifyFilter = NotifyFilters.LastWrite
+            };
+
+            watcher.Changed += OnChanged;
+            watcher.EnableRaisingEvents = true;
+        }
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
+            LoadDatabase();
+        }
+        public static void LoadDatabase()
+        {
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    SaveDatabase();
+                }
+
+                string jsonData = File.ReadAllText(filePath);
+                database = JsonConvert.DeserializeObject<CF_PlayerDB>(jsonData);
+            }
+            catch (Exception e)
+            {
+                log.Error($"LoadDatabase reported: {e.Message}");
+            }
+        }
+        public static void SaveDatabase()
+        {
+            try
+            {
+                string jsonData = JsonConvert.SerializeObject(database, Formatting.Indented);
+                File.WriteAllText(filePath, jsonData);
+            }
+            catch (Exception e)
+            {
+                log.Error($"SaveDatabase reported: {e.Message}");
+            }
+        }
         public static void OnPlayerChat(ClientInfo _cInfo, string _message, List<string> _recipients, EChatType _type)
         {
-            if (CF_PlayerDB.TryGetPlayer(_cInfo, out PlayerDBEntry playerData))
+            if (database.TryGetPlayer(_cInfo, out PlayerDBEntry playerData))
             {
                 if (playerData.isMuted)
                 {
