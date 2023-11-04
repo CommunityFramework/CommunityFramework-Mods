@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using static CF_ZonesManager.API;
+using System.Security.Policy;
 
 public class CF_Zones
 {
@@ -29,6 +30,10 @@ public class CF_Zones
     public static void RegisterZoneTickCallback(string _className, Action<EntityPlayer, CF_ZoneAlive> _callback)
     {
         TickCallbacks.Add(_className, _callback);
+    }
+    public static void AddZone(CF_ZoneAlive zone)
+    {
+        Zones[zone.UniqueName] = zone;
     }
     public static List<CF_ZoneAlive> GetZonesForPlayerPosition(EntityPlayer _player, string _className = "", string _group = "", bool _distinct = true) => GetZonesForPosition(_player.position, _className, _group, _distinct);
     public static List<CF_ZoneAlive> GetZonesForPosition(Vector3 _pos, string _className = "", string _group = "", bool _distinct = true)
@@ -182,7 +187,7 @@ public class CF_Zones
     {
         if (!File.Exists(filePathZones))
         {
-            //Zones.add
+            AddDefaultZones();
             SaveZonesToFile();
             return;
         }
@@ -198,7 +203,42 @@ public class CF_Zones
     Zones.ToDictionary(
         k => k.Key,
         v => (CF_Zone)v.Value);
-        var json = JsonConvert.SerializeObject(baseZones);
+        var json = JsonConvert.SerializeObject(baseZones, Formatting.Indented);
         File.WriteAllText(filePathZones, json);
+    }
+    public static void AddDefaultZones()
+    {
+        CF_ZoneAlive innerZone = new CF_ZoneAlive("PlayableMap", "-4000 -4000", "4000 4000");
+        AddZone(innerZone);
+
+        CF_ZoneAlive borderZone = new CF_ZoneAlive("MapBorder", "-100000 -100000", "100000 100000");
+        borderZone.AddExclusionZone(innerZone);
+        AddZone(borderZone);
+
+        CF_ZoneAlive centerZone = new CF_ZoneAlive("MapCenter", "-100 -100", "100 100");
+        AddZone(centerZone);
+    }
+    public static void RegisterDefaultZoneClasses()
+    {
+        // Class for sending a chat message on entering the zone
+        CF_ZoneClass enterMessageClass = new CF_ZoneClass("EnterMessageClass");
+        enterMessageClass.DataString["ChatMessage"] = "Welcome to the Zone!";
+        enterMessageClass.DataString["RecipientMode"] = "PlayerOnly";
+        enterMessageClass.DataString["TriggerMode"] = "Enter";
+        RegisterZoneClass("EnterMessageClass", enterMessageClass);
+
+        // Class for sending a chat message on leaving the zone
+        CF_ZoneClass leaveMessageClass = new CF_ZoneClass("LeaveMessageClass");
+        leaveMessageClass.DataString["ChatMessage"] = "You are leaving the Zone!";
+        leaveMessageClass.DataString["RecipientMode"] = "Everyone";
+        leaveMessageClass.DataString["TriggerMode"] = "Leave";
+        RegisterZoneClass("LeaveMessageClass", leaveMessageClass);
+
+        // Class for sending a chat message to friends on entering the zone
+        CF_ZoneClass enterFriendsMessageClass = new CF_ZoneClass("EnterFriendsMessageClass");
+        enterFriendsMessageClass.DataString["ChatMessage"] = "Your friend has entered the Zone!";
+        enterFriendsMessageClass.DataString["RecipientMode"] = "Friends";
+        enterFriendsMessageClass.DataString["TriggerMode"] = "Enter";
+        RegisterZoneClass("EnterFriendsMessageClass", enterFriendsMessageClass);
     }
 }
