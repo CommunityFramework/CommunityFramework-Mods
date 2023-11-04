@@ -155,7 +155,6 @@
     <Compile Include="src\NoNamespace\CF_Item.cs" />
     <Compile Include="src\NoNamespace\CF_BloodMoon.cs" />
     <Compile Include="src\NoNamespace\CF_Claim.cs" />
-    <Compile Include="src\NoNamespace\CF_JsonFile.cs" />
     <Compile Include="src\NoNamespace\CF_Log.cs" />
     <Compile Include="src\NoNamespace\CF_Timer.cs" />
     <Compile Include="src\NoNamespace\CF_Format.cs" />
