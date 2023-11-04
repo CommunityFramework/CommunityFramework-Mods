@@ -59,21 +59,21 @@ namespace CF_Firewall
                     ||(ipHubVpnSensitivity == 1 && data.block >= 1))
                     )
                 {
-                    Ban(_cInfo, "VPN", $"Detected VPN => [{data.countryCode}] IP: {_cInfo.ip} ASN: {data.isp} ({data.asn}) Block: {data.block}");
+                    Ban(_cInfo, banReasonVPN, $"Detected VPN => [{data.countryCode}] IP: {_cInfo.ip} ASN: {data.isp} ({data.asn}) Block: {data.block}");
                     return false;
                 }
 
                 // Blacklisted ASN
                 if (AnsInBlacklist(data.asn))
                 {
-                    Ban(_cInfo, "Region", $"Detected blocked ASN => [{data.countryCode}] IP: {_cInfo.ip} ASN: {data.isp} ({data.asn})");
+                    Ban(_cInfo, banReasonASN, $"Detected blocked ASN => [{data.countryCode}] IP: {_cInfo.ip} ASN: {data.isp} ({data.asn})");
                     return false;
                 }
 
-                // Blacklsited country
+                // Blacklisted country
                 if (ipHubCountryMode == 1 && ipHubCountryList.ContainsCaseInsensitive(data.countryCode) && !CF_Whitelist.Country(_cInfo))
                 {
-                    Ban(_cInfo, "Country", $"Detected blocked country => [{data.countryCode}]");
+                    Ban(_cInfo, banReasonCountry, $"Detected blocked country => [{data.countryCode}]");
                     return false;
                 }
             }

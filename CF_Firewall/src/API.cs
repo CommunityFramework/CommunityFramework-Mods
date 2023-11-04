@@ -53,6 +53,14 @@ namespace CF_Firewall
         public static bool steamCommunityBan;
         public static int steamMaxDaysSinceLastBan;
 
+        public static string banReasonASN;
+        public static string banReasonVPN;
+        public static string banReasonCountry;
+        public static string banReasonIP;
+        public static string banReasonVAC;
+        public static string banReasonGameBan;
+        public static string banReasonCommunityBan;
+        public static string banReasonFamilySharing;
         public static void OnConfigLoaded()
         {
             mod.AddSetting("Ban_IP", false, "Ban IP when banned.", out banIP);
@@ -76,6 +84,17 @@ namespace CF_Firewall
             mod.AddSetting("Steam_GameBan", true, "Ban if game banned.", out steamGameBan);
             mod.AddSetting("Steam_CommunityBan", true, "Ban if community banned.", out steamCommunityBan);
             mod.AddSetting("Steam_MaxBanDaysAgo", 500, 0, 999999, "Only ban player if last ban was less then set amount of days ago (0: Disable).", out steamMaxDaysSinceLastBan);
+
+
+            mod.AddSetting("BanReason_Region", "Region", "", "Ban region when banned by ASN", out banReasonASN);
+            mod.AddSetting("BanReason_VPN", "Region", "", "Ban region when banned by ASN", out banReasonVPN);
+            mod.AddSetting("BanReason_Country", "Country", "", "Ban region when banned by Country", out banReasonCountry);
+
+            mod.AddSetting("BanReason_IP", "IP", "", "Ban region when banned by IP", out banReasonIP);
+            mod.AddSetting("BanReason_VAC", "VAC", "", "Ban region when banned by VAC", out banReasonVAC);
+            mod.AddSetting("BanReason_GameBan", "Game Ban", "", "Ban region when banned by Steam game ban", out banReasonGameBan);
+            mod.AddSetting("BanReason_CommunityBan", "Community Ban", "", "Ban region when banned by Steam community ban", out banReasonCommunityBan);
+            mod.AddSetting("BanReason_FamilySharing", "Family Sharing", "", "Ban region when banned by Steam family sharing", out banReasonFamilySharing);
 
             string[] AsnListA = ipHubAsnListA.Split(',');
             IpHubAsnListA.Clear();
@@ -188,12 +207,12 @@ namespace CF_Firewall
         }
         public static void SaveIPdata()
         {
-            File.WriteAllText(filePathIPdata, JsonConvert.SerializeObject(checkedIPs, Newtonsoft.Json.Formatting.Indented));
+            File.WriteAllText(filePathIPdata, JsonConvert.SerializeObject(checkedIPs, Formatting.Indented));
         }
         public static void CheckPlayer(ClientInfo _cInfo, int _chunkViewDim, PlayerProfile _playerProfile)
         {
             if (checkedIPs.TryGetValue(_cInfo.ip, out CheckedIP checkedIP) && checkedIP.ipBan)
-                Ban(_cInfo, "IP Ban", "Joined with already banned IP");
+                Ban(_cInfo, banReasonIP, "Joined with already banned IP");
 
             if (!string.IsNullOrEmpty(ipHubToken) && (ipHubVpnMode >= 0 || ipHubCountryMode >= 0))
             {
@@ -220,7 +239,7 @@ namespace CF_Firewall
                             Ban(PlatformUserIdentifierAbs.FromPlatformAndId("STEAM", steam.OwnerId.ReadablePlatformUserIdentifier), _cInfo.playerName, "FamilySharing", "Owner Account");
                         */
 
-                        Ban(_cInfo, "FamilySharing", "User Account");
+                        Ban(_cInfo, banReasonFamilySharing, "User Account");
                     }
                 }
                 catch (Exception e) { log.Error($"CheckPlayer.FamilyShare reported: {e}"); }

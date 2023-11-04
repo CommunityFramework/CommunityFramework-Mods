@@ -19,11 +19,11 @@ namespace CF_Firewall
             }
 
             if (steamVacBan && response.Players[0].VACBanned)
-                Ban(_cInfo, "Profile Ban", $"Detected VAC ban");
+                Ban(_cInfo, banReasonVAC, $"Detected VAC ban");
             if (steamGameBan && response.Players[0].NumberOfGameBans > 0)
-                Ban(_cInfo, "Profile Ban", $"Detected game ban");
+                Ban(_cInfo, banReasonGameBan, $"Detected game ban");
             if (steamCommunityBan && response.Players[0].CommunityBanned)
-                Ban(_cInfo, "Profile Ban", $"Detected community ban");
+                Ban(_cInfo, banReasonCommunityBan, $"Detected community ban");
         }
     }
 }

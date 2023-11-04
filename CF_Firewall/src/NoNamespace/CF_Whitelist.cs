@@ -60,7 +60,7 @@ public class CF_Whitelist
     }
     public static void Save()
     {
-        File.WriteAllText(filePathWhitelist, JsonConvert.SerializeObject(whitelist, Newtonsoft.Json.Formatting.Indented));
+        File.WriteAllText(filePathWhitelist, JsonConvert.SerializeObject(whitelist, Formatting.Indented));
         log.Debug($"Saved whitelist to {filePathWhitelist}.");
     }
 }
