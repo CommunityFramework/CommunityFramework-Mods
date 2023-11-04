@@ -134,7 +134,11 @@ public class CF_HitLogEntry
         sb.Append($"{victimName} ({victimId}) ");
         sb.Append($"causing {damage} dmg ");
         sb.Append($"{hitbox.ToStringCached().Replace("Upper", "Up").Replace("Lower", "Lo")} from {direction} {Distance():F1}m away ");
-        sb.Append($"Type: {damageSrc.ToStringCached()} - {damageTyp.ToStringCached()}");
+
+        if(damageSrc == EnumDamageSource.External)
+            sb.Append($"Type: {damageTyp.ToStringCached()} (E) ");
+        else sb.Append($"Type: {damageTyp.ToStringCached()} (I) ");
+
         if (armorRating > 0)
             sb.Append($"Armor: {armorRatingEff:F1} ({armorRating:F1}) Pen: {GetArmorPenetration():P1} ({armorDamage} ad) ");
         sb.Append($"using {weaponNameWithMods} ");

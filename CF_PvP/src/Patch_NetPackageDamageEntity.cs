@@ -39,20 +39,20 @@ namespace CF_PvP
 
                 if (!playerV.Spawned)
                 {
-                    log.Warn($"Victim not spawned. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    log.Warn($"Victim not spawned. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}.");
                     //allow = false;
                 }
 
                 if (!playerA.IsAlive())
                 {
-                    log.Warn($"Attacker not alive. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    log.Warn($"Attacker not alive. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}.");
                     //allow = false;
                 }
 
                 // If the player died decently then he may be shown where he died as tpose and can get damage while respawned somewher else already
                 if (fatalHitTime.TryGetValue(___entityId, out DateTime lastHit) && (DateTime.UtcNow - lastHit) < fatalHitThreshold)
                 {
-                    log.Warn($"Victim already dead. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
+                    log.Warn($"Victim already dead. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}.");
                     //allow = false;
                 }
 
@@ -61,8 +61,8 @@ namespace CF_PvP
 
                 if (___attackerEntityId != __instance.Sender.entityId)
                 {
-                    log.Warn($"Invalid attacker. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}. Blocked.");
-                    allow = false;
+                    log.Warn($"Invalid attacker. Attacker: {___attackerEntityId} sender: {__instance.Sender.entityId} Target: {___entityId}.");
+                    //allow = false;
                 }
 
                 float distance = Vector3.Distance(playerA.position, playerV.position);
