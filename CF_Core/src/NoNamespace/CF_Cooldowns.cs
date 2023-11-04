@@ -8,29 +8,30 @@ public class CF_Cooldowns
 {
     // Use ConcurrentDictionary for better thread-safety and performance
     private static ConcurrentDictionary<int, ConcurrentDictionary<string, DateTime>> cooldownData = new ConcurrentDictionary<int, ConcurrentDictionary<string, DateTime>>();
-    private static string filePath = "Cooldowns.json";
-    private static Lazy<FileSystemWatcher> fileWatcher = new Lazy<FileSystemWatcher>(InitializeFileWatcher);
+    private static string filePath;
+    private static string fileName = "Cooldowns.json";
+    private static FileSystemWatcher fileWatcher;
     private static bool savePending = false;
-    static CF_Cooldowns()
+    public static void Init(CF_Mod mod)
     {
-        // Initialize the file watcher lazily
-        var _ = fileWatcher.Value;
+        filePath = Path.Combine(mod.modDatabasePath, fileName);
         Load();
+        InitializeFileWatcher();
     }
     private static FileSystemWatcher InitializeFileWatcher()
     {
-        var watcher = new FileSystemWatcher(Path.GetDirectoryName(filePath), Path.GetFileName(filePath));
+        var watcher = new FileSystemWatcher(filePath);
         watcher.Changed += OnFileChanged;
         watcher.EnableRaisingEvents = true;
         return watcher;
     }
     public static void Load()
     {
-        if (File.Exists(filePath))
-        {
-            string json = File.ReadAllText(filePath);
-            cooldownData = JsonConvert.DeserializeObject<ConcurrentDictionary<int, ConcurrentDictionary<string, DateTime>>>(json);
-        }
+        if (!File.Exists(filePath))
+            Save();
+
+        string json = File.ReadAllText(filePath);
+        cooldownData = JsonConvert.DeserializeObject<ConcurrentDictionary<int, ConcurrentDictionary<string, DateTime>>>(json);
     }
     public static async void Save()
     {
