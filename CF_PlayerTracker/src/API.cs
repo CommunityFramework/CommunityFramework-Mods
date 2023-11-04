@@ -1,12 +1,12 @@
 ﻿using HarmonyLib;
 
-namespace CF_PlayerMonitor
+namespace CF_PlayerTracker
 {
     public class API : IModApi
     {
-        public static CF_Mod mod = new CF_Mod("CF_PlayerMonitor", OnConfigLoaded, OnPhrasesLoaded);
-        public static CF_Log log = new CF_Log("CF_PlayerMonitor");
-        Harmony harmony = new Harmony("CF_PlayerMonitor");
+        public static CF_Mod mod = new CF_Mod("CF_PlayerTracker", OnConfigLoaded, OnPhrasesLoaded);
+        public static CF_Log log = new CF_Log("CF_PlayerTracker");
+        Harmony harmony = new Harmony("CF_PlayerTracker");
 
         public void InitMod(Mod _modInstance)
         {

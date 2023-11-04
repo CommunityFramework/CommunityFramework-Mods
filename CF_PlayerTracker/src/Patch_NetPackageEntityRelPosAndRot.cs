@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static CF_PlayerMonitor.API;
+using static CF_PlayerTracker.API;
 
-namespace CF_PlayerMonitor
+namespace CF_PlayerTracker
 {
     [HarmonyPatch(typeof(NetPackageEntityRelPosAndRot), "ProcessPackage")]
     public class Patch_NetPackageEntityRelPosAndRot

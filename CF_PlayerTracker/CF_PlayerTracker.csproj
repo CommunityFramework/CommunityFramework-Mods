@@ -158,8 +158,8 @@
     <Compile Include="src\Patch_NetPackageEntityRotation.cs" />
     <Compile Include="src\Patch_NetPackageEntityTeleport.cs" />
     <Compile Include="src\Patch_NetPackageEntityVelocity.cs" />
-    <Compile Include="src\NoNamespace\CF_PlayerTracker.cs" />
-    <Compile Include="src\NoNamespace\CF_PlayerTrackerEntry.cs" />
+    <Compile Include="src\NoNamespace\CF_PlayerTrackerManager.cs" />
+    <Compile Include="src\NoNamespace\CF_PlayerTrackerPosData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
